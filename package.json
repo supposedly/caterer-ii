@@ -1,0 +1,10 @@
+{
+    "name": "caterer-ii",
+    "version": "0.1.0",
+    "private": true,
+    "type": "module",
+    "main": "lib/index.js",
+    "devDependencies": {
+        "typescript": "^5.9.3"
+    }
+}
