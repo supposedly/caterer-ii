@@ -141,14 +141,19 @@ const COMMANDS: {[key: string]: (msg: Message, argv: string[]) => void | Promise
     },
 
     async sim(msg: Message, argv: string[]): Promise<void> {
-        let parts: string[][] = [];
-        let currentPart: string[] = [];
+        let parts: (string | number)[][] = [];
+        let currentPart: (string | number)[] = [];
         for (let arg of argv.slice(1)) {
             if (arg === '>') {
                 parts.push(currentPart);
                 currentPart = [];
             } else {
-                currentPart.push(arg);
+                let num = parseInt(arg);
+                if (Number.isNaN(num)) {
+                    currentPart.push(arg);
+                } else {
+                    currentPart.push(num);
+                }
             }
         }
         parts.push(currentPart);
@@ -157,11 +162,27 @@ const COMMANDS: {[key: string]: (msg: Message, argv: string[]) => void | Promise
             throw new Error('Cannot find RLE');
         }
         let frames: Pattern[] = [pattern.copy()];
+        let time = 5;
         for (let part of parts) {
-            let num = parseInt(part[0]);
-            if (!Number.isNaN(num)) {
-                for (let i = 1; i < num; i++) {
-                    pattern.runGeneration();
+            if (typeof part[0] === 'number') {
+                if (typeof part[1] === 'number') {
+                    for (let i = parts.length > 1 ? 0 : 1; i < Math.ceil(part[0] / part[1]); i++) {
+                        pattern.run(part[1]);
+                        frames.push(pattern.copy());
+                    }
+                } else if (typeof part[1] === 'string') {
+                    throw new Error(`Invalid !sim command: ${part.join(' ')}`);
+                } else {
+                    for (let i = parts.length > 1 ? 0 : 1; i < part[0]; i++) {
+                        pattern.runGeneration();
+                        frames.push(pattern.copy());
+                    }
+                }
+            } else if (part[0] === 'wait') {
+                if (typeof part[1] !== 'number' || part.length > 2) {
+                    throw new Error(`Invalid !sim command: ${part.join(' ')}`);
+                }
+                for (let i = 0; i < part[1]; i++) {
                     frames.push(pattern.copy());
                 }
             } else {
@@ -183,7 +204,7 @@ const COMMANDS: {[key: string]: (msg: Message, argv: string[]) => void | Promise
             alphaThreshold: 0,
             quality: 1,
         });
-        let frameTime = Math.ceil(500 / frames.length) * 10;
+        let frameTime = Math.ceil(time * 100 / frames.length) * 10;
         for (let p of frames) {
             let i = 0;
             let startY = p.yOffset - minY;
