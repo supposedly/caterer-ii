@@ -302,7 +302,7 @@ const COMMANDS: {[key: string]: (msg: Message, argv: string[]) => void | Promise
         for (let line of data) {
             let [pop, rule, dx, dy, period, rle] = line.split(', ');
             if (speed.p === parseInt(period) && speed.x === parseInt(dx) && speed.y === parseInt(dy)) {
-                rle = parse(`x = 0, y = 0, rule = ${rule}\n${rle}`).shrinkToFit().toRLE();
+                rle = parse(`x = 0, y = 0, rule = ${rule}\n${rle}`).toRLE();
                 await msg.reply(`\`\`\`\n#C (${dx}, ${dy})c/${period}, population ${pop}\n${rle}\`\`\``)
             }
         }
