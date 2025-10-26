@@ -30,6 +30,45 @@ async function findRLE(channel: Message['channel']): Promise<Pattern | null> {
     return null;
 }
 
+function parseSpeed(speed: string): {p: number, x: number, y: number} {
+    if (!speed.includes('c')) {
+        throw new Error('Invalid speed!');
+    }
+    let [disp, period] = speed.split('c');
+    if (period.startsWith('/')) {
+        period = period.slice(1);
+    }
+    let p = parseInt(period);
+    let x: number;
+    let y: number;
+    let num = parseInt(disp);
+    if (!Number.isNaN(num)) {
+        x = num;
+        if (period.endsWith('d')) {
+            y = num;
+        } else {
+            y = 0;
+        }
+    } else if (disp.startsWith('(')) {
+        let parts = disp.slice(1, -1).split(',');
+        x = parseInt(parts[1]);
+        y = parseInt(parts[2]);
+        if (Number.isNaN(x) || Number.isNaN(y) || parts.length !== 2) {
+            throw new Error('Invalid speed!');
+        }
+    } else if (disp === '') {
+        x = 1;
+        if (period.endsWith('d')) {
+            y = 1;
+        } else {
+            y = 0;
+        }
+    } else {
+        throw new Error('Invalid speed!');
+    }
+    return {p, x, y};
+}
+
 
 interface Help {
     desc: string;
@@ -51,7 +90,15 @@ const HELP: {[key: string]: Help} = {
     },
     sim: {
         desc: 'Simulate an RLE and output to GIF',
-        syntax: '!sim',
+        syntax: '!sim [parts]',
+    },
+    sssss: {
+        desc: 'Query the 5S database',
+        syntax: '!sssss <speed>',
+    },
+    '5s': {
+        desc: 'Alias for !sssss',
+        syntax: '!5s <speed>',
     },
 };
 
@@ -73,7 +120,7 @@ const COMMANDS: {[key: string]: (msg: Message, argv: string[]) => void | Promise
             if (!(cmd in HELP)) {
                 await msg.reply(`No command called !${cmd}`);
             } else {
-                await msg.reply('```\n!' + cmd + ' - ' + HELP[cmd].desc + '\n\nSyntax:' + HELP[cmd].syntax + '```');
+                await msg.reply('```\n!' + cmd + ' - ' + HELP[cmd].desc + '\n\nSyntax: ' + HELP[cmd].syntax + '```');
             }
         } else {
             await msg.reply(helpMsg);
@@ -238,6 +285,31 @@ const COMMANDS: {[key: string]: (msg: Message, argv: string[]) => void | Promise
         await msg.reply({
             files: ['sim.gif'],
         });
+    },
+
+    async sssss(msg: Message, argv: string[]): Promise<void> {
+        let speed = parseSpeed(argv.slice(1).join(' '));
+        let file = import.meta.dirname + '/../sssss/data/'
+        if (speed.y === 0) {
+            file += 'Orthogonal';
+        } else if (speed.x === speed.y) {
+            file += 'Diagonal';
+        } else {
+            file += 'Oblique';
+        }
+        file += ' ships.sss.txt';
+        let data = (await fs.readFile(file)).toString().split('\n');
+        for (let line of data) {
+            let [pop, rule, dx, dy, period, rle] = line.split(', ');
+            if (speed.p === parseInt(period) && speed.x === parseInt(dx) && speed.y === parseInt(dy)) {
+                rle = parse(`x = 0, y = 0, rule = ${rule}\n${rle}`).toRLE();
+                await msg.reply(`\`\`\`\n#C (${dx}, ${dy})c/${period}, population ${pop}\n${rle}\`\`\``)
+            }
+        }
+    },
+
+    async '5s'(msg: Message, argv: string[]): Promise<void> {
+        await COMMANDS.sssss(msg, argv);
     },
 
 };

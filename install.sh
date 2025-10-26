@@ -6,3 +6,4 @@ pushd lifeweb
 npm install
 npx tsc
 popd
+git clone https://github.com/AforAmpere/sssss
