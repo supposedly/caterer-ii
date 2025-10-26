@@ -181,13 +181,15 @@ const COMMANDS: {[key: string]: (msg: Message, argv: string[]) => void | Promise
         ctx.fillRect(0, 0, width * scale, height * scale);
         let encoder = new CanvasGifEncoder(canvas.width, canvas.height, {
             alphaThreshold: 0,
-            quality: 1
+            quality: 1,
         });
         let frameTime = Math.ceil(500 / frames.length) * 10;
         for (let p of frames) {
             let i = 0;
             let startY = p.yOffset - minY;
             let startX = p.xOffset - minX;
+            ctx.fillStyle = '#36393e';
+            ctx.fillRect(0, 0, width * scale, height * scale);
             for (let y = startY; y < startY + p.height; y++) {
                 for (let x = startX; x < startX + p.width; x++) {
                     ctx.fillStyle = p.data[i++] ? '#ffffff' : '#36393e';
