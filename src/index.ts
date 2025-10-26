@@ -51,8 +51,8 @@ function parseSpeed(speed: string): {p: number, x: number, y: number} {
         }
     } else if (disp.startsWith('(')) {
         let parts = disp.slice(1, -1).split(',');
-        x = parseInt(parts[1]);
-        y = parseInt(parts[2]);
+        x = parseInt(parts[0]);
+        y = parseInt(parts[1]);
         if (Number.isNaN(x) || Number.isNaN(y) || parts.length !== 2) {
             throw new Error('Invalid speed!');
         }
@@ -130,7 +130,7 @@ const COMMANDS: {[key: string]: (msg: Message, argv: string[]) => void | Promise
     async identify(msg: Message, argv: string[]): Promise<void> {
         let limit = 256;
         if (argv[1]) {
-            let parsed = parseInt(argv[1]);
+            let parsed = parseFloat(argv[1]);
             if (!Number.isNaN(parsed)) {
                 limit = parsed;
             }
@@ -208,7 +208,7 @@ const COMMANDS: {[key: string]: (msg: Message, argv: string[]) => void | Promise
         }
         let frameTime = 50;
         let frames: [Pattern, number][] = [[pattern.copy(), frameTime]];
-        let size = 300;
+        let size = 100;
         for (let part of parts) {
             if (part[1] === 'fps' && typeof part[0] === 'number') {
                 frameTime = Math.ceil(100 / part[0]) * 10;
@@ -249,7 +249,7 @@ const COMMANDS: {[key: string]: (msg: Message, argv: string[]) => void | Promise
         let maxY = Math.max(...frames.map(([p]) => p.height + p.yOffset)) + 1;
         let width = maxX - minX;
         let height = maxY - minY;
-        let scale = Math.ceil(size / Math.max(width, height));
+        let scale = Math.ceil(size / Math.min(width, height));
         let canvas = createCanvas(width * scale, height * scale);
         let ctx = canvas.getContext('2d');
         ctx.fillStyle = '#36393e';
@@ -302,7 +302,7 @@ const COMMANDS: {[key: string]: (msg: Message, argv: string[]) => void | Promise
         for (let line of data) {
             let [pop, rule, dx, dy, period, rle] = line.split(', ');
             if (speed.p === parseInt(period) && speed.x === parseInt(dx) && speed.y === parseInt(dy)) {
-                rle = parse(`x = 0, y = 0, rule = ${rule}\n${rle}`).toRLE();
+                rle = parse(`x = 0, y = 0, rule = ${rule}\n${rle}`).shrinkToFit().toRLE();
                 await msg.reply(`\`\`\`\n#C (${dx}, ${dy})c/${period}, population ${pop}\n${rle}\`\`\``)
             }
         }
