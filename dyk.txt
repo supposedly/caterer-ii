@@ -1,0 +1,198 @@
+Content is available under the GNU Free Documentation License 1.2 (https://www.gnu.org/licenses/fdl-1.3.html)
+that the caterpillar contains over 11 million cells, the 0E0P metacell contains over 18 million cells and the unnamed (34,7)c/156 spaceship contains over 25 million cells?
+that the Gosper glider gun was the first pattern to be discovered that exhibits infinite growth?
+that the block-laying switch engine and the glider-producing switch engine (and various combinations of two switch engines) are the only infinitely-growing patterns that are known to have ever occurred naturally from an asymmetric random starting configuration?
+that it wasn't until 2023 that Conway's Game of Life was proven to be omniperiodic?
+that the pentadecathlon and the blinker are the only known oscillators that are polyominoes in more than one phase?
+that it is impossible for any finite oscillator to be a phoenix with any period other than 2?
+that the 16 × 16 soup with the longest known lifespan lasts for over 52,000 generations before stabilizing?
+that replicators with quadratic population growth have been known to exist in Conway's Game of Life since the early 1970s, but none were found until 2018 when Adam P. Goucher constructed the 0E0P metacell?
+that the first known p23 oscillator was not found until 2019, the first known p38 oscillator was not found until 2022, and the first p19 and p41 oscillators were not found until 2023?
+that a pattern whose population grows without bound but does not tend to infinity is known as a sawtooth?
+that there are over 35.4 billion distinct strict still lifes with 34 or fewer cells?
+that some infinitely-growing patterns can be constructed with as few as three gliders?
+that quadratically-growing patterns have been found with as few as 20 initial cells?
+that the blinker is the only known finite oscillator that is one cell thick?
+that Gemini, the first spaceship found in Conway's Game of Life that travels in an oblique direction, was discovered in 2010?
+that there are still lifes (such as the quad pseudo still life) that can be split into four stable islands, but not two or three?
+that no new spaceship speeds were discovered between 1970 and 1989?
+that the first stable reflector was found in October 1996, and the first fast stable reflector appeared in 2013, allowing the construction of oscillators of all periods ≥43 ticks?
+that twenty-two spaceship velocities have been constructed, excluding several infinitely adjustable families of ships?
+that there are 71 distinct ways for two gliders to collide, but it is unknown how many distinct 3-glider collisions there are?
+that to display the smallest known gun pattern for a Gemini spaceship at 1 cell = 1 pixel, on a standard-density video monitor, a screen larger than one square mile would be needed?
+that no odd-period glider guns were known before 1995, when a period 565 p5-spark-assisted B-heptomino loop was constructed by David Buckingham?
+that even though the speed limit for spaceships is c/2 in a vacuum, in a medium of stripes agar there are "spaceships" that can travel at lightspeed along the stripes, or two thirds of lightspeed perpendicular to the stripes?
+that the smallest known spacefiller pattern consists of 107 cells?
+that the smallest known sawtooth pattern in Conway's Life consists of only 168 cells?
+that there are now over two hundred known Herschel conduits, counting stable conduits only, and a much larger number if oscillator-supported conduits are included?
+that the period-21 glider gun discovered in 2021 was the seventh smallest gun in bounding box when found?
+that a pattern exists in which no cell in the unbounded Life plane ever becomes periodic?
+that several different universal constructors in Conway’s Life have been shown to be capable of constructing their own circuitry?
+that there are dozens of known Cordership variants, including puffers, rakes and wickstretchers, with periods of any multiple of 96?
+that greyships have been constructed with speeds of c/2, c/3, c/4, c/5, and 2c/5?
+that most greyships travel parallel to the stripes in their included agars, but a few travel perpendicular to the stripes, or "against the grain"?
+that a pattern has been constructed that calculates and prints out the digits of pi in decimal, and a similar one prints out the decimal digits of the Golden Ratio?
+that several different patterns have been constructed to calculate and display the sequence of prime numbers, and some have been adapted to display only twin primes or Fermat primes?
+that two completely different types of oblique spaceships, the waterbear and the half-baked knightship, were constructed in 2014?
+that no Caterpillar-type spaceships were completed for almost ten years after the original Caterpillar was constructed in 2004, but that two different designs, the waterbear and the centipede, were finished in 2014?
+that the first spiral-growth pattern in Conway's Life was constructed in 2014?
+that among known glider recipes for irreducible objects, the Gemini spaceship has the largest known minimal recipe not counting encoded RCT recipes, currently 173,449 gliders — the runner-up being the self-synthesizing oblique loopship which is its own 144,221-glider synthesis?
+that it was shown in 2014 that any salvo of gliders, no matter how tightly packed, can be constructed by crashing together gliders whose initial positions are farther apart than any chosen finite distance?
+that no spaceships with velocities other than c/4 diagonal (glider), c/2 orthogonal (*WSS variants), and c/12 diagonal (Corderships) had known glider syntheses until 2003, when a 2c/5 spaceship gun was constructed?
+that after ten years with no new small spaceship syntheses, a glider construction was found for the c/7 loafer in 2013 less than three hours after its discovery?
+that a spaceship made of spaceships was only a theoretical concept in Conway's Life (except for 0E0P metacell patterns that were much too large to run) until an explicit universal constructor based example was constructed in 2021?
+that glider constructions for the B29, X66, half-X66 with HWSS, Pushalong 1, 25P3H1V0.1, 30P5H2V0, 30P4H2V0, a pufferfish spaceship, and the weekender were discovered in 2015 — more than twice as many new spaceship recipes as had been completed in the entire previous decade?
+that in 2014 and 2015 alone, more new spaceship syntheses have been completed than were found in all the years between 1970 and 2013?
+that as of September 2023 there are 253 different still lifes known to be constructible by colliding four or fewer gliders, but this list is almost certainly not complete?
+that in 2014 a new natural infinite growth pattern was discovered, starting from a symmetric random starting configuration?
+that the first self-constructing Conway's Life pattern was built in 2010?
+that the first glider synthesis for a c/3 spaceship was completed in 2014?
+that the first "macro-spaceship" gun (a Gemini spaceship gun) was constructed in 2010, followed by the HBK gun in January 2015 and a Demonoid gun in December 2015?
+that the waterbear was the first known high-speed oblique spaceship, many orders of magnitude faster than Gemini spaceships and half-baked knightships?
+that there are no known direct reflectors for lightspeed wire signals, or for signals in 2c/3 wires, but that very large reflectors for these signals can be constructed using stable or periodic circuitry?
+that 24 ten-cell patterns exhibit infinite growth, with 17 unique pattern types, but that it has been proven that no nine-cell pattern exhibits infinite growth?
+that all still lifes up to 22 bits have a known glider synthesis, but that there is a 154-cell still life that cannot be synthesised, so there is a population threshold between these at which not all still lifes can be constructed?
+that the French kiss remained without a glider synthesis until 2013, and there are still nine 17-bit p2s that have not been successfully synthesized?
+that Adam P. Goucher's distributed Catagolue soup-search project, started in February 2015, has tested several orders of magnitude more random soups than any previous such project, and has contributed to the reduction of many glider construction recipes?
+that with the appearance of the 0E0P metacell, the number of periods for which strict volatility 1 oscillators were known went from 12 to infinity?
+that Copperhead is not only the first c/10 orthogonal spaceship ever found, but also remarkably compact for a pattern not discovered until 2016?
+that loafer is the fifth smallest non-flotilla spaceship, but was discovered 43 years after the four spaceships smaller than it?
+that despite being the fourth smallest non-flotilla orthogonal spaceship, loafer did not appear from a single randomly generated soup until 2020?
+that all known glider eaters take at least four ticks to recover to their original state after eating a glider?
+that among Life-like (outer-totalistic) rules, Conway's Life's "near neighbours" B35/S23, B36/S23, and B38/S23 are not explosive, but B37/S23 is?
+that there is roughly one chance in 10^(N/3) that a still life appearing out of random soup will have a population of exactly N cells?
+that the number of still lifes with N+1 bits is roughly 2.48 times larger than the number of N-bit still lifes?
+that the odds of a randomly-chosen 20 × 20 soup pattern being a methuselah that lasts between N and N + 1000 ticks, are roughly the same as the odds that it will last any amount of time longer than N + 1000 ticks?
+that all still lifes up to 17 cells can be synthesized at a cost of less than one glider per cell?
+that the first elementary knightship, Sir Robin, was discovered only in 2018, with there having been a very close call in 2004?
+that there is a 5 × 2 counterexample to the Coolout Conjecture, proving that patterns that are internally compatible with stability can not always be made part of a larger still life, no matter what cells are added around the edges?
+that a Conway's Life pattern representing a complete programmable 8-bit computer, consisting only of buckaroos, p60 glider guns, and glider duplicators, was completed in November 2016?
+that whilst no elementary oblique spaceships were found in B3/S23 until 2018, and none have occurred naturally, at least two naturally occurring reactions have been discovered in B38/S23 that travel in an oblique direction?
+that not all statorless oscillators are phoenixes, but statorless period 2 oscillators must be phoenixes?
+that no pattern inside a 6 × 6 bounding box is a Garden of Eden?
+that Garden of Eden patterns with only 45 live cells have been found?
+that there are orphans that are 5 cells high, but 4-cell-high orphans are impossible?
+that 6-cell-high Garden of Eden patterns were constructed as far back as 1973, but 5-cell-high GoEs were unknown until Steven Eker found some in 2016?
+that while both a big S and a ship-tie require four gliders to synthesise individually, there is a dirty 3-glider collision whose final ash contains one of each?
+that no way is known for a 3 × 3 pattern to be tiled into an M × N rectangle to produce a Garden of Eden, but that there are 4 × 3, 4 × 4 and larger tiles that can be repeated in this way to produce GoEs?
+that there are spaceship stabilizations of agars?
+that block is the only finite strict still life where each living cell has exactly 3 neighbours?
+that all strict still lifes up to and including 15 cells have been found by apgsearch in asymmetrical 16 × 16 soups?
+that c/2 orthogonal and c/4 diagonal were the only speeds of spaceships seen to emerge from asymmetric soups on Catagolue until 2020, when a loafer appeared naturally?
+that all currently known standard Herschel conduits produce the same Herschel great-grandfather pattern, except for Fx158?
+that eater 1 is the smallest asymmetric still life?
+that in Life, no spaceship can exist with a speed of (m, n)c/x where (m + n)/x > 0.5?
+that even without using fixed-cost reverse caber tosser technology, an N-bit strict still life – specifically, some length of long long (...) boat or ship – can be constructed for any odd integer N using no more than 20 gliders, and for any even integer N using no more than 21 gliders, using a temporary tubstretcher?
+that even without using fixed-cost reverse caber tosser technology, some specific N-bit period-2 oscillators can be constructed for any even integer N using no more than 27 gliders, and for any odd integer N using no more than 29 gliders, using a temporary tubstretcher?
+that in 2022, a still life was found containing a finite region whose only predecessor is itself?
+that it was proved in the early 1970s that reflectorless rotating oscillators exist in Life, but none were found until 2018 when Adam P. Goucher completed the 0E0P metacell, and none could be run through a full cycle without specialized hardware until smaller ones were constructed in 2021?
+that there are currently known elementary spaceships with speeds c/7 and c/10 orthogonal, but none with c/8 or c/9?
+that there are currently known elementary spaceships with speeds c/7, c/8, and c/12 diagonal, but none with c/9, c/10 or c/11?
+that Karel's p177 is the highest-period known elementary oscillator with no external support?
+there were no known oscillators with period 43 without the use of adjustable glider loops before the discovery of the period-43 glider gun in September 2022?
+that without the use of Herschel loops or adjustable glider loops, there are no known oscillators with period 89?
+that small stable elementary pulse dividers have been found for multipliers of ×2, ×3, ×4, ×5, ×12, ×11 and ×(6n+4), but not for ×7?
+that with reverse caber-tosser universal constructor technology, it is possible to build any possible glider-constructible pattern, no matter what size, using only 15 gliders?
+that there are at least four known ways to send information diagonally at a speed greater than the maximum spaceship speed through vacuum? (Complete mechanisms include speeds approaching c/2 via two perpendicular telegraphs, and 2c/3 via a 2c/3 wire.)
+that an oscillator with strict volatility 1 can be constructed for any period 945 or higher?
+that the original Gemini's "below-the-elbow" construction efficiency, roughly three gliders per still life, is about four times better than that of any subsequent self-constructing spaceship?
+that an O(sqrt(log(t))) pattern was constructed in 2010, with a diameter that grows at the slowest possible asymptotic ("big O") rate for any Life pattern?
+that since the first Cordership was assembled from 13 switch engines in 1991, the number of switch engines required has gradually decreased, with a 2-engine Cordership finally making its appearance in 2017?
+that the bounding box and recovery time of the current fastest stable reflector, Mike Playle's Snark, are both more than two full orders of magnitude smaller than the first stable reflector, constructed by Paul Callahan in 1996?
+that as of 2025, no finite elementary replicators have been found in Life?
+that while multiple c/12 diagonal spaceships are known, all of them actually travel at some multiple of 8c/96 diagonal - no pure c/12 diagonal technology is known?
+that the first p23 oscillator, David Hilbert, was created as a modification of a "troll" pattern posted a week earlier?
+that exactly two years after a fake loafer-producing soup was posted to the forums on April Fools' Day, a real soup was found on April 1, 2020?
+patterns have been constructed whose fate is currently unknown (based on the twin primes and Collatz conjectures)?
+a pattern of 44 cells exists whose population grows by exactly one cell each generation?
+it is possible to send a signal from one side to the other of an infinite diagonal line of cells without destroying the line?
+there are 'Heisenburp' reactions which can detect the passage of a glider without affecting it in any way?
+Corderships can be constructed using individual switch engines placed arbitrarily far from each other, that will still support each other using intermediary gliders and stable objects?
+fuses can be made that burn arbitrarily slowly, based on sending spaceships back and forth between two rows of stable objects?
+that there exist lone dot agars consisting of isolated cells in every generation?
+that some types of spaceship, but not all, support stable Heisenburp technology, where an arrangement of still lifes detects the passage of the spaceship, emits a signal, and returns to its original state?
+that, while it is impossible to build a true stable Heisenburp device that detects a passing glider without even temporarily affecting it, there are several known stable pseudo-Heisenburp devices?
+that the name of the Bandersnatch, a color-changing lane-shifter device discovered in 2020, is derived from a Lewis Carroll poem that also supplied names for the Snark, the boojum reflector, the Jubjub reflector and the Bellman and Barrister search utilities?
+that the first rake that produces spaceships travelling in the same direction but slower was found in 2003, using a c/2 rake to produce 2c/5 spaceships?
+that it is possible for a single Life object to simulate the evolution of an arbitrary number of other Life objects at the same time (although at increasingly slower speeds)?
+that the Fast Forward Force Field reaction can transport an LWSS 11 spaces in 6 generations, creating the illusion of super-light-speed travel?
+that there are line puffers with a row of live cells at the back, which create very dirty exhaust whose period apparently (this is not proven) grows exponentially as the length of the row is increased?
+that there is an infinite series of period 3 oscillators that are polyominoes in one phase, starting with the cross?
+that there are spaceships without any sparks which can nevertheless perturb objects due to their ability to repair some damage to themselves?
+that the R-pentomino creates a queen bee in generation 774, which lasts 17 generations before being destroyed?
+that a relay glider bouncing back and forth between two pentadecathlons was one of the earliest constructive proofs that oscillators can have arbitrarily high periods?
+that there are spacefiller patterns that grow quadratically to fill space with an agar with density 1/2 (zebra stripes)?
+that a row of appropriately placed traffic lights is one of the few known wicks that can be extended by "pushing" from its stationary end?
+that space nonfiller patterns have been constructed that expand to affect the entire Life plane, leaving an expanding region of vacuum at their center?
+that there exist non-monotonic spaceships, even some with period as low as 3, whose leading edges fall back in at least one generation?
+that some periodic objects -- e.g., a pentadecathlon hassled by period-7 pipsquirters or a 28P7.1 hassled by a mold -- can be perturbed to cause them to skip forward or fall behind by one or more phases in their cycle?
+that more stable seed constellations for moving objects were completed in 2020 than in all preceding years put together?
+that Don Woods developed the text adventure game Colossal Cave Adventure with Will Crowther, who was previously Dave Greene's father's roommate for a time at MIT?
+that Rob's p16, with only 21 cells and fitting in a 9 × 8 bounding box, was only discovered via a large-scale apgsearch soup search in 2020?
+that the minimum one-cell thick solid line that produces escaping gliders has 56 cells?
+that the smallest known oscillators of periods 3, 4, 8, and 15, all have exactly 12 cells in their smallest phase?
+that a solid 83 × 83 square produces four unices at the corners?
+that a strictly volatile period-4 oscillator was not found until 2021 despite a statorless p4 being known since 1973, and the smallest known example contains a whopping 416 cells?
+that hitting a pre-block with a glider on a certain lane can output either an LWSS or MWSS, depending only on a one-tick change in the timing?
+that the clock is almost 5,000 times rarer than the toad, despite both having 6 cells and fitting in a 4 × 4 bounding box?
+that the quadpole is more common than the tripole in random soup, due to a relatively common bottleneck reaction involving a century variant hitting a ship?
+that a half blockade can be struck by a single glider to produce a three-block constellation that becomes its mirror image when hit by another glider, while also releasing another glider in the same direction?
+that a series of increasingly larger greyships, starting with Canada Grey, can all be constructed incrementally by colliding gliders with a gradually accreting still life target?
+that oblique puffers and rakes based on elementary spaceships were unknown in Conway's Life until Dylan Chen and Adam P. Goucher constructed combinations of sprayer knightships in May 2021?
+that a configuration of two ponds and two blocks recovers back to its original position when sparked in a certain way, allowing for the creation of some period multipliers?
+that the third-smallest unique-period gun (at the time) was discovered just six hours after the second-smallest unique-period gun, despite the two being completely unrelated?
+that despite 22P36 having been known since 1995, one half of it was not generalized to a versatile traffic stop catalyst until 26 years later?
+that Merzenich's p64 and 32P21 are both hassling two beehives and two R-pentominoes, and 56P27 hassles four of each?
+that a 56-cell pattern based on the p129 R-pentomino hassler is the smallest known periodic pattern by population that is isotropically endemic to Conway's Life?
+that the single seldom-used extra transition of Pedestrian Life (B38/S23) from Life leads to several non-pedestrian linear growth patterns, including a reflectorless rotating glider gun, a set of (5,2)c/190 technology and a messy oblique p1884 puffer?
+that there are two unrelated three-stage composite Herschel conduits with systematic label L156 and repeat time 62 ticks (HLx69R+RF28B+BFx59H and HL75P+PF35W+WFx46H)?
+that the 39-cell LWSS-on-LWSS variant of the Schick engine was the smallest known period-12 spaceship for about fifty years, until the discovery of 35P12H6V0 in February 2022?
+that it was unknown whether there existed an unbounded sequence of patterns with greatN-grandparents but no greatN+1 grandparents, until Ilkka Törmä and Ville Salo constructed a solution to this extended grandfather problem in early January 2022?
+that a $50 prize for the Unique Father Problem, offered by John Conway in Lifeline Volume 6 in 1972, went unclaimed for almost fifty years until Ilkka Törmä found a solution on the last day of 2021?
+that the O quad-loaf, the most common 28-cell still life, is over 750 times more common than the second most common 28-cell still life?
+that any glider-constructible pattern can theoretically be made with at most sixty-one initial cells, thanks to the reverse caber-tosser mechanism?
+that despite the fact that p5 quinti-Snark contains a period-5 oscillator, it can quintuple the period of any sufficiently sparse periodic glider stream?
+that the first gliderless Gosper glider gun puffer was created in March 2022?
+that stable reflectors were known to exist for over two decades before the first was created?
+that despite MWSSes being larger and only about one quarter as common as LWSSes, it is currently easier to convert a Herschel signal into the former than the latter using spartan technology?
+that despite being over nine times as large as a clock, a pulsar is over 150 times as common and requires fewer gliders to construct?
+that the fishhook is cheaper (in terms of gliders needed to synthesize it) than nine more common objects?
+that despite sparks always dying by themselves, it is possible to preserve certain sparks forever using only other sparks of the same type (eg. a flutter in phoenix 1)?
+that it is possible to construct patterns that temporarily exhibit cubic growth?
+that although the first trivial p34 oscillator was found in 1997, the first non-trivial example and second non-trivial example were only found 25 years later?
+that even objects as rare as the mango, long boat, and eater 1 can be transparent?
+that a pattern can be constructed with the property that every cell in the universe (as opposed to all but finitely many cells) is alive at some point in the pattern's evolution but eventually turns dead permanently?
+that if a glider collides with a U-turner in a certain way, the ash will contain a 15-bit still life with apgcode xs15_6t1egoz11?
+...that the smallest c/4 diagonal spaceship that does not contain any gliders (including temporary gliders) is more than 13 times larger than the glider?
+...that no spaceships have been found that work in both Life (B3/S23) and Grounded Life (B35/S23), despite the fact that these rules are only one outer-totalistic transition apart?
+that there are at least five distinct patterns which can be referred to using the word 'wing', namely Wing, Wing (spaceship), Wings, Flying wing and any thin component that protrudes from a spaceship in a direction not parallel to the direction of travel?
+that there are four unrelated SKOPs for p7 with a population of 28: Burloaferimeter, 28P7.1, 28P7.2 and 28P7.3?
+that 84P199 is the current largest prime-period oscillator that is engine-based?
+that seven spaceships have been proved to be the smallest possible for their speed and period: glider for period-4 c/4 diagonal, LWSS for period-4 c/2 orthogonal, 64P2H1V0 for period-2 c/2 orthogonal, 30P5H2V0 for period-5 2c/5 orthogonal, 25P3H1V0.1 and 25P3H1V0.2 for period-3 c/3 orthogonal and 37P4H1V0 for period-4 c/4 orthogonal?
+that the LWSS, MWSS and HWSS are the only known polyomino spaceships for more than 50 years?
+..that Burloaferimeter is the only known oscillator with a heat lower than 2?
+...that despite the Pi-heptomino being known for over 50 years and its notable forward motion, it has not been stabilised to a 3c/10 spaceship yet?
+...that the only known orthogonal spaceships in non-strobing outer-totalistic rules with speed c/2 < v < c have v = 2c/3, though in strobing rules there are also known spaceships of speed 3c/4 and 5c/8?
+...that the existence of spaceships in outer-totalistic rules with B23 and S0 and without B01 has been disproven, but of the 8192 such rules without S0, there are spaceships (all of which are p2 photons) known in only 8?
+...that the cyclic has been rediscovered no less than 13 times?
+that Dominoplex and B2ein3cijn4cnrwy5cnq6e/S1c2-ai3acny4anqy5c6ek8 are the first two-state alien isotropic non-totalistic rules with explicitly constructed orthogonoids?
+…that any negative spaceship in a greyship would have to move against the grain, since with the grain ones can only travel at the speed of light, but both greyships and negative spaceships that travel against the grain are more difficult to find, and no c/2 or slower negative spaceship is known?
+...that there are 4 oscillators that are the smallest asymmetric oscillators, namely Fox, Caterer, and the two isomers of beacon on table, namely Cis-beacon on table and Trans-beacon on table?
+...that John Conway once mentioned that he regretted naming the glider as such, saying it looks more like an ant walking across the plane?
+that trivial oscillators exist in Life where both rotors mutually stabilise each other, but no individual cell oscillates at the full period, with an example being the Trivial p6-1?
+...that more new glider-accepting conduit mechanisms were found in 2023 than in the entire previous decade since the discovery of the Snark -- namely Galumpher, Snark64, and several more discoveries in March, August, November, and December?
+… that all orthogonal spaceships with the unsimplified speed c/n are known to exist in range-1 isotropic rules? (True period c orthogonal, c/2 orthogonal and c/3 orthogonal spaceships are known in various rules, and can be constructed for all c/n speeds where n is even and greater than 3, and also where n is odd and greater than 4.)
+...that the p576 R-pentomino hassler is the engine-based non-LCM oscillator with the highest known period?
+…that John Conway once mentioned that it seemed as if HighLife “is really the game I should have found, since it is so rich in nice things”?
+...that Beethoven was named due to text-correction incorrectly changing "beehive" into Beethoven, which was in turn misinterpreted as the name of the constellation?
+...that although mold has been known since 1988, and fire-spitting has been known since 2003, the observation they could be combined to make an LCM oscillator was not made until 2023?
+…that the smallest G-to-LWSS is the first known stable xWSS-outputting conduit found in 8 years, after the H-to-MWSS?
+… that objects as rare as the paperclip, super pond and pentadecathlon can be hassled?
+…that some periodic catalysts can also function as stable catalysts, such as Coe's p8 being used to convert a beehive to a block?
+…that the great on-off is 3300 times more common than the eater plug despite the fact that it is larger in both bounding box and population?
+…that all phoenixes in Life, finite or not, must have a constant population?
+…that the p171 pi-heptomino hassler which is the smallest oscillator of period 171, despite being found in 2022 by Mitchell Riley, was not noticed to be complete until 2024?
+...that the period-20 glider gun was the lowest-true-period gun for more than a decade, yet the period-16 glider gun that superseded it was the lowest-true-period gun for only 5 hours before the discovery of the period-15 glider gun?
+...that there are only three period-3 three-cell rotors, namely those of cuphook, 1-2-3 and stillater?
+…that there are four statorless 12-cell oscillators, namely mazing, pentadecathlon, phoenix 1 and figure eight, yet there are none with 11 cells or below?
+...that patterns with no predecessors were known to exist right when Life was first conceived?

@@ -10,6 +10,8 @@ import CanvasGifEncoder from '@pencil.js/canvas-gif-encoder';
 
 let config = JSON.parse((await fs.readFile(import.meta.dirname + '/../config.json')).toString());
 
+let dyks = (await fs.readFile(import.meta.dirname + '/../dyk.txt')).toString().split('\n').slice(1);
+
 const RLE_HEADER = /\s*x\s*=\s*\d+\s*,?\s*y\s*=\s*\d+/;
 
 async function findRLE(channel: Message['channel']): Promise<Pattern | null> {
@@ -289,6 +291,13 @@ const COMMANDS: {[key: string]: (msg: Message, argv: string[]) => void | Promise
 
     async sssss(msg: Message, argv: string[]): Promise<void> {
         let speed = parseSpeed(argv.slice(1).join(' '));
+        speed.x = Math.abs(speed.x);
+        speed.y = Math.abs(speed.y);
+        if (speed.x < speed.y) {
+            let temp = speed.y;
+            speed.y = speed.x;
+            speed.x = temp;
+        }
         let file = import.meta.dirname + '/../sssss/data/'
         if (speed.y === 0) {
             file += 'Orthogonal';
@@ -303,14 +312,24 @@ const COMMANDS: {[key: string]: (msg: Message, argv: string[]) => void | Promise
             let [pop, rule, dx, dy, period, rle] = line.split(', ');
             if (speed.p === parseInt(period) && speed.x === parseInt(dx) && speed.y === parseInt(dy)) {
                 rle = parse(`x = 0, y = 0, rule = ${rule}\n${rle}`).toRLE();
-                await msg.reply(`\`\`\`\n#C (${dx}, ${dy})c/${period}, population ${pop}\n${rle}\`\`\``)
+                await msg.reply(`\`\`\`\n#C (${dx}, ${dy})c/${period}, population ${pop}\n${rle}\`\`\``);
+                return;
             }
         }
+        await msg.reply('No such ship found in database!');
     },
 
     async '5s'(msg: Message, argv: string[]): Promise<void> {
         await COMMANDS.sssss(msg, argv);
     },
+
+    async dyk(msg: Message, argv: string[]): Promise<void> {
+        let num = Math.floor(Math.random() * dyks.length);
+        let out = '**#' + (num + 1) + ':** ' + dyks[num] + '\n\n-# Licensed under the [GNU Free Documentation License 1.2](https://www.gnu.org/licenses/fdl-1.3.html)';
+        await msg.reply({
+            embeds: [new EmbedBuilder().setTitle('Did you know...').setDescription(out)],
+        });
+    }
 
 };
 
