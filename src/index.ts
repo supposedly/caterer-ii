@@ -1,8 +1,7 @@
 
 import {inspect} from 'node:util';
 import * as fs from 'node:fs/promises';
-import {execSync} from 'node:child_process';
-import {parse, identify, Pattern, toCatagolueRule} from '../lifeweb/lib/index.js';
+import {parse, identify, Pattern, toCatagolueRule, createPattern} from '../lifeweb/lib/index.js';
 import {Client, GatewayIntentBits, Message, EmbedBuilder} from 'discord.js';
 import {createCanvas} from 'canvas';
 // @ts-ignore
@@ -30,7 +29,6 @@ async function findRLE(channel: Message['channel']): Promise<Pattern | null> {
     }
     return null;
 }
-
 
 
 interface Help {
@@ -130,10 +128,10 @@ const COMMANDS: {[key: string]: (msg: Message, argv: string[]) => void | Promise
             if (!code.includes(';') && !code.includes('\n')) {
                 code = 'return ' + code;
             }
-            let out = (new Function('client', 'parse', 'identify', 'Pattern', '"use strict";' + code))(client, parse, identify, Pattern);
+            let out = (new Function('client', 'parse', 'identify', 'Pattern', 'createPattern', '"use strict";' + code))(client, parse, identify, Pattern, createPattern);
             await msg.reply('```ansi\n' + inspect(out, {
                 colors: true,
-                depth: 3, 
+                depth: 2, 
             }) + '```');
         } else {
             await msg.reply('nice try');
@@ -161,21 +159,30 @@ const COMMANDS: {[key: string]: (msg: Message, argv: string[]) => void | Promise
         if (!pattern) {
             throw new Error('Cannot find RLE');
         }
-        let frames: Pattern[] = [pattern.copy()];
-        let time = 5;
+        let frameTime = 50;
+        let frames: [Pattern, number][] = [[pattern.copy(), frameTime]];
+        let size = 300;
         for (let part of parts) {
+            if (part[1] === 'fps' && typeof part[0] === 'number') {
+                frameTime = Math.ceil(100 / part[0]) * 10;
+                part = part.slice(2);
+            }
+            if (part[0] === 'size' && typeof part[1] === 'number') {
+                size = part[1];
+                part = part.slice(2);
+            }
             if (typeof part[0] === 'number') {
                 if (typeof part[1] === 'number') {
                     for (let i = parts.length > 1 ? 0 : 1; i < Math.ceil(part[0] / part[1]); i++) {
                         pattern.run(part[1]);
-                        frames.push(pattern.copy());
+                        frames.push([pattern.copy(), frameTime]);
                     }
                 } else if (typeof part[1] === 'string') {
                     throw new Error(`Invalid !sim command: ${part.join(' ')}`);
                 } else {
                     for (let i = parts.length > 1 ? 0 : 1; i < part[0]; i++) {
                         pattern.runGeneration();
-                        frames.push(pattern.copy());
+                        frames.push([pattern.copy(), frameTime]);
                     }
                 }
             } else if (part[0] === 'wait') {
@@ -183,19 +190,19 @@ const COMMANDS: {[key: string]: (msg: Message, argv: string[]) => void | Promise
                     throw new Error(`Invalid !sim command: ${part.join(' ')}`);
                 }
                 for (let i = 0; i < part[1]; i++) {
-                    frames.push(pattern.copy());
+                    frames.push([pattern.copy(), frameTime]);
                 }
-            } else {
+            } else if (part[0] !== undefined) {
                 throw new Error(`Invalid !sim command: ${part.join(' ')}`);
             }
         }
-        let minX = Math.min(...frames.map(p => p.xOffset)) - 1;
-        let maxX = Math.max(...frames.map(p => p.width + p.xOffset)) + 1;
-        let minY = Math.min(...frames.map(p => p.yOffset)) - 1;
-        let maxY = Math.max(...frames.map(p => p.height + p.yOffset)) + 1;
+        let minX = Math.min(...frames.map(([p]) => p.xOffset)) - 1;
+        let maxX = Math.max(...frames.map(([p]) => p.width + p.xOffset)) + 1;
+        let minY = Math.min(...frames.map(([p]) => p.yOffset)) - 1;
+        let maxY = Math.max(...frames.map(([p]) => p.height + p.yOffset)) + 1;
         let width = maxX - minX;
         let height = maxY - minY;
-        let scale = Math.ceil(300 / Math.max(width, height));
+        let scale = Math.ceil(size / Math.max(width, height));
         let canvas = createCanvas(width * scale, height * scale);
         let ctx = canvas.getContext('2d');
         ctx.fillStyle = '#36393e';
@@ -204,8 +211,7 @@ const COMMANDS: {[key: string]: (msg: Message, argv: string[]) => void | Promise
             alphaThreshold: 0,
             quality: 1,
         });
-        let frameTime = Math.ceil(time * 100 / frames.length) * 10;
-        for (let p of frames) {
+        for (let [p, frameTime] of frames) {
             let i = 0;
             let startY = p.yOffset - minY;
             let startX = p.xOffset - minX;
@@ -213,8 +219,15 @@ const COMMANDS: {[key: string]: (msg: Message, argv: string[]) => void | Promise
             ctx.fillRect(0, 0, width * scale, height * scale);
             for (let y = startY; y < startY + p.height; y++) {
                 for (let x = startX; x < startX + p.width; x++) {
-                    ctx.fillStyle = p.data[i++] ? '#ffffff' : '#36393e';
-                    ctx.fillRect(x * scale, y * scale, scale, scale);
+                    let value = p.data[i++];
+                    if (value) {
+                        if (p.states > 2) {
+                            ctx.fillStyle = '#ff' + (Math.ceil(value / p.states * 256) - 1).toString(16).padStart(2, '0') + '00';
+                        } else {
+                            ctx.fillStyle = '#ffffff';
+                        }
+                        ctx.fillRect(x * scale, y * scale, scale, scale);
+                    }
                 }
             }
             encoder.addFrame(ctx, frameTime);
