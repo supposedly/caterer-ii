@@ -2,7 +2,7 @@
 import {inspect} from 'node:util';
 import * as fs from 'node:fs/promises';
 import {parse, identify, Pattern, toCatagolueRule, createPattern} from '../lifeweb/lib/index.js';
-import {Client, GatewayIntentBits, Message, EmbedBuilder} from 'discord.js';
+import {Client, GatewayIntentBits, Message, EmbedBuilder, Attachment} from 'discord.js';
 import {createCanvas} from 'canvas';
 // @ts-ignore
 import CanvasGifEncoder from '@pencil.js/canvas-gif-encoder';
@@ -12,24 +12,56 @@ let config = JSON.parse((await fs.readFile(import.meta.dirname + '/../config.jso
 
 let dyks = (await fs.readFile(import.meta.dirname + '/../dyk.txt')).toString().split('\n').slice(1);
 
+let names = new Map((await fs.readFile(import.meta.dirname + '/../names.txt')).toString().split('\n').map(x => x.split(' ')).map(x => [x[0], x.slice(1).join(' ')]));
+const NAME_CHARS = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789~!@#$%^&*()-=_+[]\\{}|;\':",./<>? ';
+
 const RLE_HEADER = /\s*x\s*=\s*\d+\s*,?\s*y\s*=\s*\d+/;
 
-async function findRLE(channel: Message['channel']): Promise<Pattern | null> {
-    let msgs = await channel.messages.fetch({limit: 50});
-    for (let msg of msgs) {
-        let data = msg[1].content;
-        let match = RLE_HEADER.exec(data);
-        if (!match) {
-            continue;
-        }
-        data = data.slice(match.index);
-        let index = data.indexOf('!');
-        if (index === -1) {
-            continue;
-        }
-        return parse(data.slice(0, index + 1));
+function findRLEFromText(data: string): Pattern | undefined {
+    let match = RLE_HEADER.exec(data);
+    if (!match) {
+        return;
     }
-    return null;
+    data = data.slice(match.index);
+    let index = data.indexOf('!');
+    if (index === -1) {
+        return;
+    }
+    return parse(data.slice(0, index + 1));
+}
+
+async function findRLEFromMessage(msg: Message): Promise<Pattern | undefined> {
+    let out = findRLEFromText(msg.content);
+    if (out) {
+        return out;
+    }
+    if (msg.attachments.size > 0) {
+        let attachment = msg.attachments.first();
+        if (attachment) {
+            let data = await (await fetch(attachment.url)).text();
+            return findRLEFromText(data);
+        }
+    }
+}
+
+async function findRLE(msg: Message): Promise<Pattern | undefined> {
+    let out = await findRLEFromMessage(msg);
+    if (out) {
+        return out;
+    }
+    if (msg.reference) {
+        let reply = await msg.fetchReference();
+        out = await findRLEFromMessage(reply);
+        if (out) {
+            return out;
+        }
+    }
+    let msgs = await msg.channel.messages.fetch({limit: 50});
+    for (let msg of msgs) {
+        if (out = await findRLEFromMessage(msg[1])) {
+            return out;
+        }
+    }
 }
 
 function parseSpeed(speed: string): {p: number, x: number, y: number} {
@@ -102,6 +134,10 @@ const HELP: {[key: string]: Help} = {
         desc: 'Alias for !sssss',
         syntax: '!5s <speed>',
     },
+    name: {
+        desc: 'Find or set the name of a pattern',
+        syntax: '!name [new name]',
+    },
 };
 
 let helpMsg = '```ansi\n\x1b[1m\x1b[34mA cellular automata bot for the ConwayLife Lounge Discord server\n\nCommands:\x1b[0m';
@@ -137,7 +173,7 @@ const COMMANDS: {[key: string]: (msg: Message, argv: string[]) => void | Promise
                 limit = parsed;
             }
         }
-        let pattern = await findRLE(msg.channel);
+        let pattern = await findRLE(msg);
         if (!pattern) {
             throw new Error('Cannot find RLE');
         }
@@ -168,7 +204,12 @@ const COMMANDS: {[key: string]: (msg: Message, argv: string[]) => void | Promise
             }
             out += '](https://catagolue.hatsya.com/object/' + data.apgcode + '/' + toCatagolueRule(pattern.ruleStr) + ')';
         }
-        await msg.reply({embeds: [new EmbedBuilder().setTitle(data.desc).setDescription(out)]});
+        let title = data.desc;
+        let name = names.get(data.apgcode);
+        if (name !== undefined) {
+            title = name + ' (' + title + ')';
+        }
+        await msg.reply({embeds: [new EmbedBuilder().setTitle(title).setDescription(out)]});
     },
 
     async eval(msg: Message, argv: string[]): Promise<void> {
@@ -204,7 +245,7 @@ const COMMANDS: {[key: string]: (msg: Message, argv: string[]) => void | Promise
             }
         }
         parts.push(currentPart);
-        let pattern = await findRLE(msg.channel);
+        let pattern = await findRLE(msg);
         if (!pattern) {
             throw new Error('Cannot find RLE');
         }
@@ -323,13 +364,63 @@ const COMMANDS: {[key: string]: (msg: Message, argv: string[]) => void | Promise
         await COMMANDS.sssss(msg, argv);
     },
 
-    async dyk(msg: Message, argv: string[]): Promise<void> {
+    async dyk(msg: Message): Promise<void> {
         let num = Math.floor(Math.random() * dyks.length);
         let out = '**#' + (num + 1) + ':** ' + dyks[num] + '\n\n-# Licensed under the [GNU Free Documentation License 1.2](https://www.gnu.org/licenses/fdl-1.3.html)';
         await msg.reply({
             embeds: [new EmbedBuilder().setTitle('Did you know...').setDescription(out)],
         });
-    }
+    },
+
+    async ping(msg: Message): Promise<void> {
+        let msg2 = await msg.reply('Pong!');
+        msg2.edit(`Pong! Latency: ${Math.round(msg2.createdTimestamp - msg.createdTimestamp)} ms (Discord WebSocket: ${Math.round(client.ws.ping)} ms)`)
+    },
+
+    async pig(msg: Message): Promise<void> {
+        if (msg.reference) {
+            await (await msg.fetchReference()).react('🐷');
+        } else {
+            await msg.react('🐷');
+        }
+    },
+
+    async name(msg: Message, argv: string[]): Promise<void> {
+        let pattern = await findRLE(msg);
+        if (!pattern) {
+            throw new Error('Cannot find RLE');
+        }
+        let apgcode = identify(pattern, 4096).apgcode;
+        if (!apgcode.startsWith('x') || apgcode.startsWith('y')) {
+            throw new Error(`Apgcode is ${apgcode}`);
+        }
+        let newName = argv.slice(1).join(' ');
+        if (newName === '') {
+            let name = names.get(apgcode);
+            if (name !== undefined) {
+                await msg.reply(name);
+            } else {
+                await msg.reply('Pattern is not named');
+            }
+            return;
+        }
+        if (!msg.member) {
+            throw new Error('bruh');
+        }
+        if (!msg.member.roles.cache.find(role => role.id === config.accepterer)) {
+            throw new Error('You are not an accepterer');
+        }
+        if (!Array.from(newName).every(x => NAME_CHARS.includes(x))) {
+            throw new Error('Invalid name!');
+        }
+        if (names.has(apgcode)) {
+            await msg.reply('Renamed `' + names.get(apgcode) + '` to `' + newName + '`');
+        } else {
+            await msg.reply('Set name to `' + newName + '`');
+        }
+        names.set(apgcode, newName);
+        await fs.writeFile(import.meta.dirname + '/../names.txt', Array.from(names.entries()).map(x => x[0] + ' ' + x[1]).join('\n'));
+    },
 
 };
 
@@ -350,6 +441,7 @@ client.on('messageCreate', async msg => {
         let cmd = argv[0].toLowerCase();
         if (cmd in COMMANDS) {
             try {
+                await msg.channel.sendTyping();
                 await COMMANDS[cmd](msg, argv);
             } catch (error) {
                 await msg.reply('`' + String(error) + '`');
