@@ -12,6 +12,8 @@ let config = JSON.parse((await fs.readFile(import.meta.dirname + '/../config.jso
 
 let dyks = (await fs.readFile(import.meta.dirname + '/../dyk.txt')).toString().split('\n').slice(1);
 
+let simStats = JSON.parse((await fs.readFile(import.meta.dirname + '/../sim_stats.json')).toString());
+
 let names = new Map((await fs.readFile(import.meta.dirname + '/../names.txt')).toString().split('\n').map(x => x.split(' ')).map(x => [x[0], x.slice(1).join(' ')]));
 const NAME_CHARS = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789~!@#$%^&*()-=_+[]\\{}|;\':",./<>? ';
 
@@ -138,6 +140,14 @@ const HELP: {[key: string]: Help} = {
         desc: 'Find or set the name of a pattern',
         syntax: '!name [new name]',
     },
+    sim_stats: {
+        desc: 'Get statistics on the most popular rules used by !sim',
+        syntax: '!sim_stats [page]',
+    },
+    save_sim_stats: {
+        desc: 'Save the sim stats (accepterer only)',
+        syntax: '!save_sim_stats',
+    },
 };
 
 let helpMsg = '```ansi\n\x1b[1m\x1b[34mA cellular automata bot for the ConwayLife Lounge Discord server\n\nCommands:\x1b[0m';
@@ -146,6 +156,8 @@ for (let cmd in HELP) {
     helpMsg += '\n!' + cmd.padEnd(padding) + ' | ' + HELP[cmd].desc;
 }
 helpMsg += '```';
+
+let simCounter = 0;
 
 const COMMANDS: {[key: string]: (msg: Message, argv: string[]) => void | Promise<void>} = {
 
@@ -333,6 +345,16 @@ const COMMANDS: {[key: string]: (msg: Message, argv: string[]) => void | Promise
         await msg.reply({
             files: ['sim.gif'],
         });
+        if (pattern.ruleStr in simStats) {
+            simStats[pattern.ruleStr]++;
+        } else {
+            simStats[pattern.ruleStr] = 1;
+        }
+        simCounter++;
+        if (simCounter === 16) {
+            simCounter = 0;
+            await fs.writeFile(import.meta.dirname + '/../sim_stats.json', JSON.stringify(simStats, undefined, 4));
+        }
     },
 
     async sssss(msg: Message, argv: string[]): Promise<void> {
@@ -412,7 +434,7 @@ const COMMANDS: {[key: string]: (msg: Message, argv: string[]) => void | Promise
         if (!msg.member) {
             throw new Error('bruh');
         }
-        if (!msg.member.roles.cache.find(role => role.id === config.accepterer)) {
+        if (!msg.member.roles.cache.find(role => role.id === config.accepterer) && !config.admins.includes(msg.author.id)) {
             throw new Error('You are not an accepterer');
         }
         if (!Array.from(newName).every(x => NAME_CHARS.includes(x))) {
@@ -425,6 +447,32 @@ const COMMANDS: {[key: string]: (msg: Message, argv: string[]) => void | Promise
         }
         names.set(apgcode, newName);
         await fs.writeFile(import.meta.dirname + '/../names.txt', Array.from(names.entries()).map(x => x[0] + ' ' + x[1]).join('\n'));
+    },
+
+    async sim_stats(msg: Message, argv: string[]): Promise<void> {
+        let page = argv[1] ? parseInt(argv[1]) - 1 : 0;
+        if (Number.isNaN(page)) {
+            throw new Error('Invalid page number');
+        }
+        let data = Object.entries(simStats).sort((x, y) => (x[1] as any) - (y[1] as any)).slice(page, page + 10);
+        let out = data.map(x => x[0] + ': ' + x[1]).join('\n');
+        if (out === '') {
+            out = 'No data!';
+        }
+        await msg.reply({
+            embeds: [new EmbedBuilder().setTitle('Most popular rules (page ' + (page + 1) + ')').setDescription(out)],
+        });
+    },
+
+    async save_sim_stats(msg: Message, argv: string[]): Promise<void> {
+        if (!msg.member) {
+            throw new Error('bruh');
+        }
+        if (!msg.member.roles.cache.find(role => role.id === config.accepterer) && !config.admins.includes(msg.author.id)) {
+            throw new Error('You are not an accepterer');
+        }
+        await fs.writeFile(import.meta.dirname + '/../sim_stats.json', JSON.stringify(simStats, undefined, 4));
+        await msg.reply('Saved');
     },
 
 };
