@@ -1,7 +1,7 @@
 
 import {inspect} from 'node:util';
 import * as fs from 'node:fs/promises';
-import {parse, identify, Pattern, toCatagolueRule, createPattern, MAPPattern, mapMinmax} from '../lifeweb/lib/index.js';
+import {parse, identify, fullIdentify, Pattern, toCatagolueRule, createPattern, FullIdentified} from '../lifeweb/lib/index.js';
 import {Client, GatewayIntentBits, Message, EmbedBuilder} from 'discord.js';
 import {createCanvas} from 'canvas';
 // @ts-ignore
@@ -105,6 +105,66 @@ function parseSpeed(speed: string): {p: number, x: number, y: number} {
     return {p, x, y};
 }
 
+function embedIdentified(data: FullIdentified, isOutput?: boolean): EmbedBuilder[] {
+    let out = '';
+    if (data.period > 0) {
+        out += '**Period:** ' + data.period + '\n';
+    }
+    if (data.disp && (data.disp[0] !== 0 || data.disp[1] !== 0)) {
+        out += '**Displacement:** (' + data.disp[0] + ', ' + data.disp[1] + ')\n';
+    }
+    if (data.stabilizedAt > 0) {
+        out += '**Stabilizes at:** ' + data.stabilizedAt + '\n';
+    }
+    if (data.power !== undefined) {
+        out += '**Power:** ' + data.power + '\n';
+    }
+    let minPop = Math.min(...data.pops);
+    let avgPop = data.pops.reduce((x, y) => x + y, 0) / data.pops.length;
+    let maxPop = Math.max(...data.pops);
+    out += '**Populations:** ' + minPop + ' | ' + (Math.round(avgPop * 100) / 100) + ' | ' + maxPop + '\n';
+    if (data.minmax) {
+        out += '**Min:** ' + data.minmax[0] + '\n';
+        out += '**Max:** ' + data.minmax[1] + '\n';
+    }
+    if (data.period > 1) {
+        if (data.heat) {
+            out += '**Heat:** ' + data.heat + '\n';
+        }
+        if (data.temperature) {
+            out += '**Temperature:** ' + data.temperature + '\n';
+        }
+        if (data.volatility) {
+            out += '**Volatility:** ' + data.volatility + '\n';
+        }
+        if (data.strictVolatility) {
+            out += '**Strict volatility:** ' + data.strictVolatility + '\n';
+        }
+    }
+    if (data.apgcode !== 'PATHOLOGICAL') {
+        out += '[';
+        if (data.apgcode.length > 31) {
+            out += data.apgcode.slice(0, 14) + '...' + data.apgcode.slice(-14);
+        } else {
+            out += data.apgcode;
+        }
+        out += '](https://catagolue.hatsya.com/object/' + data.apgcode + '/' + toCatagolueRule(data.phases[0].ruleStr) + ')';
+    }
+    let title = data.desc;
+    let name = names.get(data.apgcode);
+    if (name !== undefined) {
+        title = name[0].toUpperCase() + name.slice(1) + ' (' + title + ')';
+    }
+    if (isOutput) {
+        title = 'Output: ' + title;
+    }
+    let embeds = [new EmbedBuilder().setTitle(title).setDescription(out)];
+    if (data.output) {
+        embeds.push(...embedIdentified(data.output, true));
+    }
+    return embeds;
+}
+
 
 interface Help {
     desc: string;
@@ -189,44 +249,7 @@ const COMMANDS: {[key: string]: (msg: Message, argv: string[]) => void | Promise
         if (!pattern) {
             throw new Error('Cannot find RLE');
         }
-        let data = identify(pattern, limit);
-        let out = '';
-        if (data.period > 0) {
-            out += '**Period:** ' + data.period + '\n';
-        }
-        if (data.disp && (data.disp[0] !== 0 || data.disp[1] !== 0)) {
-            out += '**Displacement:** (' + data.disp[0] + ', ' + data.disp[1] + ')\n';
-        }
-        if (data.stabilizedAt > 0) {
-            out += '**Stabilizes at:** ' + data.stabilizedAt + '\n';
-        }
-        if (data.power !== undefined) {
-            out += '**Power:** ' + data.power + '\n';
-        }
-        let minPop = Math.min(...data.pops);
-        let avgPop = data.pops.reduce((x, y) => x + y, 0) / data.pops.length;
-        let maxPop = Math.max(...data.pops);
-        out += '**Populations:** ' + minPop + ' | ' + (Math.round(avgPop * 100) / 100) + ' | ' + maxPop + '\n';
-        if (pattern instanceof MAPPattern) {
-            let [min, max] = mapMinmax(pattern, data, limit);
-            out += '**Min:** ' + min + '\n';
-            out += '**Max:** ' + max + '\n';
-        }
-        if (data.apgcode !== 'PATHOLOGICAL') {
-            out += '[';
-            if (data.apgcode.length > 31) {
-                out += data.apgcode.slice(0, 14) + '...' + data.apgcode.slice(-14);
-            } else {
-                out += data.apgcode;
-            }
-            out += '](https://catagolue.hatsya.com/object/' + data.apgcode + '/' + toCatagolueRule(pattern.ruleStr) + ')';
-        }
-        let title = data.desc;
-        let name = names.get(data.apgcode);
-        if (name !== undefined) {
-            title = name[0].toUpperCase() + name.slice(1) + ' (' + title + ')';
-        }
-        await msg.reply({embeds: [new EmbedBuilder().setTitle(title).setDescription(out)]});
+        await msg.reply({embeds: embedIdentified(fullIdentify(pattern, limit))});
     },
 
     async eval(msg: Message, argv: string[]): Promise<void> {
@@ -235,7 +258,7 @@ const COMMANDS: {[key: string]: (msg: Message, argv: string[]) => void | Promise
             if (!code.includes(';') && !code.includes('\n')) {
                 code = 'return ' + code;
             }
-            let out = (new Function('client', 'parse', 'identify', 'Pattern', 'createPattern', '"use strict";' + code))(client, parse, identify, Pattern, createPattern);
+            let out = (new Function('client', 'parse', 'identify', 'fullIdentify', 'Pattern', 'createPattern', '"use strict";' + code))(client, parse, identify, fullIdentify, Pattern, createPattern);
             await msg.reply('```ansi\n' + inspect(out, {
                 colors: true,
                 depth: 2, 
