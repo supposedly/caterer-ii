@@ -1,8 +1,8 @@
 
 import {inspect} from 'node:util';
 import * as fs from 'node:fs/promises';
-import {parse, identify, Pattern, toCatagolueRule, createPattern} from '../lifeweb/lib/index.js';
-import {Client, GatewayIntentBits, Message, EmbedBuilder, Attachment} from 'discord.js';
+import {parse, identify, Pattern, toCatagolueRule, createPattern, MAPPattern, mapMinmax} from '../lifeweb/lib/index.js';
+import {Client, GatewayIntentBits, Message, EmbedBuilder} from 'discord.js';
 import {createCanvas} from 'canvas';
 // @ts-ignore
 import CanvasGifEncoder from '@pencil.js/canvas-gif-encoder';
@@ -193,8 +193,13 @@ const COMMANDS: {[key: string]: (msg: Message, argv: string[]) => void | Promise
         }
         let minPop = Math.min(...data.pops);
         let avgPop = data.pops.reduce((x, y) => x + y, 0) / data.pops.length;
-        let maxPop = Math.min(...data.pops);
-        out += '**Populations:** ' + minPop + ' | ' + avgPop + ' | ' + maxPop + '\n';
+        let maxPop = Math.max(...data.pops);
+        out += '**Populations:** ' + minPop + ' | ' + (Math.round(avgPop * 100) / 100) + ' | ' + maxPop + '\n';
+        if (pattern instanceof MAPPattern) {
+            let [min, max] = mapMinmax(pattern, data, limit);
+            out += '**Min:** ' + min + '\n';
+            out += '**Max:** ' + max + '\n';
+        }
         if (data.apgcode !== 'PATHOLOGICAL') {
             out += '[';
             if (data.apgcode.length > 31) {
@@ -207,7 +212,7 @@ const COMMANDS: {[key: string]: (msg: Message, argv: string[]) => void | Promise
         let title = data.desc;
         let name = names.get(data.apgcode);
         if (name !== undefined) {
-            title = name + ' (' + title + ')';
+            title = name[0].toUpperCase() + name.slice(1) + ' (' + title + ')';
         }
         await msg.reply({embeds: [new EmbedBuilder().setTitle(title).setDescription(out)]});
     },
