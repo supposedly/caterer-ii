@@ -2,7 +2,7 @@
 import {inspect} from 'node:util';
 import * as fs from 'node:fs/promises';
 import {parse, identify, fullIdentify, Pattern, toCatagolueRule, createPattern, FullIdentified} from '../lifeweb/lib/index.js';
-import {Client, GatewayIntentBits, Message, EmbedBuilder} from 'discord.js';
+import {Client, GatewayIntentBits, Message, EmbedBuilder, OmitPartialGroupDMChannel} from 'discord.js';
 import {createCanvas} from 'canvas';
 // @ts-ignore
 import CanvasGifEncoder from '@pencil.js/canvas-gif-encoder';
@@ -119,9 +119,15 @@ function embedIdentified(data: FullIdentified, isOutput?: boolean): EmbedBuilder
     if (data.power !== undefined) {
         out += '**Power:** ' + data.power + '\n';
     }
-    let minPop = Math.min(...data.pops);
-    let avgPop = data.pops.reduce((x, y) => x + y, 0) / data.pops.length;
-    let maxPop = Math.max(...data.pops);
+    let pops: number[];
+    if (data.period > 0) {
+        pops = data.pops.slice(0, data.period);
+    } else {
+        pops = data.pops;
+    }
+    let minPop = Math.min(...pops);
+    let avgPop = pops.reduce((x, y) => x + y, 0) / pops.length;
+    let maxPop = Math.max(...pops);
     out += '**Populations:** ' + minPop + ' | ' + (Math.round(avgPop * 100) / 100) + ' | ' + maxPop + '\n';
     if (data.minmax) {
         out += '**Min:** ' + data.minmax[0] + '\n';
@@ -219,25 +225,27 @@ helpMsg += '```';
 
 let simCounter = 0;
 
-const COMMANDS: {[key: string]: (msg: Message, argv: string[]) => void | Promise<void>} = {
+type Response = Promise<undefined | Parameters<Message['reply']>[0]>;
 
-    async help(msg: Message, argv: string[]): Promise<void> {
+const COMMANDS: {[key: string]: (msg: Message, argv: string[]) => Response} = {
+
+    async help(msg: Message, argv: string[]): Response {
         if (argv.length > 1) {
             let cmd = argv.slice(1).join(' ');
             if (cmd.startsWith('!')) {
                 cmd = cmd.slice(1);
             }
             if (!(cmd in HELP)) {
-                await msg.reply(`No command called !${cmd}`);
+                return `No command called !${cmd}`;
             } else {
-                await msg.reply('```\n!' + cmd + ' - ' + HELP[cmd].desc + '\n\nSyntax: ' + HELP[cmd].syntax + '```');
+                return '```\n!' + cmd + ' - ' + HELP[cmd].desc + '\n\nSyntax: ' + HELP[cmd].syntax + '```';
             }
         } else {
-            await msg.reply(helpMsg);
+            return helpMsg;
         }
     },
 
-    async identify(msg: Message, argv: string[]): Promise<void> {
+    async identify(msg: Message, argv: string[]): Response {
         let limit = 256;
         if (argv[1]) {
             let parsed = parseFloat(argv[1]);
@@ -249,26 +257,26 @@ const COMMANDS: {[key: string]: (msg: Message, argv: string[]) => void | Promise
         if (!pattern) {
             throw new Error('Cannot find RLE');
         }
-        await msg.reply({embeds: embedIdentified(fullIdentify(pattern, limit))});
+        return {embeds: embedIdentified(fullIdentify(pattern, limit))};
     },
 
-    async eval(msg: Message, argv: string[]): Promise<void> {
+    async eval(msg: Message, argv: string[]): Response {
         if (config.admins.includes(msg.author.id)) {
             let code = argv.slice(1).join(' ');
             if (!code.includes(';') && !code.includes('\n')) {
                 code = 'return ' + code;
             }
             let out = (new Function('client', 'parse', 'identify', 'fullIdentify', 'Pattern', 'createPattern', '"use strict";' + code))(client, parse, identify, fullIdentify, Pattern, createPattern);
-            await msg.reply('```ansi\n' + inspect(out, {
+            return '```ansi\n' + inspect(out, {
                 colors: true,
                 depth: 2, 
-            }) + '```');
+            }) + '```';
         } else {
-            await msg.reply('nice try');
+            return 'nice try';
         }
     },
 
-    async sim(msg: Message, argv: string[]): Promise<void> {
+    async sim(msg: Message, argv: string[]): Response {
         let parts: (string | number)[][] = [];
         let currentPart: (string | number)[] = [];
         for (let arg of argv.slice(1)) {
@@ -365,9 +373,6 @@ const COMMANDS: {[key: string]: (msg: Message, argv: string[]) => void | Promise
         let gif = encoder.end();
         encoder.flush();
         await fs.writeFile('sim.gif', gif);
-        await msg.reply({
-            files: ['sim.gif'],
-        });
         if (pattern.ruleStr in simStats) {
             simStats[pattern.ruleStr]++;
         } else {
@@ -378,9 +383,10 @@ const COMMANDS: {[key: string]: (msg: Message, argv: string[]) => void | Promise
             simCounter = 0;
             await fs.writeFile(import.meta.dirname + '/../sim_stats.json', JSON.stringify(simStats, undefined, 4));
         }
+        return {files: ['sim.gif']};
     },
 
-    async sssss(msg: Message, argv: string[]): Promise<void> {
+    async sssss(msg: Message, argv: string[]): Response {
         let speed = parseSpeed(argv.slice(1).join(' '));
         speed.x = Math.abs(speed.x);
         speed.y = Math.abs(speed.y);
@@ -403,31 +409,28 @@ const COMMANDS: {[key: string]: (msg: Message, argv: string[]) => void | Promise
             let [pop, rule, dx, dy, period, rle] = line.split(', ');
             if (speed.p === parseInt(period) && speed.x === parseInt(dx) && speed.y === parseInt(dy)) {
                 rle = parse(`x = 0, y = 0, rule = ${rule}\n${rle}`).toRLE();
-                await msg.reply(`\`\`\`\n#C (${dx}, ${dy})c/${period}, population ${pop}\n${rle}\`\`\``);
-                return;
+                return `\`\`\`\n#C (${dx}, ${dy})c/${period}, population ${pop}\n${rle}\`\`\``;
             }
         }
-        await msg.reply('No such ship found in database!');
+        return 'No such ship found in database!';
     },
 
-    async '5s'(msg: Message, argv: string[]): Promise<void> {
-        await COMMANDS.sssss(msg, argv);
+    async '5s'(msg: Message, argv: string[]): Response {
+        return COMMANDS.sssss(msg, argv);
     },
 
-    async dyk(msg: Message): Promise<void> {
+    async dyk(): Response {
         let num = Math.floor(Math.random() * dyks.length);
         let out = '**#' + (num + 1) + ':** ' + dyks[num] + '\n\n-# Licensed under the [GNU Free Documentation License 1.2](https://www.gnu.org/licenses/fdl-1.3.html)';
-        await msg.reply({
-            embeds: [new EmbedBuilder().setTitle('Did you know...').setDescription(out)],
-        });
+        return {embeds: [new EmbedBuilder().setTitle('Did you know...').setDescription(out)]};
     },
 
-    async ping(msg: Message): Promise<void> {
+    async ping(msg: Message): Promise<undefined> {
         let msg2 = await msg.reply('Pong!');
         msg2.edit(`Pong! Latency: ${Math.round(msg2.createdTimestamp - msg.createdTimestamp)} ms (Discord WebSocket: ${Math.round(client.ws.ping)} ms)`)
     },
 
-    async pig(msg: Message): Promise<void> {
+    async pig(msg: Message): Promise<undefined> {
         if (msg.reference) {
             await (await msg.fetchReference()).react('🐷');
         } else {
@@ -435,7 +438,7 @@ const COMMANDS: {[key: string]: (msg: Message, argv: string[]) => void | Promise
         }
     },
 
-    async name(msg: Message, argv: string[]): Promise<void> {
+    async name(msg: Message, argv: string[]): Response {
         let pattern = await findRLE(msg);
         if (!pattern) {
             throw new Error('Cannot find RLE');
@@ -448,11 +451,10 @@ const COMMANDS: {[key: string]: (msg: Message, argv: string[]) => void | Promise
         if (newName === '') {
             let name = names.get(apgcode);
             if (name !== undefined) {
-                await msg.reply(name);
+                return name;
             } else {
-                await msg.reply('Pattern is not named');
+                return 'Pattern is not named';
             }
-            return;
         }
         if (!msg.member) {
             throw new Error('bruh');
@@ -463,16 +465,16 @@ const COMMANDS: {[key: string]: (msg: Message, argv: string[]) => void | Promise
         if (!Array.from(newName).every(x => NAME_CHARS.includes(x))) {
             throw new Error('Invalid name!');
         }
-        if (names.has(apgcode)) {
-            await msg.reply('Renamed `' + names.get(apgcode) + '` to `' + newName + '`');
-        } else {
-            await msg.reply('Set name to `' + newName + '`');
-        }
         names.set(apgcode, newName);
         await fs.writeFile(import.meta.dirname + '/../names.txt', Array.from(names.entries()).map(x => x[0] + ' ' + x[1]).join('\n'));
+        if (names.has(apgcode)) {
+            return 'Renamed `' + names.get(apgcode) + '` to `' + newName + '`';
+        } else {
+            return 'Set name to `' + newName + '`';
+        }
     },
 
-    async sim_stats(msg: Message, argv: string[]): Promise<void> {
+    async sim_stats(msg: Message, argv: string[]): Response {
         let page = argv[1] ? parseInt(argv[1]) - 1 : 0;
         if (Number.isNaN(page)) {
             throw new Error('Invalid page number');
@@ -482,12 +484,10 @@ const COMMANDS: {[key: string]: (msg: Message, argv: string[]) => void | Promise
         if (out === '') {
             out = 'No data!';
         }
-        await msg.reply({
-            embeds: [new EmbedBuilder().setTitle('Most popular rules (page ' + (page + 1) + ')').setDescription(out)],
-        });
+        return {embeds: [new EmbedBuilder().setTitle('Most popular rules (page ' + (page + 1) + ')').setDescription(out)]};
     },
 
-    async save_sim_stats(msg: Message, argv: string[]): Promise<void> {
+    async save_sim_stats(msg: Message): Response {
         if (!msg.member) {
             throw new Error('bruh');
         }
@@ -495,19 +495,15 @@ const COMMANDS: {[key: string]: (msg: Message, argv: string[]) => void | Promise
             throw new Error('You are not an accepterer');
         }
         await fs.writeFile(import.meta.dirname + '/../sim_stats.json', JSON.stringify(simStats, undefined, 4));
-        await msg.reply('Saved');
+        return 'Saved';
     },
 
 };
 
 
-let client = new Client({intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent]});
+let previousMsgs: [string, Message][] = [];
 
-client.once('clientReady', readyClient => {
-    console.log(`Logged in as ${readyClient.user.tag}`);
-});
-
-client.on('messageCreate', async msg => {
+async function runCommand(msg: OmitPartialGroupDMChannel<Message>): Promise<void> {
     if (msg.author.bot) {
         return;
     }
@@ -518,14 +514,42 @@ client.on('messageCreate', async msg => {
         if (cmd in COMMANDS) {
             try {
                 await msg.channel.sendTyping();
-                await COMMANDS[cmd](msg, argv);
+                let out = await COMMANDS[cmd](msg, argv);
+                if (out) {
+                    previousMsgs.push([msg.id, await msg.reply(out)]);
+                }
             } catch (error) {
-                await msg.reply('`' + String(error) + '`');
+                previousMsgs.push([msg.id, await msg.reply('`' + String(error) + '`')]);
                 if (error && typeof error === 'object' && 'stack' in error) {
                     console.log(error.stack);
                 }
             }
+            if (previousMsgs.length > 2000) {
+                previousMsgs = previousMsgs.slice(1000);
+            }
         }
+    }
+}
+
+let client = new Client({intents: [
+    GatewayIntentBits.MessageContent,
+    GatewayIntentBits.Guilds,
+    GatewayIntentBits.GuildMessages,
+    GatewayIntentBits.GuildMessageReactions,
+]});
+
+client.once('clientReady', readyClient => {
+    console.log(`Logged in as ${readyClient.user.tag}`);
+});
+
+client.on('messageCreate', runCommand);
+
+client.on('messageUpdate', async (old, msg) => {
+    let index = previousMsgs.findIndex(x => x[0] === old.id);
+    if (index > -1) {
+        await previousMsgs[index][1].delete();
+        previousMsgs = previousMsgs.splice(index, 1);
+        runCommand(msg);
     }
 });
 
