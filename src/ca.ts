@@ -5,7 +5,6 @@ import {execSync} from 'node:child_process';
 import {Pattern, FullIdentified, fullIdentify, toCatagolueRule} from '../lifeweb/lib/index.js';
 import {EmbedBuilder} from 'discord.js';
 import {Message, Response, writeFile, names, simStats, findRLE} from './util.js';
-import {createCanvas} from 'canvas';
 import CanvasGifEncoder from '@pencil.js/canvas-gif-encoder';
 
 
@@ -124,14 +123,14 @@ export async function cmdSim(msg: Message, argv: string[]): Promise<Response> {
     }
     let frameTime = 50;
     let frames: [Pattern, number][] = [[pattern.copy(), frameTime]];
-    let size = 100;
+    let gifSize = 100;
     for (let part of parts) {
         if (part[1] === 'fps' && typeof part[0] === 'number') {
             frameTime = Math.ceil(100 / part[0]) * 10;
             part = part.slice(2);
         }
         if (part[0] === 'size' && typeof part[1] === 'number') {
-            size = part[1];
+            gifSize = part[1];
             part = part.slice(2);
         }
         if (typeof part[0] === 'number') {
@@ -170,41 +169,55 @@ export async function cmdSim(msg: Message, argv: string[]): Promise<Response> {
     let maxY = Math.max(...frames.map(([p]) => p.height + p.yOffset)) + 1;
     let width = maxX - minX;
     let height = maxY - minY;
-    let scale = Math.ceil(size / Math.min(width, height));
-    let canvas = createCanvas(width * scale, height * scale);
-    let arraySize = width * scale * height * scale;
-    let ctx = canvas.getContext('2d');
-    ctx.fillStyle = '#36393e';
-    ctx.fillRect(0, 0, width * scale, height * scale);
-    let encoder = new CanvasGifEncoder(canvas.width, canvas.height, {
+    let size = width * height;
+    let array = new Uint8ClampedArray(size * 4);
+    let empty = new Uint8ClampedArray(size * 4);
+    let j = 0;
+    for (let i = 0; i < size; i++) {
+        empty[j++] = 0x36;
+        empty[j++] = 0x39;
+        empty[j++] = 0x3e;
+        empty[j++] = 0;
+    }
+    let encoder = new CanvasGifEncoder(width, height, {
         alphaThreshold: 0,
         quality: 1,
     });
     let middle = performance.now();
     for (let [p, frameTime] of frames) {
-        let i = 0;
         let startY = p.yOffset - minY;
         let startX = p.xOffset - minX;
-        ctx.fillStyle = '#36393e';
-        ctx.fillRect(0, 0, width * scale, height * scale);
+        array.set(empty);
+        let i = 0;
+        let j = startY * width * 4;
         for (let y = startY; y < startY + p.height; y++) {
+            j += startX * 4;
             for (let x = startX; x < startX + p.width; x++) {
                 let value = p.data[i++];
                 if (value) {
+                    array[j++] = 0xff;
                     if (p.states > 2) {
-                        ctx.fillStyle = '#ff' + (Math.ceil(value / p.states * 256) - 1).toString(16).padStart(2, '0') + '00';
+                        array[j++] = Math.ceil(value / p.states * 256) - 1;
+                        array[j++] = 0;
                     } else {
-                        ctx.fillStyle = '#ffffff';
+                        array[j++] = 0xff;
+                        array[j++] = 0xff;
                     }
-                    ctx.fillRect(x * scale, y * scale, scale, scale);
+                    array[j++] = 0;
+                } else {
+                    j += 4;
                 }
             }
+            j += (width - startX - p.width) * 4;
         }
-        encoder.addFrame(ctx, frameTime);
+        encoder.addFrame({height, width, data: array}, frameTime);
     }
     let gif = encoder.end();
     encoder.flush();
-    await writeFile('sim.gif', gif);
+    await writeFile('sim_base.gif', gif);
+    let scale = Math.ceil(gifSize / Math.min(width, height));
+    gifSize = Math.min(width, height) * scale;
+    execSync(`gifsicle --resize-${width < height ? 'width' : 'height'} ${gifSize} sim_base.gif > sim.gif`);
     if (pattern.ruleStr in simStats) {
         simStats[pattern.ruleStr]++;
     } else {
@@ -215,7 +228,6 @@ export async function cmdSim(msg: Message, argv: string[]): Promise<Response> {
         simCounter = 0;
         await writeFile('data/sim_stats.json', JSON.stringify(simStats, undefined, 4));
     }
-    // execSync(`gifsicle --resize-${width < height ? 'width' : 'height'} ${size} sim.gif > sim.gif`);
     if (outputTime) {
         let total = Math.round(performance.now() - start) / 1000;
         let parse = Math.round(middle - start) / 1000;
