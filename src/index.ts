@@ -248,6 +248,8 @@ async function runCommand(msg: Message): Promise<void> {
                 previousMsgs.push([msg.id, await msg.reply('`' + String(error) + '`')]);
                 if (error && typeof error === 'object' && 'stack' in error) {
                     console.log(error.stack);
+                } else {
+                    console.log(String(error));
                 }
             }
             if (previousMsgs.length > 2000) {
@@ -272,12 +274,22 @@ client.once('clientReady', readyClient => {
 client.on('messageCreate', runCommand);
 
 client.on('messageUpdate', async (old, msg) => {
-    let index = previousMsgs.findIndex(x => x[0] === old.id);
-    if (index > -1) {
-        await previousMsgs[index][1].delete();
-        previousMsgs = previousMsgs.splice(index, 1);
-        runCommand(msg);
+    try {
+        let index = previousMsgs.findLastIndex(x => x[0] === old.id);
+        if (index > -1) {
+            previousMsgs[index]
+            let msg = previousMsgs[index][1];
+            msg.delete();
+            previousMsgs = previousMsgs.splice(index, 1);
+        }
+    } catch (error) {
+        if (error && typeof error === 'object' && 'stack' in error) {
+            console.log(error.stack);
+        } else {
+            console.log(String(error));
+        }
     }
+    runCommand(msg);
 });
 
 client.login(config.token);
