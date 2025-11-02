@@ -70,6 +70,25 @@ const HELP: {[key: string]: Help} = {
         extra: `Example: !sim 1 fps 20 > wait 10 > 10 fps 200\nThe parts are seperated by >. Each part specifies a thing to do.\n\nValid parts:\n<gens> - Run for that many generations\n<gens> <step> - Run for that many generations at that step.\nwait <frames> - Wait for that many frames.\njump <gens> - Run the pattern for that many generations, but don't add the frames.\ntime - Also output the time taken to run it.\n\nThese prefixes can appear before any part:\n<x> fps - Sets the frames per second of the outputted gif (default 20).\nsize <x> - Sets the size (in the outputted gif) of the smaller axis (width or height, whichever is smaller) to x pixels (default 100). This cannot be used multiple times to have different parts of the gif at different sizes.\n\nWhen there is only 1 part, and it is just a number (or 2 numbers), the number is subtracted by 1. This makes it so you can do !sim <period of oscillator> and it will work.`
     },
 
+    'sim rand': {
+        desc: 'Simulate a random pattern',
+        args: [
+            {
+                name: 'size',
+                optional: true,
+                desc: 'The size of the pattern, such as 20x20 or 8x32 (default 16x16).',
+            },
+            {
+                name: 'rule',
+                desc: 'The rule to simulate it in.'
+            },
+            {
+                name: 'parts',
+                desc: 'How to run it. See !help sim',
+            },
+        ],
+    },
+
     sssss: {
         desc: 'Query the 5S database',
         args: [

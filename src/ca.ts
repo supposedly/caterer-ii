@@ -2,7 +2,7 @@
 /// <reference path="./pencil.js__canvas-gif-encoder.d.ts" />
 
 import {execSync} from 'node:child_process';
-import {Pattern, FullIdentified, fullIdentify, toCatagolueRule} from '../lifeweb/lib/index.js';
+import {Pattern, FullIdentified, fullIdentify, createPattern, toCatagolueRule} from '../lifeweb/lib/index.js';
 import {EmbedBuilder} from 'discord.js';
 import {Message, Response, writeFile, names, simStats, findRLE} from './util.js';
 import CanvasGifEncoder from '@pencil.js/canvas-gif-encoder';
@@ -103,6 +103,35 @@ export async function cmdSim(msg: Message, argv: string[]): Promise<Response> {
         outputTime = true;
         argv = argv.slice(1);
     }
+    let pattern: Pattern;
+    if (argv[1] === 'rand') {
+        let height = 16;
+        let width = 16;
+        if (argv[2].match(/^\d+x\d+$/)) {
+            let data = argv[2].split('x');
+            width = parseInt(data[0]);
+            height = parseInt(data[1]);
+            argv = argv.slice(1);
+        }
+        let rule = argv[2];
+        argv = argv.slice(2);
+        pattern = createPattern(rule);
+        let size = height * width;
+        let data = new Uint8Array(size);
+        for (let i = 0; i < size; i++) {
+            data[i] = Math.floor(Math.random() * pattern.states);
+        }
+        pattern.height = height;
+        pattern.width = width;
+        pattern.size = size;
+        pattern.data = data;
+    } else {
+        let p = await findRLE(msg);
+        if (!p) {
+            throw new Error('Cannot find RLE');
+        }
+        pattern = p;
+    }
     for (let arg of argv.slice(1)) {
         if (arg === '>') {
             parts.push(currentPart);
@@ -117,10 +146,7 @@ export async function cmdSim(msg: Message, argv: string[]): Promise<Response> {
         }
     }
     parts.push(currentPart);
-    let pattern = await findRLE(msg);
-    if (!pattern) {
-        throw new Error('Cannot find RLE');
-    }
+
     let frameTime = 50;
     let frames: [Pattern, number][] = [[pattern.copy(), frameTime]];
     let gifSize = 100;
