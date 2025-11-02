@@ -1,3 +1,4 @@
+git pull
 pushd lifeweb
 git pull
 popd
