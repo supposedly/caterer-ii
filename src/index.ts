@@ -84,7 +84,7 @@ const HELP: {[key: string]: Help} = {
             },
             {
                 name: 'parts',
-                desc: 'How to run it. See !help sim',
+                desc: 'How to run it. See !help sim.',
             },
         ],
     },
