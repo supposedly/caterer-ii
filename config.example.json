@@ -3,5 +3,7 @@
     "admins": [
         "your user id"
     ],
-    "accepterer": "the accepterer role"
+    "accepterers":[
+        "the accepterer role"
+    ]
 }

@@ -2,6 +2,6 @@
 /lib
 /config.json
 /lifeweb
-/sssss
+/data/sssss
 *.gif
-/sim_stats.json
+/data/sim_stats.json

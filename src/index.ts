@@ -1,428 +1,186 @@
 
+import * as lifeweb from '../lifeweb/lib/index.js';
 import {inspect} from 'node:util';
-import * as fs from 'node:fs/promises';
-import {parse, identify, fullIdentify, Pattern, toCatagolueRule, createPattern, FullIdentified} from '../lifeweb/lib/index.js';
-import {Client, GatewayIntentBits, Message, EmbedBuilder, OmitPartialGroupDMChannel} from 'discord.js';
-import {createCanvas} from 'canvas';
-// @ts-ignore
-import CanvasGifEncoder from '@pencil.js/canvas-gif-encoder';
-
-
-let config = JSON.parse((await fs.readFile(import.meta.dirname + '/../config.json')).toString());
-
-let dyks = (await fs.readFile(import.meta.dirname + '/../dyk.txt')).toString().split('\n').slice(1);
-
-let simStats = JSON.parse((await fs.readFile(import.meta.dirname + '/../sim_stats.json')).toString());
-
-let names = new Map((await fs.readFile(import.meta.dirname + '/../names.txt')).toString().split('\n').map(x => x.split(' ')).map(x => [x[0], x.slice(1).join(' ')]));
-const NAME_CHARS = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789~!@#$%^&*()-=_+[]\\{}|;\':",./<>? ';
-
-const RLE_HEADER = /\s*x\s*=\s*\d+\s*,?\s*y\s*=\s*\d+/;
-
-function findRLEFromText(data: string): Pattern | undefined {
-    let match = RLE_HEADER.exec(data);
-    if (!match) {
-        return;
-    }
-    data = data.slice(match.index);
-    let index = data.indexOf('!');
-    if (index === -1) {
-        return;
-    }
-    return parse(data.slice(0, index + 1));
-}
-
-async function findRLEFromMessage(msg: Message): Promise<Pattern | undefined> {
-    let out = findRLEFromText(msg.content);
-    if (out) {
-        return out;
-    }
-    if (msg.attachments.size > 0) {
-        let attachment = msg.attachments.first();
-        if (attachment) {
-            let data = await (await fetch(attachment.url)).text();
-            return findRLEFromText(data);
-        }
-    }
-}
-
-async function findRLE(msg: Message): Promise<Pattern | undefined> {
-    let out = await findRLEFromMessage(msg);
-    if (out) {
-        return out;
-    }
-    if (msg.reference) {
-        let reply = await msg.fetchReference();
-        out = await findRLEFromMessage(reply);
-        if (out) {
-            return out;
-        }
-    }
-    let msgs = await msg.channel.messages.fetch({limit: 50});
-    for (let msg of msgs) {
-        if (out = await findRLEFromMessage(msg[1])) {
-            return out;
-        }
-    }
-}
-
-function parseSpeed(speed: string): {p: number, x: number, y: number} {
-    if (!speed.includes('c')) {
-        throw new Error('Invalid speed!');
-    }
-    let [disp, period] = speed.split('c');
-    if (period.startsWith('/')) {
-        period = period.slice(1);
-    }
-    let p = parseInt(period);
-    let x: number;
-    let y: number;
-    let num = parseInt(disp);
-    if (!Number.isNaN(num)) {
-        x = num;
-        if (period.endsWith('d')) {
-            y = num;
-        } else {
-            y = 0;
-        }
-    } else if (disp.startsWith('(')) {
-        let parts = disp.slice(1, -1).split(',');
-        x = parseInt(parts[0]);
-        y = parseInt(parts[1]);
-        if (Number.isNaN(x) || Number.isNaN(y) || parts.length !== 2) {
-            throw new Error('Invalid speed!');
-        }
-    } else if (disp === '') {
-        x = 1;
-        if (period.endsWith('d')) {
-            y = 1;
-        } else {
-            y = 0;
-        }
-    } else {
-        throw new Error('Invalid speed!');
-    }
-    return {p, x, y};
-}
-
-function embedIdentified(data: FullIdentified, isOutput?: boolean): EmbedBuilder[] {
-    let out = '';
-    if (data.period > 0) {
-        out += '**Period:** ' + data.period + '\n';
-    }
-    if (data.disp && (data.disp[0] !== 0 || data.disp[1] !== 0)) {
-        out += '**Displacement:** (' + data.disp[0] + ', ' + data.disp[1] + ')\n';
-    }
-    if (data.stabilizedAt > 0) {
-        out += '**Stabilizes at:** ' + data.stabilizedAt + '\n';
-    }
-    if (data.power !== undefined) {
-        out += '**Power:** ' + data.power + '\n';
-    }
-    let pops: number[];
-    if (data.period > 0) {
-        pops = data.pops.slice(0, data.period);
-    } else {
-        pops = data.pops;
-    }
-    let minPop = Math.min(...pops);
-    let avgPop = pops.reduce((x, y) => x + y, 0) / pops.length;
-    let maxPop = Math.max(...pops);
-    out += '**Populations:** ' + minPop + ' | ' + (Math.round(avgPop * 100) / 100) + ' | ' + maxPop + '\n';
-    if (data.minmax) {
-        out += '**Min:** ' + data.minmax[0] + '\n';
-        out += '**Max:** ' + data.minmax[1] + '\n';
-    }
-    if (data.period > 1) {
-        if (data.heat) {
-            out += '**Heat:** ' + data.heat + '\n';
-        }
-        if (data.temperature) {
-            out += '**Temperature:** ' + data.temperature + '\n';
-        }
-        if (data.volatility) {
-            out += '**Volatility:** ' + data.volatility + '\n';
-        }
-        if (data.strictVolatility) {
-            out += '**Strict volatility:** ' + data.strictVolatility + '\n';
-        }
-    }
-    if (data.apgcode !== 'PATHOLOGICAL') {
-        out += '[';
-        if (data.apgcode.length > 31) {
-            out += data.apgcode.slice(0, 14) + '...' + data.apgcode.slice(-14);
-        } else {
-            out += data.apgcode;
-        }
-        out += '](https://catagolue.hatsya.com/object/' + data.apgcode + '/' + toCatagolueRule(data.phases[0].ruleStr) + ')';
-    }
-    let title = data.desc;
-    let name = names.get(data.apgcode);
-    if (name !== undefined) {
-        title = name[0].toUpperCase() + name.slice(1) + ' (' + title + ')';
-    }
-    if (isOutput) {
-        title = 'Output: ' + title;
-    }
-    let embeds = [new EmbedBuilder().setTitle(title).setDescription(out)];
-    if (data.output) {
-        embeds.push(...embedIdentified(data.output, true));
-    }
-    return embeds;
-}
+import {Client, GatewayIntentBits} from 'discord.js';
+import {Response, Message, config, sentByAdmin} from './util.js';
+import {cmdIdentify, cmdSim} from './ca.js';
+import {cmdSssss, cmdDyk, cmdName, cmdSimStats, cmdSaveSimStats} from './db.js';
 
 
 interface Help {
     desc: string;
-    syntax: string;
+    args: {name: string, optional?: boolean, desc: string}[];
+    extra?: string;
+    aliases?: string[];
 }
 
 const HELP: {[key: string]: Help} = {
+
     help: {
         desc: 'Display a help message',
-        syntax: '!help [command]',
+        args: [
+            {
+                name: 'command',
+                optional: true,
+                desc: 'Command to display infomation for. If omitted or invalid, displays generic help/info message.'
+            }
+        ],
+        extra: 'If an argument looks like <arg>, it is required. If it looks like [arg], it is optional.'
     },
+
+    eval: {
+        desc: 'Evaluates code (admins only)',
+        args: [
+            {
+                name: 'code',
+                desc: 'The code to run',
+            },
+        ],
+    },
+
+    ping: {
+        desc: 'Gets the latency',
+        args: [],
+    },
+
     identify: {
         desc: 'Identify a pattern',
-        syntax: '!identify [generations]',
+        args: [
+            {
+                name: 'generations',
+                optional: true,
+                desc: 'Number of generations to run the identifier for (default 256).'
+            },
+        ],
     },
-    eval: {
-        desc: 'Evaluates code',
-        syntax: '!eval <code>',
-    },
+
     sim: {
-        desc: 'Simulate an RLE and output to GIF',
-        syntax: '!sim [parts]',
+        desc: 'Simulate a RLE and output a gif',
+        args: [
+            {
+                name: '\'time\'',
+                optional: true,
+                desc: 'Shows how much time it took',
+            },
+            {
+                name: 'parts',
+                desc: 'Specifies how to simulate',
+            },
+        ],
+        extra: `Example: !sim 1 fps 20 > wait 10 > 10 fps 200\nThe parts are seperated by >. Each part specifies a thing to do.\n\nValid parts:\n<gens> - Run for that many generations\n<gens> <step> - Run for that many generations at that step.\nwait <frames> - Wait for that many frames.\njump <gens> - Run the pattern for that many generations, but don't add the frames.\ntime - Also output the time taken to run it.\n\nThese prefixes can appear before any part:\n<x> fps - Sets the frames per second of the outputted gif (default 20).\nsize <x> - Sets the size (in the outputted gif) of the smaller axis (width or height, whichever is smaller) to x pixels (default 100). This cannot be used multiple times to have different parts of the gif at different sizes.\n\nWhen there is only 1 part, and it is just a number (or 2 numbers), the number is subtracted by 1. This makes it so you can do !sim <period of oscillator> and it will work.`
     },
+
     sssss: {
         desc: 'Query the 5S database',
-        syntax: '!sssss <speed>',
+        args: [
+            {
+                name: 'speed',
+                desc: 'A speed, such as c/2, c/2o, c/2d, (2, 1)c/5, etc',
+            },
+        ],
+        aliases: ['5s'],
     },
-    '5s': {
-        desc: 'Alias for !sssss',
-        syntax: '!5s <speed>',
-    },
+
     name: {
         desc: 'Find or set the name of a pattern',
-        syntax: '!name [new name]',
+        args: [
+            {
+                name: 'new_name',
+                optional: true,
+                desc: 'The new name. If provided, it will change the name (accepterers only). If omitted, it will just show the current name.'
+            }
+        ]
     },
+
     sim_stats: {
         desc: 'Get statistics on the most popular rules used by !sim',
-        syntax: '!sim_stats [page]',
+        args: [
+            {
+                name: 'page',
+                optional: true,
+                desc: 'The page to get data for, defaults to 0.'
+            },
+        ],
     },
+
     save_sim_stats: {
-        desc: 'Save the sim stats (accepterer only)',
-        syntax: '!save_sim_stats',
+        desc: 'Save the !sim stats (accepterer only)',
+        args: [],
     },
+
 };
 
 let helpMsg = '```ansi\n\x1b[1m\x1b[34mA cellular automata bot for the ConwayLife Lounge Discord server\n\nCommands:\x1b[0m';
+let helpMsgs: {[key: string]: string} = {};
+
 let padding = Math.max(...Object.keys(HELP).map(x => x.length));
+
 for (let cmd in HELP) {
-    helpMsg += '\n!' + cmd.padEnd(padding) + ' | ' + HELP[cmd].desc;
+    let data = HELP[cmd];
+    helpMsg += '\n' + cmd.padEnd(padding) + ' | ' + data.desc;
+    let msg = '```ansi\n' + '\x1b[1m\x1b[34m!' + cmd + '\x1b[0m';
+    for (let arg of data.args) {
+        msg += ' ';
+        if (arg.optional) {
+            msg += '[' + arg.name + ']';
+        } else {
+            msg += '<' + arg.name + '>';
+        }
+    }
+    msg += '\n' + data.desc + '``````ansi\n\x1b[1m\x1b[34mArguments:\x1b[0m';
+    for (let arg of data.args) {
+        msg += '\n';
+        if (arg.optional) {
+            msg += '[' + arg.name + ']';
+        } else {
+            msg += '<' + arg.name + '>';
+        }
+        msg += ' - ' + arg.desc;
+    }
+    if (data.extra) {
+        msg += '``````ansi\n' + data.extra;
+    }
+    msg += '```'
+    helpMsgs[cmd] = msg;
 }
+
 helpMsg += '```';
 
-let simCounter = 0;
 
-type Response = Promise<undefined | Parameters<Message['reply']>[0]>;
+const EVAL_PREFIX = `\nlet {RuleError, APGCODE_CHARS, SYMMETRY_COMBINE, SYMMETRY_LEAST, symmetryFromBases, Pattern, TRANSITIONS, VALID_TRANSITIONS, HEX_TRANSITIONS, VALID_HEX_TRANSITIONS, parseTransitions, unparseTransitions, transitionsToArray, arrayToTransitions, parseIsotropic, parseMAP, unparseMAP, findSymmetry, MAPPattern, MAPB0Pattern, MAPGenPattern, MAPB0GenPattern, AlternatingPattern, findType, identify, findMinmax, classifyLinear, findOscillatorInfo, fullIdentify, getKnots, INTSeperator, createPattern, parse, toCatagolueRule} = lifeweb;\n`;
 
-const COMMANDS: {[key: string]: (msg: Message, argv: string[]) => Response} = {
 
-    async help(msg: Message, argv: string[]): Response {
+const COMMANDS: {[key: string]: (msg: Message, argv: string[]) => Promise<Response>} = {
+
+    async help(msg: Message, argv: string[]): Promise<Response> {
         if (argv.length > 1) {
             let cmd = argv.slice(1).join(' ');
             if (cmd.startsWith('!')) {
                 cmd = cmd.slice(1);
             }
-            if (!(cmd in HELP)) {
-                return `No command called !${cmd}`;
+            if (cmd in helpMsgs) {
+                return helpMsgs[cmd];
             } else {
-                return '```\n!' + cmd + ' - ' + HELP[cmd].desc + '\n\nSyntax: ' + HELP[cmd].syntax + '```';
+                return `No command called !${cmd}`;
             }
         } else {
             return helpMsg;
         }
     },
 
-    async identify(msg: Message, argv: string[]): Response {
-        let limit = 256;
-        if (argv[1]) {
-            let parsed = parseFloat(argv[1]);
-            if (!Number.isNaN(parsed)) {
-                limit = parsed;
-            }
-        }
-        let pattern = await findRLE(msg);
-        if (!pattern) {
-            throw new Error('Cannot find RLE');
-        }
-        return {embeds: embedIdentified(fullIdentify(pattern, limit))};
-    },
-
-    async eval(msg: Message, argv: string[]): Response {
-        if (config.admins.includes(msg.author.id)) {
+    async eval(msg: Message, argv: string[]): Promise<Response> {
+        await msg.channel.sendTyping();
+        if (sentByAdmin(msg)) {
             let code = argv.slice(1).join(' ');
             if (!code.includes(';') && !code.includes('\n')) {
                 code = 'return ' + code;
             }
-            let out = (new Function('client', 'parse', 'identify', 'fullIdentify', 'Pattern', 'createPattern', '"use strict";' + code))(client, parse, identify, fullIdentify, Pattern, createPattern);
+            let out = (new Function('client', 'msg', 'lifeweb', '"use strict";' + EVAL_PREFIX + code))(client, msg, lifeweb);
             return '```ansi\n' + inspect(out, {
                 colors: true,
                 depth: 2, 
             }) + '```';
-        } else {
-            return 'nice try';
         }
-    },
-
-    async sim(msg: Message, argv: string[]): Response {
-        let parts: (string | number)[][] = [];
-        let currentPart: (string | number)[] = [];
-        for (let arg of argv.slice(1)) {
-            if (arg === '>') {
-                parts.push(currentPart);
-                currentPart = [];
-            } else {
-                let num = parseInt(arg);
-                if (Number.isNaN(num)) {
-                    currentPart.push(arg);
-                } else {
-                    currentPart.push(num);
-                }
-            }
-        }
-        parts.push(currentPart);
-        let pattern = await findRLE(msg);
-        if (!pattern) {
-            throw new Error('Cannot find RLE');
-        }
-        let frameTime = 50;
-        let frames: [Pattern, number][] = [[pattern.copy(), frameTime]];
-        let size = 100;
-        for (let part of parts) {
-            if (part[1] === 'fps' && typeof part[0] === 'number') {
-                frameTime = Math.ceil(100 / part[0]) * 10;
-                part = part.slice(2);
-            }
-            if (part[0] === 'size' && typeof part[1] === 'number') {
-                size = part[1];
-                part = part.slice(2);
-            }
-            if (typeof part[0] === 'number') {
-                if (typeof part[1] === 'number') {
-                    for (let i = parts.length > 1 ? 0 : 1; i < Math.ceil(part[0] / part[1]); i++) {
-                        pattern.run(part[1]);
-                        frames.push([pattern.copy(), frameTime]);
-                    }
-                } else if (typeof part[1] === 'string') {
-                    throw new Error(`Invalid !sim command: ${part.join(' ')}`);
-                } else {
-                    for (let i = parts.length > 1 ? 0 : 1; i < part[0]; i++) {
-                        pattern.runGeneration();
-                        frames.push([pattern.copy(), frameTime]);
-                    }
-                }
-            } else if (part[0] === 'wait') {
-                if (typeof part[1] !== 'number' || part.length > 2) {
-                    throw new Error(`Invalid !sim command: ${part.join(' ')}`);
-                }
-                for (let i = 0; i < part[1]; i++) {
-                    frames.push([pattern.copy(), frameTime]);
-                }
-            } else if (part[0] !== undefined) {
-                throw new Error(`Invalid !sim command: ${part.join(' ')}`);
-            }
-        }
-        let minX = Math.min(...frames.map(([p]) => p.xOffset)) - 1;
-        let maxX = Math.max(...frames.map(([p]) => p.width + p.xOffset)) + 1;
-        let minY = Math.min(...frames.map(([p]) => p.yOffset)) - 1;
-        let maxY = Math.max(...frames.map(([p]) => p.height + p.yOffset)) + 1;
-        let width = maxX - minX;
-        let height = maxY - minY;
-        let scale = Math.ceil(size / Math.min(width, height));
-        let canvas = createCanvas(width * scale, height * scale);
-        let ctx = canvas.getContext('2d');
-        ctx.fillStyle = '#36393e';
-        ctx.fillRect(0, 0, width * scale, height * scale);
-        let encoder = new CanvasGifEncoder(canvas.width, canvas.height, {
-            alphaThreshold: 0,
-            quality: 1,
-        });
-        for (let [p, frameTime] of frames) {
-            let i = 0;
-            let startY = p.yOffset - minY;
-            let startX = p.xOffset - minX;
-            ctx.fillStyle = '#36393e';
-            ctx.fillRect(0, 0, width * scale, height * scale);
-            for (let y = startY; y < startY + p.height; y++) {
-                for (let x = startX; x < startX + p.width; x++) {
-                    let value = p.data[i++];
-                    if (value) {
-                        if (p.states > 2) {
-                            ctx.fillStyle = '#ff' + (Math.ceil(value / p.states * 256) - 1).toString(16).padStart(2, '0') + '00';
-                        } else {
-                            ctx.fillStyle = '#ffffff';
-                        }
-                        ctx.fillRect(x * scale, y * scale, scale, scale);
-                    }
-                }
-            }
-            encoder.addFrame(ctx, frameTime);
-        }
-        let gif = encoder.end();
-        encoder.flush();
-        await fs.writeFile('sim.gif', gif);
-        if (pattern.ruleStr in simStats) {
-            simStats[pattern.ruleStr]++;
-        } else {
-            simStats[pattern.ruleStr] = 1;
-        }
-        simCounter++;
-        if (simCounter === 16) {
-            simCounter = 0;
-            await fs.writeFile(import.meta.dirname + '/../sim_stats.json', JSON.stringify(simStats, undefined, 4));
-        }
-        return {files: ['sim.gif']};
-    },
-
-    async sssss(msg: Message, argv: string[]): Response {
-        let speed = parseSpeed(argv.slice(1).join(' '));
-        speed.x = Math.abs(speed.x);
-        speed.y = Math.abs(speed.y);
-        if (speed.x < speed.y) {
-            let temp = speed.y;
-            speed.y = speed.x;
-            speed.x = temp;
-        }
-        let file = import.meta.dirname + '/../sssss/data/'
-        if (speed.y === 0) {
-            file += 'Orthogonal';
-        } else if (speed.x === speed.y) {
-            file += 'Diagonal';
-        } else {
-            file += 'Oblique';
-        }
-        file += ' ships.sss.txt';
-        let data = (await fs.readFile(file)).toString().split('\n');
-        for (let line of data) {
-            let [pop, rule, dx, dy, period, rle] = line.split(', ');
-            if (speed.p === parseInt(period) && speed.x === parseInt(dx) && speed.y === parseInt(dy)) {
-                rle = parse(`x = 0, y = 0, rule = ${rule}\n${rle}`).toRLE();
-                return `\`\`\`\n#C (${dx}, ${dy})c/${period}, population ${pop}\n${rle}\`\`\``;
-            }
-        }
-        return 'No such ship found in database!';
-    },
-
-    async '5s'(msg: Message, argv: string[]): Response {
-        return COMMANDS.sssss(msg, argv);
-    },
-
-    async dyk(): Response {
-        let num = Math.floor(Math.random() * dyks.length);
-        let out = '**#' + (num + 1) + ':** ' + dyks[num] + '\n\n-# Licensed under the [GNU Free Documentation License 1.2](https://www.gnu.org/licenses/fdl-1.3.html)';
-        return {embeds: [new EmbedBuilder().setTitle('Did you know...').setDescription(out)]};
     },
 
     async ping(msg: Message): Promise<undefined> {
@@ -438,72 +196,22 @@ const COMMANDS: {[key: string]: (msg: Message, argv: string[]) => Response} = {
         }
     },
 
-    async name(msg: Message, argv: string[]): Response {
-        let pattern = await findRLE(msg);
-        if (!pattern) {
-            throw new Error('Cannot find RLE');
-        }
-        let apgcode = identify(pattern, 4096).apgcode;
-        if (!apgcode.startsWith('x') || apgcode.startsWith('y')) {
-            throw new Error(`Apgcode is ${apgcode}`);
-        }
-        let newName = argv.slice(1).join(' ');
-        if (newName === '') {
-            let name = names.get(apgcode);
-            if (name !== undefined) {
-                return name;
-            } else {
-                return 'Pattern is not named';
-            }
-        }
-        if (!msg.member) {
-            throw new Error('bruh');
-        }
-        if (!msg.member.roles.cache.find(role => role.id === config.accepterer) && !config.admins.includes(msg.author.id)) {
-            throw new Error('You are not an accepterer');
-        }
-        if (!Array.from(newName).every(x => NAME_CHARS.includes(x))) {
-            throw new Error('Invalid name!');
-        }
-        names.set(apgcode, newName);
-        await fs.writeFile(import.meta.dirname + '/../names.txt', Array.from(names.entries()).map(x => x[0] + ' ' + x[1]).join('\n'));
-        if (names.has(apgcode)) {
-            return 'Renamed `' + names.get(apgcode) + '` to `' + newName + '`';
-        } else {
-            return 'Set name to `' + newName + '`';
-        }
-    },
+    identify: cmdIdentify,
+    sim: cmdSim,
 
-    async sim_stats(msg: Message, argv: string[]): Response {
-        let page = argv[1] ? parseInt(argv[1]) - 1 : 0;
-        if (Number.isNaN(page)) {
-            throw new Error('Invalid page number');
-        }
-        let data = Object.entries(simStats).sort((x, y) => (x[1] as any) - (y[1] as any)).slice(page, page + 10);
-        let out = data.map(x => x[0] + ': ' + x[1]).join('\n');
-        if (out === '') {
-            out = 'No data!';
-        }
-        return {embeds: [new EmbedBuilder().setTitle('Most popular rules (page ' + (page + 1) + ')').setDescription(out)]};
-    },
-
-    async save_sim_stats(msg: Message): Response {
-        if (!msg.member) {
-            throw new Error('bruh');
-        }
-        if (!msg.member.roles.cache.find(role => role.id === config.accepterer) && !config.admins.includes(msg.author.id)) {
-            throw new Error('You are not an accepterer');
-        }
-        await fs.writeFile(import.meta.dirname + '/../sim_stats.json', JSON.stringify(simStats, undefined, 4));
-        return 'Saved';
-    },
+    sssss: cmdSssss,
+    '5s': cmdSssss,
+    dyk: cmdDyk,
+    name: cmdName,
+    sim_stats: cmdSimStats,
+    save_sim_stats: cmdSaveSimStats,
 
 };
 
 
 let previousMsgs: [string, Message][] = [];
 
-async function runCommand(msg: OmitPartialGroupDMChannel<Message>): Promise<void> {
+async function runCommand(msg: Message): Promise<void> {
     if (msg.author.bot) {
         return;
     }
@@ -513,7 +221,6 @@ async function runCommand(msg: OmitPartialGroupDMChannel<Message>): Promise<void
         let cmd = argv[0].toLowerCase();
         if (cmd in COMMANDS) {
             try {
-                await msg.channel.sendTyping();
                 let out = await COMMANDS[cmd](msg, argv);
                 if (out) {
                     previousMsgs.push([msg.id, await msg.reply(out)]);
@@ -530,6 +237,7 @@ async function runCommand(msg: OmitPartialGroupDMChannel<Message>): Promise<void
         }
     }
 }
+
 
 let client = new Client({intents: [
     GatewayIntentBits.MessageContent,

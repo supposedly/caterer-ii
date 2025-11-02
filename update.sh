@@ -2,6 +2,6 @@ pushd lifeweb
 git pull
 npx tsc
 popd
-pushd sssss
+pushd data/sssss
 git pull
 popd
