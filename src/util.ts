@@ -95,6 +95,9 @@ export async function findRLE(msg: Message): Promise<Pattern | undefined> {
     }
     let msgs = await msg.channel.messages.fetch({limit: 50});
     for (let msg of msgs) {
+        if (msg[1].author.bot) {
+            continue;
+        }
         if (out = await findRLEFromMessage(msg[1] as Message)) {
             return out;
         }
