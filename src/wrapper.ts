@@ -29,11 +29,11 @@ client.on('messageCreate', async msg => {
             execSync('systemctl start caterer');
             await msg.reply('Restarted!');
         } else if (msg.content === '!!update') {
-            let response = await msg.reply('Updating...');
+            await msg.reply('Updating...');
             execSync('systemctl stop caterer');
             execSync(import.meta.dirname + '/../update2.sh');
             execSync('systemctl start caterer');
-            await response.edit('Updating... Complete!');
+            await msg.channel.send('Update complete!');
         } else {
             throw new Error('Invalid command!');
         }
