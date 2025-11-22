@@ -121,10 +121,7 @@ export async function cmdSim(msg: Message, argv: string[]): Promise<Response> {
         for (let i = 0; i < size; i++) {
             data[i] = Math.floor(Math.random() * pattern.states);
         }
-        pattern.height = height;
-        pattern.width = width;
-        pattern.size = size;
-        pattern.data = data;
+        pattern.setData(data, height, width);
     } else {
         let p = await findRLE(msg);
         if (!p) {
@@ -216,10 +213,11 @@ export async function cmdSim(msg: Message, argv: string[]): Promise<Response> {
         array.set(empty);
         let i = 0;
         let j = startY * width * 4;
+        let pData = p.getData();
         for (let y = startY; y < startY + p.height; y++) {
             j += startX * 4;
             for (let x = startX; x < startX + p.width; x++) {
-                let value = p.data[i++];
+                let value = pData[i++];
                 if (value) {
                     array[j++] = 0xff;
                     if (p.states > 2) {
