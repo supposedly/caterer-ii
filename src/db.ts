@@ -14,7 +14,7 @@ export async function cmdSssss(msg: Message, argv: string[]): Promise<Response> 
         speed.y = speed.x;
         speed.x = temp;
     }
-    let file = import.meta.dirname + '/../sssss/data/'
+    let file = 'data/sssss/';
     if (speed.y === 0) {
         file += 'Orthogonal';
     } else if (speed.x === speed.y) {

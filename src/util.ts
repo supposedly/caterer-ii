@@ -13,6 +13,7 @@ export interface Config {
     token: string;
     admins: string[];
     accepterers: string[];
+    wrapperToken: string;
 }
 
 

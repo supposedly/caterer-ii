@@ -267,9 +267,7 @@ let client = new Client({intents: [
     GatewayIntentBits.GuildMessageReactions,
 ]});
 
-client.once('clientReady', readyClient => {
-    console.log(`Logged in as ${readyClient.user.tag}`);
-});
+client.once('clientReady', () => console.log('Logged in'));
 
 client.on('messageCreate', runCommand);
 
