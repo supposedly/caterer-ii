@@ -20,23 +20,26 @@ client.on('messageCreate', async msg => {
     try {
         if (msg.content === '!!start') {
             execSync('systemctl start caterer');
+            await msg.reply('Started!');
         } else if (msg.content === '!!stop') {
             execSync('systemctl stop caterer');
+            await msg.reply('Stopped!');
         } else if (msg.content === '!!restart') {
             execSync('systemctl stop caterer');
             execSync('systemctl start caterer');
+            await msg.reply('Restarted!');
         } else if (msg.content === '!!update') {
+            let response = await msg.reply('Updating...');
             execSync('systemctl stop caterer');
             execSync(import.meta.dirname + '/../update2.sh');
             execSync('systemctl start caterer');
+            await response.edit('Updating... Complete!');
         } else {
             throw new Error('Invalid command!');
         }
     } catch (error) {
         await msg.reply('`' + String(error) + '`');
-        return;
     }
-    await msg.react('✅');
 });
 
 client.login(config.wrapperToken);
