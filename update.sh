@@ -1,9 +1,9 @@
 pushd lifeweb
 git pull
-npx tsc
+./node_modules/.bin/npx tsc
 popd
 pushd data/sssss
 git pull
 popd
 git pull
-npx tsc
+./node_modules/.bin/npx tsc

@@ -27,7 +27,7 @@ client.on('messageCreate', async msg => {
             execSync('systemctl start caterer');
         } else if (msg.content === '!!update') {
             execSync('systemctl stop caterer');
-            execSync(import.meta.dirname + '/../update2.sh');
+            execSync(import.meta.dirname + '/../update.sh');
             execSync('systemctl start caterer');
         } else {
             throw new Error('Invalid command!');
