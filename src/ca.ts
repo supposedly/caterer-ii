@@ -8,59 +8,59 @@ import {Message, Response, writeFile, names, simStats, findRLE} from './util.js'
 import CanvasGifEncoder from '@pencil.js/canvas-gif-encoder';
 
 
-function embedIdentified(data: FullIdentified, isOutput?: boolean): EmbedBuilder[] {
+function embedIdentified(type: FullIdentified, isOutput?: boolean): EmbedBuilder[] {
     let out = '';
-    if (data.period > 0) {
-        out += '**Period:** ' + data.period + '\n';
+    if (type.period > 0) {
+        out += '**Period:** ' + type.period + '\n';
     }
-    if (data.disp && (data.disp[0] !== 0 || data.disp[1] !== 0)) {
-        out += '**Displacement:** (' + data.disp[0] + ', ' + data.disp[1] + ')\n';
+    if (type.disp && (type.disp[0] !== 0 || type.disp[1] !== 0)) {
+        out += '**Displacement:** (' + type.disp[0] + ', ' + type.disp[1] + ')\n';
     }
-    if (data.stabilizedAt > 0) {
-        out += '**Stabilizes at:** ' + data.stabilizedAt + '\n';
+    if (type.stabilizedAt > 0) {
+        out += '**Stabilizes at:** ' + type.stabilizedAt + '\n';
     }
-    if (data.power !== undefined) {
-        out += '**Power:** ' + data.power + '\n';
+    if (type.power !== undefined) {
+        out += '**Power:** ' + type.power + '\n';
     }
     let pops: number[];
-    if (data.period > 0) {
-        pops = data.pops.slice(0, data.period);
+    if (type.period > 0) {
+        pops = type.pops.slice(type.stabilizedAt, type.stabilizedAt + type.period);
     } else {
-        pops = data.pops;
+        pops = type.pops;
     }
     let minPop = Math.min(...pops);
     let avgPop = pops.reduce((x, y) => x + y, 0) / pops.length;
     let maxPop = Math.max(...pops);
     out += '**Populations:** ' + minPop + ' | ' + (Math.round(avgPop * 100) / 100) + ' | ' + maxPop + '\n';
-    if (data.minmax) {
-        out += '**Min:** ' + data.minmax[0] + '\n';
-        out += '**Max:** ' + data.minmax[1] + '\n';
+    if (type.minmax) {
+        out += '**Min:** ' + type.minmax[0] + '\n';
+        out += '**Max:** ' + type.minmax[1] + '\n';
     }
-    if (data.period > 1) {
-        if (data.heat) {
-            out += '**Heat:** ' + data.heat + '\n';
+    if (type.period > 1) {
+        if (type.heat) {
+            out += '**Heat:** ' + type.heat + '\n';
         }
-        if (data.temperature) {
-            out += '**Temperature:** ' + data.temperature + '\n';
+        if (type.temperature) {
+            out += '**Temperature:** ' + type.temperature + '\n';
         }
-        if (data.volatility) {
-            out += '**Volatility:** ' + data.volatility + '\n';
+        if (type.volatility) {
+            out += '**Volatility:** ' + type.volatility + '\n';
         }
-        if (data.strictVolatility) {
-            out += '**Strict volatility:** ' + data.strictVolatility + '\n';
+        if (type.strictVolatility) {
+            out += '**Strict volatility:** ' + type.strictVolatility + '\n';
         }
     }
-    if (data.apgcode !== 'PATHOLOGICAL') {
+    if (type.apgcode !== 'PATHOLOGICAL') {
         out += '[';
-        if (data.apgcode.length > 31) {
-            out += data.apgcode.slice(0, 14) + '...' + data.apgcode.slice(-14);
+        if (type.apgcode.length > 31) {
+            out += type.apgcode.slice(0, 14) + '...' + type.apgcode.slice(-14);
         } else {
-            out += data.apgcode;
+            out += type.apgcode;
         }
-        out += '](https://catagolue.hatsya.com/object/' + data.apgcode + '/' + toCatagolueRule(data.phases[0].ruleStr) + ')';
+        out += '](https://catagolue.hatsya.com/object/' + type.apgcode + '/' + toCatagolueRule(type.phases[0].ruleStr) + ')';
     }
-    let title = data.desc;
-    let name = names.get(data.apgcode);
+    let title = type.desc;
+    let name = names.get(type.apgcode);
     if (name !== undefined) {
         title = name[0].toUpperCase() + name.slice(1) + ' (' + title + ')';
     }
@@ -68,8 +68,8 @@ function embedIdentified(data: FullIdentified, isOutput?: boolean): EmbedBuilder
         title = 'Output: ' + title;
     }
     let embeds = [new EmbedBuilder().setTitle(title).setDescription(out)];
-    if (data.output) {
-        embeds.push(...embedIdentified(data.output, true));
+    if (type.output) {
+        embeds.push(...embedIdentified(type.output, true));
     }
     return embeds;
 }
