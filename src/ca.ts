@@ -24,7 +24,7 @@ function embedIdentified(type: FullIdentified, isOutput?: boolean): EmbedBuilder
     }
     let pops: number[];
     if (type.period > 0) {
-        pops = type.pops.slice(type.stabilizedAt, type.stabilizedAt + type.period);
+        pops = type.pops.slice(0, type.stabilizedAt + type.period);
     } else {
         pops = type.pops;
     }
