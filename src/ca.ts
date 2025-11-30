@@ -259,6 +259,7 @@ export async function cmdSim(msg: Message, argv: string[]): Promise<Response> {
     maxX++;
     minY--;
     maxY++;
+    let debug = minX + ' ' + maxX + ' ' + minY + ' ' + maxY;
     let width = maxX - minX + 1;
     let height = maxY - minY + 1;
     let size = width * height;
@@ -337,6 +338,6 @@ export async function cmdSim(msg: Message, argv: string[]): Promise<Response> {
             files: ['sim.gif'],
         };
     } else {
-        return {files: ['sim.gif']};
+        return {content: debug, files: ['sim.gif']};
     }
 }
