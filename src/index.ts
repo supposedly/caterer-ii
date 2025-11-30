@@ -3,7 +3,7 @@ import * as lifeweb from '../lifeweb/lib/index.js';
 import {inspect} from 'node:util';
 import {Client, GatewayIntentBits} from 'discord.js';
 import {Response, Message, config, sentByAdmin} from './util.js';
-import {cmdIdentify, cmdSim} from './ca.js';
+import {cmdIdentify, cmdBasicIdentify, cmdMinmax, cmdSim} from './ca.js';
 import {cmdSssss, cmdDyk, cmdName, cmdSimStats, cmdSaveSimStats} from './db.js';
 
 
@@ -50,6 +50,28 @@ const HELP: {[key: string]: Help} = {
                 name: 'generations',
                 optional: true,
                 desc: 'Number of generations to run the identifier for (default 256).'
+            },
+        ],
+    },
+
+    basic_identify: {
+        desc: 'Identify a pattern, but provide less information',
+        args: [
+            {
+                name: 'generations',
+                optional: true,
+                desc: 'Number of generations to run the identifier for (default 256).'
+            },
+        ],
+        aliases: ['basicidentify'],
+    },
+
+    minmax: {
+        desc: 'Find the minimum and maximum rule of a pattern',
+        args: [
+            {
+                name: 'generations',
+                desc: 'Number of generations to run the pattern for.',
             },
         ],
     },
@@ -159,8 +181,13 @@ for (let cmd in HELP) {
     if (data.extra) {
         msg += '``````ansi\n' + data.extra;
     }
-    msg += '```'
+    msg += '```';
     helpMsgs[cmd] = msg;
+    if (data.aliases) {
+        for (let alias in data.aliases) {
+            helpMsgs[alias] = msg;
+        }
+    }
 }
 
 helpMsg += '```';
@@ -216,6 +243,9 @@ const COMMANDS: {[key: string]: (msg: Message, argv: string[]) => Promise<Respon
     },
 
     identify: cmdIdentify,
+    basic_identify: cmdBasicIdentify,
+    basicidentify: cmdBasicIdentify,
+    minmax: cmdMinmax,
     sim: cmdSim,
 
     sssss: cmdSssss,

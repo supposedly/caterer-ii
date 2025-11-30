@@ -2,13 +2,13 @@
 /// <reference path="./pencil.js__canvas-gif-encoder.d.ts" />
 
 import {execSync} from 'node:child_process';
-import {Pattern, FullIdentified, fullIdentify, createPattern, toCatagolueRule} from '../lifeweb/lib/index.js';
+import {Pattern, Identified, FullIdentified, identify, findMinmax, getDescription, fullIdentify, createPattern, toCatagolueRule} from '../lifeweb/lib/index.js';
 import {EmbedBuilder} from 'discord.js';
 import {Message, Response, writeFile, names, simStats, findRLE} from './util.js';
 import CanvasGifEncoder from '@pencil.js/canvas-gif-encoder';
 
 
-function embedIdentified(type: FullIdentified, isOutput?: boolean): EmbedBuilder[] {
+function embedIdentified(type: Identified | FullIdentified, isOutput?: boolean): EmbedBuilder[] {
     let out = '';
     if (type.period > 0) {
         out += '**Period:** ' + type.period + '\n';
@@ -32,21 +32,21 @@ function embedIdentified(type: FullIdentified, isOutput?: boolean): EmbedBuilder
     let avgPop = pops.reduce((x, y) => x + y, 0) / pops.length;
     let maxPop = Math.max(...pops);
     out += '**Populations:** ' + minPop + ' | ' + (Math.round(avgPop * 100) / 100) + ' | ' + maxPop + '\n';
-    if (type.minmax) {
+    if ('minmax' in type && type.minmax) {
         out += '**Min:** ' + type.minmax[0] + '\n';
         out += '**Max:** ' + type.minmax[1] + '\n';
     }
     if (type.period > 1) {
-        if (type.heat) {
+        if ('heat' in type) {
             out += '**Heat:** ' + type.heat + '\n';
         }
-        if (type.temperature) {
+        if ('temperature' in type) {
             out += '**Temperature:** ' + type.temperature + '\n';
         }
-        if (type.volatility) {
+        if ('volatility' in type) {
             out += '**Volatility:** ' + type.volatility + '\n';
         }
-        if (type.strictVolatility) {
+        if ('strictVolatility' in type) {
             out += '**Strict volatility:** ' + type.strictVolatility + '\n';
         }
     }
@@ -59,7 +59,7 @@ function embedIdentified(type: FullIdentified, isOutput?: boolean): EmbedBuilder
         }
         out += '](https://catagolue.hatsya.com/object/' + type.apgcode + '/' + toCatagolueRule(type.phases[0].ruleStr) + ')';
     }
-    let title = type.desc;
+    let title = 'desc' in type ? type.desc : getDescription(type);
     let name = names.get(type.apgcode);
     if (name !== undefined) {
         title = name[0].toUpperCase() + name.slice(1) + ' (' + title + ')';
@@ -68,7 +68,7 @@ function embedIdentified(type: FullIdentified, isOutput?: boolean): EmbedBuilder
         title = 'Output: ' + title;
     }
     let embeds = [new EmbedBuilder().setTitle(title).setDescription(out)];
-    if (type.output) {
+    if ('output' in type && type.output) {
         embeds.push(...embedIdentified(type.output, true));
     }
     return embeds;
@@ -88,6 +88,39 @@ export async function cmdIdentify(msg: Message, argv: string[]): Promise<Respons
         throw new Error('Cannot find RLE');
     }
     return {embeds: embedIdentified(fullIdentify(pattern, limit))};
+}
+
+export async function cmdBasicIdentify(msg: Message, argv: string[]): Promise<Response> {
+    await msg.channel.sendTyping();
+    let limit = 256;
+    if (argv[1]) {
+        let parsed = parseFloat(argv[1]);
+        if (!Number.isNaN(parsed)) {
+            limit = parsed;
+        }
+    }
+    let pattern = await findRLE(msg);
+    if (!pattern) {
+        throw new Error('Cannot find RLE');
+    }
+    return {embeds: embedIdentified(identify(pattern, limit))};
+}
+
+export async function cmdMinmax(msg: Message, argv: string[]): Promise<Response> {
+    await msg.channel.sendTyping();
+    if (!argv[1]) {
+        throw new Error('Expected 1 argument');
+    }
+    let gens = parseInt(argv[1]);
+    if (Number.isNaN(gens)) {
+        throw new Error('Argument 1 is not a valid number');
+    }
+    let pattern = await findRLE(msg);
+    if (!pattern) {
+        throw new Error('Cannot find RLE');
+    }
+    let [min, max] = findMinmax(pattern, gens)
+    return `Min: ${min}\nMax: ${max}`;
 }
 
 
