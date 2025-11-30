@@ -37,17 +37,17 @@ function embedIdentified(type: Identified | FullIdentified, isOutput?: boolean):
         out += '**Max:** ' + type.minmax[1] + '\n';
     }
     if (type.period > 1) {
-        if ('heat' in type) {
-            out += '**Heat:** ' + type.heat + '\n';
+        if ('heat' in type && type.heat !== undefined) {
+            out += '**Heat:** ' + (Math.round(type.heat * 1000) / 1000) + '\n';
         }
-        if ('temperature' in type) {
-            out += '**Temperature:** ' + type.temperature + '\n';
+        if ('temperature' in type && type.temperature !== undefined) {
+            out += '**Temperature:** ' + (Math.round(type.temperature * 1000) / 1000) + '\n';
         }
-        if ('volatility' in type) {
-            out += '**Volatility:** ' + type.volatility + '\n';
+        if ('volatility' in type && type.volatility !== undefined) {
+            out += '**Volatility:** ' + (Math.round(type.volatility * 1000) / 1000) + '\n';
         }
-        if ('strictVolatility' in type) {
-            out += '**Strict volatility:** ' + type.strictVolatility + '\n';
+        if ('strictVolatility' in type && type.strictVolatility !== undefined) {
+            out += '**Strict volatility:** ' + (Math.round(type.strictVolatility * 1000) / 1000) + '\n';
         }
     }
     if (type.apgcode !== 'PATHOLOGICAL') {
