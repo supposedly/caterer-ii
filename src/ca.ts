@@ -259,8 +259,8 @@ export async function cmdSim(msg: Message, argv: string[]): Promise<Response> {
     maxX++;
     minY--;
     maxY++;
-    let width = maxX - minX;
-    let height = maxY - minY;
+    let width = maxX - minX + 1;
+    let height = maxY - minY + 1;
     let size = width * height;
     let array = new Uint8ClampedArray(size * 4);
     let empty = new Uint8ClampedArray(size * 4);
