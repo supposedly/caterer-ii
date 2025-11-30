@@ -259,7 +259,7 @@ export async function cmdSim(msg: Message, argv: string[]): Promise<Response> {
     maxX++;
     minY--;
     maxY++;
-    let debug = minX + ' ' + maxX + ' ' + minY + ' ' + maxY;
+    let debug = minX + ' ' + maxX + ' ' + minY + ' ' + maxY + '\n';
     let width = maxX - minX + 1;
     let height = maxY - minY + 1;
     let size = width * height;
@@ -285,6 +285,7 @@ export async function cmdSim(msg: Message, argv: string[]): Promise<Response> {
             startY = data.minY - minY;
             startX = data.minX - minX;
         } else {
+            debug += p.xOffset + ' ' + p.yOffset + ' ' + (p.xOffset + p.width) + ' ' + (p.yOffset + p.height);
             startY = p.yOffset - minY;
             startX = p.xOffset - minX;
         }
