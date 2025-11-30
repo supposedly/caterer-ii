@@ -176,8 +176,10 @@ export async function cmdSim(msg: Message, argv: string[]): Promise<Response> {
         }
     }
     parts.push(currentPart);
-
     let frameTime = 50;
+    if (parts[0] && parts[0][1] === 'fps' && typeof parts[0][0] === 'number') {
+        frameTime = Math.ceil(100 / parts[0][0]) * 10;
+    }
     let frames: [Pattern, number][] = [[pattern.copy(), frameTime]];
     let gifSize = 100;
     for (let part of parts) {
