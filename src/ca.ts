@@ -276,7 +276,7 @@ export async function cmdSim(msg: Message, argv: string[]): Promise<Response> {
         quality: 1,
     });
     let middle = performance.now();
-    let debug = '';
+    let debug = minX + ' ' + maxX + ' ' + minY + ' ' + maxY + '\n';
     for (let [p, frameTime] of frames) {
         let startY: number;
         let startX: number;
