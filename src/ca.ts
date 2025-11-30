@@ -285,7 +285,7 @@ export async function cmdSim(msg: Message, argv: string[]): Promise<Response> {
             startY = data.minY - minY;
             startX = data.minX - minX;
         } else {
-            debug += p.xOffset + ' ' + p.yOffset + ' ' + (p.xOffset + p.width) + ' ' + (p.yOffset + p.height);
+            debug += '\n' + p.toRLE() + '\n' + p.xOffset + ' ' + p.yOffset + ' ' + (p.xOffset + p.width) + ' ' + (p.yOffset + p.height);
             startY = p.yOffset - minY;
             startX = p.xOffset - minX;
         }
