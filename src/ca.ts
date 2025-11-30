@@ -276,7 +276,6 @@ export async function cmdSim(msg: Message, argv: string[]): Promise<Response> {
         quality: 1,
     });
     let middle = performance.now();
-    let debug = minX + ' ' + maxX + ' ' + minY + ' ' + maxY + '\n';
     for (let [p, frameTime] of frames) {
         let startY: number;
         let startX: number;
@@ -284,7 +283,6 @@ export async function cmdSim(msg: Message, argv: string[]): Promise<Response> {
             let data = p.getMinMaxCoords();
             startY = data.minY - minY;
             startX = data.minX - minX;
-            debug += data.minX + ' ' + data.maxX + ' ' + data.minY + ' ' + data.maxY + ' / ' + startX + ' ' + startY + '\n';
         } else {
             startY = p.yOffset - minY;
             startX = p.xOffset - minX;
@@ -339,6 +337,6 @@ export async function cmdSim(msg: Message, argv: string[]): Promise<Response> {
             files: ['sim.gif'],
         };
     } else {
-        return {content: debug, files: ['sim.gif']};
+        return {files: ['sim.gif']};
     }
 }
