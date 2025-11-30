@@ -4,7 +4,7 @@ import {inspect} from 'node:util';
 import {Client, GatewayIntentBits} from 'discord.js';
 import {BotError, Response, Message, config, sentByAdmin} from './util.js';
 import {cmdIdentify, cmdBasicIdentify, cmdMinmax, cmdSim} from './ca.js';
-import {cmdSssss, cmdDyk, cmdName, cmdSimStats, cmdSaveSimStats} from './db.js';
+import {cmdSssss, cmdDyk, cmdName, cmdRename, cmdDeleteName, cmdSimStats, cmdSaveSimStats, cmdAlias, cmdUnalias} from './db.js';
 
 
 interface Help {
@@ -128,9 +128,27 @@ const HELP: {[key: string]: Help} = {
             {
                 name: 'new_name',
                 optional: true,
-                desc: 'The new name. If provided, it will change the name (accepterers only). If omitted, it will just show the current name.'
-            }
-        ]
+                desc: 'The new name. If provided, it will set the name. If omitted, it will just show the current name.'
+            },
+        ],
+        aliases: ['rename'],
+    },
+
+    rename: {
+        desc: 'Change the name of a pattern (accepterers only)',
+        args: [
+            {
+                name: 'new_name',
+                desc: 'The new name.',
+            },
+        ],
+        aliases: ['rename'],
+    },
+
+    delete_name: {
+        desc: 'Delete the name of a pattern (accepterers only)',
+        args: [],
+        aliases: ['deletename'],
     },
 
     sim_stats: {
@@ -149,6 +167,30 @@ const HELP: {[key: string]: Help} = {
         desc: 'Save the !sim stats (accepterer only)',
         args: [],
         aliases: ['savesimstats'],
+    },
+
+    alias: {
+        desc: 'Alias a rule',
+        args: [
+            {
+                name: 'alias',
+                desc: 'The new alias for the rule.',
+            },
+            {
+                name: '\nrule',
+                desc: 'The rule being aliased to',
+            },
+        ],
+    },
+
+    unalias: {
+        desc: 'Remove an alias for a rule (accepterers only)',
+        args: [
+            {
+                name: 'alias',
+                desc: 'The alias to remove.',
+            },
+        ],
     },
 
 };
@@ -178,7 +220,7 @@ for (let cmd in HELP) {
         } else {
             msg += '<' + arg.name + '>';
         }
-        msg += ' - ' + arg.desc;
+        msg += ' - ' + arg.desc + '.';
     }
     if (data.extra) {
         msg += '``````ansi\n' + data.extra;
@@ -254,10 +296,15 @@ const COMMANDS: {[key: string]: (msg: Message, argv: string[]) => Promise<Respon
     '5s': cmdSssss,
     dyk: cmdDyk,
     name: cmdName,
+    rename: cmdRename,
+    delete_name: cmdDeleteName,
+    deletename: cmdDeleteName,
     sim_stats: cmdSimStats,
     simstats: cmdSimStats,
     save_sim_stats: cmdSaveSimStats,
     savesimstats: cmdSaveSimStats,
+    alias: cmdAlias,
+    unalias: cmdUnalias,
 
 };
 

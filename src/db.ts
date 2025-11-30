@@ -1,7 +1,7 @@
 
 import {parse, identify} from '../lifeweb/lib/index.js';
 import {EmbedBuilder} from 'discord.js';
-import {BotError, Message, Response, NAME_CHARS, dyks, names, simStats, readFile, writeFile, sentByAccepterer, findRLE, parseSpeed} from './util.js';
+import {BotError, Message, Response, NAME_CHARS, dyks, names, simStats, aliases, readFile, writeFile, sentByAccepterer, findRLE, parseSpeed} from './util.js';
 
 
 export async function cmdSssss(msg: Message, argv: string[]): Promise<Response> {
@@ -61,18 +61,71 @@ export async function cmdName(msg: Message, argv: string[]): Promise<Response> {
             return 'Pattern is not named';
         }
     }
-    if (!sentByAccepterer(msg)) {
-        throw new BotError('You are not an accepterer');
-    }
     if (!Array.from(newName).every(x => NAME_CHARS.includes(x))) {
         throw new BotError('Invalid name!');
     }
-    names.set(apgcode, newName);
-    await writeFile('data/names.txt', Array.from(names.entries()).map(x => x[0] + ' ' + x[1]).join('\n'));
     if (names.has(apgcode)) {
-        return 'Renamed `' + names.get(apgcode) + '` to `' + newName + '`';
+        if (!sentByAccepterer(msg)) {
+            return 'Pattern is already named';
+        }
+        let oldName = names.get(apgcode);
+        names.set(apgcode, newName);
+        await writeFile('data/names.txt', Array.from(names.entries()).map(x => x[0] + ' ' + x[1]).join('\n'));
+        return 'Renamed `' + oldName + '` to `' + newName + '`';
     } else {
+        names.set(apgcode, newName);
+        await writeFile('data/names.txt', Array.from(names.entries()).map(x => x[0] + ' ' + x[1]).join('\n'));
         return 'Set name to `' + newName + '`';
+    }
+}
+
+export async function cmdRename(msg: Message, argv: string[]): Promise<Response> {
+    await msg.channel.sendTyping();
+    if (!sentByAccepterer(msg)) {
+        throw new BotError('You are not an accepterer');
+    }
+    let pattern = await findRLE(msg);
+    if (!pattern) {
+        throw new BotError('Cannot find RLE');
+    }
+    let apgcode = identify(pattern, 4096).apgcode;
+    if (!apgcode.startsWith('x') || apgcode.startsWith('y')) {
+        throw new BotError(`Apgcode is ${apgcode}`);
+    }
+    let newName = argv.slice(1).join(' ');
+    if (!Array.from(newName).every(x => NAME_CHARS.includes(x))) {
+        throw new BotError('Invalid name!');
+    }
+    if (names.has(apgcode)) {
+        let oldName = names.get(apgcode);
+        names.set(apgcode, newName);
+        await writeFile('data/names.txt', Array.from(names.entries()).map(x => x[0] + ' ' + x[1]).join('\n'));
+        return 'Renamed `' + oldName + '` to `' + newName + '`';
+    } else {
+        names.set(apgcode, newName);
+        await writeFile('data/names.txt', Array.from(names.entries()).map(x => x[0] + ' ' + x[1]).join('\n'));
+        return 'Set name to `' + newName + '`';
+    }
+}
+
+export async function cmdDeleteName(msg: Message, argv: string[]): Promise<Response> {
+    await msg.channel.sendTyping();
+    if (!sentByAccepterer(msg)) {
+        throw new BotError('You are not an accepterer');
+    }
+    let pattern = await findRLE(msg);
+    if (!pattern) {
+        throw new BotError('Cannot find RLE');
+    }
+    let apgcode = identify(pattern, 4096).apgcode;
+    if (!apgcode.startsWith('x') || apgcode.startsWith('y')) {
+        throw new BotError(`Apgcode is ${apgcode}`);
+    }
+    if (names.has(apgcode)) {
+        names.delete(apgcode);
+        await msg.reply('Name deleted');
+    } else {
+        return 'Pattern is not named';
     }
 }
 
@@ -95,6 +148,31 @@ export async function cmdSaveSimStats(msg: Message): Promise<Response> {
         throw new BotError('You are not an accepterer');
     }
     await writeFile('data/sim_stats.json', JSON.stringify(simStats, undefined, 4));
-    await msg.react('✅');
-    return undefined;
+    return 'Saved!';
+}
+
+
+export async function cmdAlias(msg: Message): Promise<Response> {
+    let data = msg.content.slice(msg.content.indexOf(' ')).split('\n');
+    let alias = data[0];
+    let rule = data.slice(1).join('\n');
+    if (alias in aliases && !sentByAccepterer(msg)) {
+        return 'Alias is already used';
+    }
+    aliases[alias] = rule;
+    await writeFile('data/aliases.json', JSON.stringify(aliases, undefined, 4));
+    return 'Alias set!';
+}
+
+export async function cmdUnalias(msg: Message, argv: string[]): Promise<Response> {
+    if (!sentByAccepterer(msg)) {
+        throw new BotError('You are not an accepterer');
+    }
+    let alias = argv.slice(1).join(' ');
+    if (alias in aliases) {
+        delete aliases[alias];
+        return 'Alias deleted!';
+    } else {
+        return 'Alias does not exist';
+    }
 }
