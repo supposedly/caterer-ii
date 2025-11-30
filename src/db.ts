@@ -154,7 +154,7 @@ export async function cmdSaveSimStats(msg: Message): Promise<Response> {
 
 export async function cmdAlias(msg: Message): Promise<Response> {
     let data = msg.content.slice(msg.content.indexOf(' ')).split('\n');
-    let alias = data[0];
+    let alias = data[0].toLowerCase();
     let rule = data.slice(1).join('\n');
     if (alias in aliases && !sentByAccepterer(msg)) {
         return 'Alias is already used';
@@ -168,7 +168,7 @@ export async function cmdUnalias(msg: Message, argv: string[]): Promise<Response
     if (!sentByAccepterer(msg)) {
         throw new BotError('You are not an accepterer');
     }
-    let alias = argv.slice(1).join(' ');
+    let alias = argv.slice(1).join(' ').toLowerCase();
     if (alias in aliases) {
         delete aliases[alias];
         return 'Alias deleted!';
