@@ -277,8 +277,16 @@ export async function cmdSim(msg: Message, argv: string[]): Promise<Response> {
     });
     let middle = performance.now();
     for (let [p, frameTime] of frames) {
-        let startY = p.yOffset - minY;
-        let startX = p.xOffset - minX;
+        let startY: number;
+        let startX: number;
+        if (p instanceof CoordPattern) {
+            let data = p.getMinMaxCoords();
+            startY = data.minY - minY;
+            startX = data.minX - minX;
+        } else {
+            startY = p.yOffset - minY;
+            startX = p.xOffset - minX;
+        }
         array.set(empty);
         let i = 0;
         let j = startY * width * 4;
