@@ -167,7 +167,7 @@ export async function cmdSim(msg: Message, argv: string[]): Promise<Response> {
             parts.push(currentPart);
             currentPart = [];
         } else {
-            let num = parseInt(arg);
+            let num = parseFloat(arg);
             if (Number.isNaN(num)) {
                 currentPart.push(arg);
             } else {
