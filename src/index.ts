@@ -142,11 +142,13 @@ const HELP: {[key: string]: Help} = {
                 desc: 'The page to get data for, defaults to 0.'
             },
         ],
+        aliases: ['simstats'],
     },
 
     save_sim_stats: {
         desc: 'Save the !sim stats (accepterer only)',
         args: [],
+        aliases: ['savesimstats'],
     },
 
 };
@@ -253,7 +255,9 @@ const COMMANDS: {[key: string]: (msg: Message, argv: string[]) => Promise<Respon
     dyk: cmdDyk,
     name: cmdName,
     sim_stats: cmdSimStats,
+    simstats: cmdSimStats,
     save_sim_stats: cmdSaveSimStats,
+    savesimstats: cmdSaveSimStats,
 
 };
 

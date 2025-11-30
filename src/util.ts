@@ -38,7 +38,7 @@ export const RLE_HEADER = /\s*x\s*=\s*\d+\s*,?\s*y\s*=\s*\d+/;
 
 export let config: Config = JSON.parse(await readFile('config.json'));
 export let dyks = (await readFile('data/dyk.txt')).split('\n').slice(1);
-export let simStats = JSON.parse(await readFile('data/sim_stats.json'));
+export let simStats = JSON.parse(await readFile('data/sim_stats.json')) as {[key: string]: number};
 export let names = new Map((await readFile('data/names.txt')).split('\n').map(x => x.split(' ')).map(x => [x[0], x.slice(1).join(' ')]));
 
 
