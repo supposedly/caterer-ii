@@ -280,7 +280,7 @@ async function runCommand(msg: Message): Promise<void> {
                 }
             } catch (error) {
                 if (error instanceof BotError || error instanceof lifeweb.RuleError) {
-                    previousMsgs.push([msg.id, await msg.reply(String(error))]);
+                    previousMsgs.push([msg.id, await msg.reply('Error: ' + error.message)]);
                 } else {
                     let str: string;
                     if (error && typeof error === 'object' && 'stack' in error) {
