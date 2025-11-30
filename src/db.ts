@@ -153,7 +153,7 @@ export async function cmdSaveSimStats(msg: Message): Promise<Response> {
 
 
 export async function cmdAlias(msg: Message): Promise<Response> {
-    let data = msg.content.slice(msg.content.indexOf(' ')).split('\n');
+    let data = msg.content.slice(msg.content.indexOf(' ') + 1).split('\n');
     let alias = data[0].toLowerCase();
     let rule = data.slice(1).join('\n');
     if (alias in aliases && !sentByAccepterer(msg)) {
