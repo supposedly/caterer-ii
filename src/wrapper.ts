@@ -35,7 +35,7 @@ client.on('messageCreate', async msg => {
             execSync('systemctl start caterer');
             await msg.channel.send('Update complete!');
         } else {
-            throw new Error('Invalid command!');
+            await msg.reply('Invalid command!');
         }
     } catch (error) {
         await msg.reply('`' + String(error) + '`');

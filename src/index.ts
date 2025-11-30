@@ -2,7 +2,7 @@
 import * as lifeweb from '../lifeweb/lib/index.js';
 import {inspect} from 'node:util';
 import {Client, GatewayIntentBits} from 'discord.js';
-import {Response, Message, config, sentByAdmin} from './util.js';
+import {BotError, Response, Message, config, sentByAdmin} from './util.js';
 import {cmdIdentify, cmdBasicIdentify, cmdMinmax, cmdSim} from './ca.js';
 import {cmdSssss, cmdDyk, cmdName, cmdSimStats, cmdSaveSimStats} from './db.js';
 
@@ -275,11 +275,17 @@ async function runCommand(msg: Message): Promise<void> {
                     previousMsgs.push([msg.id, await msg.reply(out)]);
                 }
             } catch (error) {
-                previousMsgs.push([msg.id, await msg.reply('`' + String(error) + '`')]);
-                if (error && typeof error === 'object' && 'stack' in error) {
-                    console.log(error.stack);
+                if (error instanceof BotError) {
+                    previousMsgs.push([msg.id, await msg.reply(String(error))]);
                 } else {
-                    console.log(String(error));
+                    let str: string;
+                    if (error && typeof error === 'object' && 'stack' in error) {
+                        str = String(error.stack);
+                    } else {
+                        str = String(error);
+                    }
+                    console.log(str);
+                    previousMsgs.push([msg.id, await msg.reply('```' + str + '```')]);
                 }
             }
             if (previousMsgs.length > 2000) {
@@ -305,17 +311,19 @@ client.on('messageUpdate', async (old, msg) => {
     try {
         let index = previousMsgs.findLastIndex(x => x[0] === old.id);
         if (index > -1) {
-            previousMsgs[index]
             let msg = previousMsgs[index][1];
             msg.delete();
             previousMsgs = previousMsgs.splice(index, 1);
         }
     } catch (error) {
+        let str: string;
         if (error && typeof error === 'object' && 'stack' in error) {
-            console.log(error.stack);
+            str = String(error.stack);
         } else {
-            console.log(String(error));
+            str = String(error);
         }
+        await msg.reply('```' + str + '```');
+        return;
     }
     runCommand(msg);
 });

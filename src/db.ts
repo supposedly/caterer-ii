@@ -1,7 +1,7 @@
 
 import {parse, identify} from '../lifeweb/lib/index.js';
 import {EmbedBuilder} from 'discord.js';
-import {Message, Response, NAME_CHARS, dyks, names, simStats, readFile, writeFile, sentByAccepterer, findRLE, parseSpeed} from './util.js';
+import {BotError, Message, Response, NAME_CHARS, dyks, names, simStats, readFile, writeFile, sentByAccepterer, findRLE, parseSpeed} from './util.js';
 
 
 export async function cmdSssss(msg: Message, argv: string[]): Promise<Response> {
@@ -46,11 +46,11 @@ export async function cmdName(msg: Message, argv: string[]): Promise<Response> {
     await msg.channel.sendTyping();
     let pattern = await findRLE(msg);
     if (!pattern) {
-        throw new Error('Cannot find RLE');
+        throw new BotError('Cannot find RLE');
     }
     let apgcode = identify(pattern, 4096).apgcode;
     if (!apgcode.startsWith('x') || apgcode.startsWith('y')) {
-        throw new Error(`Apgcode is ${apgcode}`);
+        throw new BotError(`Apgcode is ${apgcode}`);
     }
     let newName = argv.slice(1).join(' ');
     if (newName === '') {
@@ -62,10 +62,10 @@ export async function cmdName(msg: Message, argv: string[]): Promise<Response> {
         }
     }
     if (!sentByAccepterer(msg)) {
-        throw new Error('You are not an accepterer');
+        throw new BotError('You are not an accepterer');
     }
     if (!Array.from(newName).every(x => NAME_CHARS.includes(x))) {
-        throw new Error('Invalid name!');
+        throw new BotError('Invalid name!');
     }
     names.set(apgcode, newName);
     await writeFile('data/names.txt', Array.from(names.entries()).map(x => x[0] + ' ' + x[1]).join('\n'));
@@ -80,7 +80,7 @@ export async function cmdName(msg: Message, argv: string[]): Promise<Response> {
 export async function cmdSimStats(msg: Message, argv: string[]): Promise<Response> {
     let page = argv[1] ? parseInt(argv[1]) - 1 : 0;
     if (Number.isNaN(page)) {
-        throw new Error('Invalid page number');
+        throw new BotError('Invalid page number');
     }
     let data = Object.entries(simStats).sort((x, y) => (x[1] as any) - (y[1] as any)).slice(page, page + 10);
     let out = data.map(x => x[0] + ': ' + x[1]).join('\n');
@@ -92,7 +92,7 @@ export async function cmdSimStats(msg: Message, argv: string[]): Promise<Respons
 
 export async function cmdSaveSimStats(msg: Message): Promise<Response> {
     if (!sentByAccepterer(msg)) {
-        throw new Error('You are not an accepterer');
+        throw new BotError('You are not an accepterer');
     }
     await writeFile('data/sim_stats.json', JSON.stringify(simStats, undefined, 4));
     await msg.react('✅');

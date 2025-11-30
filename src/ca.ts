@@ -4,7 +4,7 @@
 import {execSync} from 'node:child_process';
 import {Pattern, Identified, FullIdentified, identify, findMinmax, getDescription, fullIdentify, createPattern, toCatagolueRule} from '../lifeweb/lib/index.js';
 import {EmbedBuilder} from 'discord.js';
-import {Message, Response, writeFile, names, simStats, findRLE} from './util.js';
+import {BotError, Message, Response, writeFile, names, simStats, findRLE} from './util.js';
 import CanvasGifEncoder from '@pencil.js/canvas-gif-encoder';
 
 
@@ -85,7 +85,7 @@ export async function cmdIdentify(msg: Message, argv: string[]): Promise<Respons
     }
     let pattern = await findRLE(msg);
     if (!pattern) {
-        throw new Error('Cannot find RLE');
+        throw new BotError('Cannot find RLE');
     }
     return {embeds: embedIdentified(fullIdentify(pattern, limit))};
 }
@@ -101,7 +101,7 @@ export async function cmdBasicIdentify(msg: Message, argv: string[]): Promise<Re
     }
     let pattern = await findRLE(msg);
     if (!pattern) {
-        throw new Error('Cannot find RLE');
+        throw new BotError('Cannot find RLE');
     }
     return {embeds: embedIdentified(identify(pattern, limit))};
 }
@@ -109,15 +109,15 @@ export async function cmdBasicIdentify(msg: Message, argv: string[]): Promise<Re
 export async function cmdMinmax(msg: Message, argv: string[]): Promise<Response> {
     await msg.channel.sendTyping();
     if (!argv[1]) {
-        throw new Error('Expected 1 argument');
+        throw new BotError('Expected 1 argument');
     }
     let gens = parseInt(argv[1]);
     if (Number.isNaN(gens)) {
-        throw new Error('Argument 1 is not a valid number');
+        throw new BotError('Argument 1 is not a valid number');
     }
     let pattern = await findRLE(msg);
     if (!pattern) {
-        throw new Error('Cannot find RLE');
+        throw new BotError('Cannot find RLE');
     }
     let [min, max] = findMinmax(pattern, gens);
     return `Min: ${min}\nMax: ${max}`;
@@ -158,7 +158,7 @@ export async function cmdSim(msg: Message, argv: string[]): Promise<Response> {
     } else {
         let p = await findRLE(msg);
         if (!p) {
-            throw new Error('Cannot find RLE');
+            throw new BotError('Cannot find RLE');
         }
         pattern = p;
     }
@@ -196,7 +196,7 @@ export async function cmdSim(msg: Message, argv: string[]): Promise<Response> {
                     frames.push([pattern.copy(), frameTime]);
                 }
             } else if (typeof part[1] === 'string') {
-                throw new Error(`Invalid part: ${part.join(' ')}`);
+                throw new BotError(`Invalid part: ${part.join(' ')}`);
             } else {
                 for (let i = parts.length > 1 ? 0 : 1; i < part[0]; i++) {
                     pattern.runGeneration();
@@ -205,18 +205,18 @@ export async function cmdSim(msg: Message, argv: string[]): Promise<Response> {
             }
         } else if (part[0] === 'wait') {
             if (typeof part[1] !== 'number' || part.length > 2) {
-                throw new Error(`Invalid part: ${part.join(' ')}`);
+                throw new BotError(`Invalid part: ${part.join(' ')}`);
             }
             for (let i = 0; i < part[1]; i++) {
                 frames.push([pattern.copy(), frameTime]);
             }
         } else if (part[0] === 'jump') {
             if (typeof part[1] !== 'number' || part.length > 2) {
-                throw new Error(`Invalid part: ${part.join(' ')}`);
+                throw new BotError(`Invalid part: ${part.join(' ')}`);
             }
             pattern.run(part[1]);
         } else if (part[0] !== undefined) {
-            throw new Error(`Invalid part: ${part.join(' ')}`);
+            throw new BotError(`Invalid part: ${part.join(' ')}`);
         }
     }
     let minX = Math.min(...frames.map(([p]) => p.xOffset)) - 1;

@@ -5,6 +5,9 @@ import {Pattern, parse} from '../lifeweb/lib/index.js';
 import {Message as _Message, OmitPartialGroupDMChannel} from 'discord.js';
 
 
+export class BotError extends Error {}
+
+
 export type Message = OmitPartialGroupDMChannel<_Message>;
 
 export type Response = undefined | void | Parameters<Message['reply']>[0];
@@ -108,7 +111,7 @@ export async function findRLE(msg: Message): Promise<Pattern | undefined> {
 
 export function parseSpeed(speed: string): {p: number, x: number, y: number} {
     if (!speed.includes('c')) {
-        throw new Error('Invalid speed!');
+        throw new BotError('Invalid speed!');
     }
     let [disp, period] = speed.split('c');
     if (period.startsWith('/')) {
@@ -130,7 +133,7 @@ export function parseSpeed(speed: string): {p: number, x: number, y: number} {
         x = parseInt(parts[0]);
         y = parseInt(parts[1]);
         if (Number.isNaN(x) || Number.isNaN(y) || parts.length !== 2) {
-            throw new Error('Invalid speed!');
+            throw new BotError('Invalid speed!');
         }
     } else if (disp === '') {
         x = 1;
@@ -140,7 +143,7 @@ export function parseSpeed(speed: string): {p: number, x: number, y: number} {
             y = 0;
         }
     } else {
-        throw new Error('Invalid speed!');
+        throw new BotError('Invalid speed!');
     }
     return {p, x, y};
 }
