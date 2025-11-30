@@ -259,9 +259,12 @@ export async function cmdSim(msg: Message, argv: string[]): Promise<Response> {
     maxX++;
     minY--;
     maxY++;
-    let debug = minX + ' ' + maxX + ' ' + minY + ' ' + maxY + '\n';
-    let width = maxX - minX + 1;
-    let height = maxY - minY + 1;
+    let width = maxX - minX;
+    let height = maxY - minY;
+    if (pattern instanceof CoordPattern) {
+        width++;
+        height++;
+    }
     let size = width * height;
     let array = new Uint8ClampedArray(size * 4);
     let empty = new Uint8ClampedArray(size * 4);
@@ -285,7 +288,6 @@ export async function cmdSim(msg: Message, argv: string[]): Promise<Response> {
             startY = data.minY - minY;
             startX = data.minX - minX;
         } else {
-            debug += '\n' + p.toRLE() + '\n' + p.xOffset + ' ' + p.yOffset + ' ' + (p.xOffset + p.width) + ' ' + (p.yOffset + p.height);
             startY = p.yOffset - minY;
             startX = p.xOffset - minX;
         }
@@ -339,6 +341,6 @@ export async function cmdSim(msg: Message, argv: string[]): Promise<Response> {
             files: ['sim.gif'],
         };
     } else {
-        return {content: debug, files: ['sim.gif']};
+        return {files: ['sim.gif']};
     }
 }
