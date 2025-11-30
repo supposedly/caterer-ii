@@ -275,7 +275,7 @@ async function runCommand(msg: Message): Promise<void> {
                     previousMsgs.push([msg.id, await msg.reply(out)]);
                 }
             } catch (error) {
-                if (error instanceof BotError) {
+                if (error instanceof BotError || error instanceof lifeweb.RuleError) {
                     previousMsgs.push([msg.id, await msg.reply(String(error))]);
                 } else {
                     let str: string;
