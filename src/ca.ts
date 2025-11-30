@@ -119,7 +119,7 @@ export async function cmdMinmax(msg: Message, argv: string[]): Promise<Response>
     if (!pattern) {
         throw new Error('Cannot find RLE');
     }
-    let [min, max] = findMinmax(pattern, gens)
+    let [min, max] = findMinmax(pattern, gens);
     return `Min: ${min}\nMax: ${max}`;
 }
 
