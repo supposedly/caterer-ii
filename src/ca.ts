@@ -2,7 +2,7 @@
 /// <reference path="./pencil.js__canvas-gif-encoder.d.ts" />
 
 import {execSync} from 'node:child_process';
-import {Pattern, Identified, FullIdentified, identify, findMinmax, getDescription, fullIdentify, createPattern, toCatagolueRule} from '../lifeweb/lib/index.js';
+import {Pattern, CoordPattern, Identified, FullIdentified, identify, findMinmax, getDescription, fullIdentify, createPattern, toCatagolueRule} from '../lifeweb/lib/index.js';
 import {EmbedBuilder} from 'discord.js';
 import {BotError, Message, Response, writeFile, names, simStats, findRLE} from './util.js';
 import CanvasGifEncoder from '@pencil.js/canvas-gif-encoder';
@@ -221,10 +221,44 @@ export async function cmdSim(msg: Message, argv: string[]): Promise<Response> {
             throw new BotError(`Invalid part: ${part.join(' ')}`);
         }
     }
-    let minX = Math.min(...frames.map(([p]) => p.xOffset)) - 1;
-    let maxX = Math.max(...frames.map(([p]) => p.width + p.xOffset)) + 1;
-    let minY = Math.min(...frames.map(([p]) => p.yOffset)) - 1;
-    let maxY = Math.max(...frames.map(([p]) => p.height + p.yOffset)) + 1;
+    let minX = Infinity;
+    let maxX = -Infinity;
+    let minY = Infinity;
+    let maxY = -Infinity;
+    for (let [p] of frames) {
+        if (p instanceof CoordPattern) {
+            let data = p.getMinMaxCoords();
+            if (data.minX < minX) {
+                minX = data.minX;
+            }
+            if (data.maxX > maxX) {
+                minX = data.minX;
+            }
+            if (data.minY < minY) {
+                minY = data.minY;
+            }
+            if (data.maxY > maxY) {
+                minY = data.minY;
+            }
+        } else {
+            if (p.xOffset < minX) {
+                minX = p.xOffset;
+            }
+            if (p.xOffset + p.width > maxX) {
+                maxX = p.xOffset + p.width;
+            }
+            if (p.yOffset < minY) {
+                minY = p.yOffset;
+            }
+            if (p.yOffset + p.height > maxY) {
+                maxY = p.yOffset + p.height;
+            }
+        }
+    }
+    minX--;
+    maxX++;
+    minY--;
+    maxY++;
     let width = maxX - minX;
     let height = maxY - minY;
     let size = width * height;
