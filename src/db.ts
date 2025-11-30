@@ -82,7 +82,7 @@ export async function cmdSimStats(msg: Message, argv: string[]): Promise<Respons
     if (Number.isNaN(page)) {
         throw new BotError('Invalid page number');
     }
-    let data = Object.entries(simStats).sort((x, y) => y[1] - x[1]).reverse().slice(page, page + 10);
+    let data = Object.entries(simStats).sort((x, y) => y[1] - x[1]).slice(page * 10, (page + 1) * 10);
     let out = data.map(x => x[0] + ': ' + x[1]).join('\n');
     if (out === '') {
         out = 'No data!';
