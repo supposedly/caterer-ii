@@ -212,7 +212,7 @@ for (let cmd in HELP) {
             msg += '<' + arg.name + '>';
         }
     }
-    msg += '\n' + data.desc + '``````ansi\n\x1b[1m\x1b[34mArguments:\x1b[0m';
+    msg += '\n' + data.desc + '.``````ansi\n\x1b[1m\x1b[34mArguments:\x1b[0m';
     for (let arg of data.args) {
         msg += '\n';
         if (arg.optional) {
@@ -220,7 +220,7 @@ for (let cmd in HELP) {
         } else {
             msg += '<' + arg.name + '>';
         }
-        msg += ' - ' + arg.desc + '.';
+        msg += ' - ' + arg.desc;
     }
     if (data.extra) {
         msg += '``````ansi\n' + data.extra;
