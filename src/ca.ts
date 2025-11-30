@@ -231,14 +231,14 @@ export async function cmdSim(msg: Message, argv: string[]): Promise<Response> {
             if (data.minX < minX) {
                 minX = data.minX;
             }
-            if (data.maxX > maxX) {
-                maxX = data.maxX;
+            if (data.maxX + 1> maxX) {
+                maxX = data.maxX + 1;
             }
             if (data.minY < minY) {
                 minY = data.minY;
             }
-            if (data.maxY > maxY) {
-                maxY = data.maxY;
+            if (data.maxY + 1 > maxY) {
+                maxY = data.maxY + 1;
             }
         } else {
             if (p.xOffset < minX) {
