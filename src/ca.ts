@@ -284,7 +284,7 @@ export async function cmdSim(msg: Message, argv: string[]): Promise<Response> {
             let data = p.getMinMaxCoords();
             startY = data.minY - minY;
             startX = data.minX - minX;
-            debug += startX + ' ' + startY + '\n';
+            debug += data.minX + ' ' + data.maxX + ' ' + data.minY + ' ' + data.maxY + ' / ' + startX + ' ' + startY + '\n';
         } else {
             startY = p.yOffset - minY;
             startX = p.xOffset - minX;
