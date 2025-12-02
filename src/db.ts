@@ -178,7 +178,7 @@ export async function cmdUnalias(msg: Message, argv: string[]): Promise<Response
 }
 
 export async function cmdLookupAlias(msg: Message, argv: string[]): Promise<Response> {
-    let alias = argv.slice(1).join(' ');
+    let alias = argv.slice(1).join(' ').toLowerCase();
     let out: string[] = [alias];
     while (alias in aliases) {
         alias = aliases[alias];
