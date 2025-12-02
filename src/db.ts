@@ -1,5 +1,5 @@
 
-import {parse, identify} from '../lifeweb/lib/index.js';
+import {parse, identify, createPattern, RuleError} from '../lifeweb/lib/index.js';
 import {EmbedBuilder} from 'discord.js';
 import {BotError, Message, Response, NAME_CHARS, dyks, names, simStats, aliases, readFile, writeFile, sentByAccepterer, findRLE, parseSpeed} from './util.js';
 
@@ -155,6 +155,19 @@ export async function cmdSaveSimStats(msg: Message): Promise<Response> {
 export async function cmdAlias(msg: Message): Promise<Response> {
     let data = msg.content.slice(msg.content.indexOf(' ') + 1).split('\n');
     let alias = data[0].toLowerCase();
+    let isValidRule = true;
+    try {
+        createPattern(alias);
+    } catch (error) {
+        if (error instanceof RuleError) {
+            isValidRule = false;
+        } else {
+            throw error;
+        }
+    }
+    if (isValidRule) {
+        return 'Alias is a valid rule';
+    }
     let rule = data.slice(1).join('\n');
     if (alias in aliases && !sentByAccepterer(msg)) {
         return 'Alias is already used';
@@ -179,6 +192,9 @@ export async function cmdUnalias(msg: Message, argv: string[]): Promise<Response
 
 export async function cmdLookupAlias(msg: Message, argv: string[]): Promise<Response> {
     let alias = argv.slice(1).join(' ').toLowerCase();
+    if (!(alias in aliases)) {
+        return 'Alias does not exist';
+    }
     let out: string[] = [alias];
     while (alias in aliases) {
         alias = aliases[alias];
