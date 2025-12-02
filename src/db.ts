@@ -182,9 +182,9 @@ export async function cmdUnalias(msg: Message, argv: string[]): Promise<Response
         throw new BotError('You are not an accepterer');
     }
     let alias = argv.slice(1).join(' ').toLowerCase().trim();
-    await writeFile('data/aliases.json', JSON.stringify(aliases, undefined, 4));
     if (alias in aliases) {
         delete aliases[alias];
+        await writeFile('data/aliases.json', JSON.stringify(aliases, undefined, 4));
         return 'Alias deleted!';
     } else {
         return 'Alias does not exist';
