@@ -191,6 +191,7 @@ const HELP: {[key: string]: Help} = {
                 desc: 'The alias to remove.',
             },
         ],
+        aliases: ['delete_alias', 'deletealias'],
     },
 
     lookup_alias: {
@@ -316,6 +317,8 @@ const COMMANDS: {[key: string]: (msg: Message, argv: string[]) => Promise<Respon
     savesimstats: cmdSaveSimStats,
     alias: cmdAlias,
     unalias: cmdUnalias,
+    delete_alias: cmdUnalias,
+    deletealias: cmdUnalias,
     lookup_alias: cmdLookupAlias,
     lookupalias: cmdLookupAlias,
 
