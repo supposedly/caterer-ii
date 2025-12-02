@@ -176,3 +176,17 @@ export async function cmdUnalias(msg: Message, argv: string[]): Promise<Response
         return 'Alias does not exist';
     }
 }
+
+export async function cmdLookupAlias(msg: Message, argv: string[]): Promise<Response> {
+    let alias = argv.slice(1).join(' ');
+    let out: string[] = [alias];
+    while (alias in aliases) {
+        alias = aliases[alias];
+        if (out.includes(alias)) {
+            out.push(alias);
+            break;
+        }
+        out.push(alias);
+    }
+    return out.join(' -> ');
+}

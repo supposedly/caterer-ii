@@ -4,7 +4,7 @@ import {inspect} from 'node:util';
 import {Client, GatewayIntentBits} from 'discord.js';
 import {BotError, Response, Message, config, sentByAdmin} from './util.js';
 import {cmdIdentify, cmdBasicIdentify, cmdMinmax, cmdSim} from './ca.js';
-import {cmdSssss, cmdDyk, cmdName, cmdRename, cmdDeleteName, cmdSimStats, cmdSaveSimStats, cmdAlias, cmdUnalias} from './db.js';
+import {cmdSssss, cmdDyk, cmdName, cmdRename, cmdDeleteName, cmdSimStats, cmdSaveSimStats, cmdAlias, cmdUnalias, cmdLookupAlias} from './db.js';
 
 
 interface Help {
@@ -193,6 +193,17 @@ const HELP: {[key: string]: Help} = {
         ],
     },
 
+    lookup_alias: {
+        desc: 'Looks up an alias for a rule',
+        args: [
+            {
+                name: 'alias',
+                desc: 'The alias to look up.'
+            }
+        ],
+        aliases: ['lookupalias'],
+    },
+
 };
 
 let helpMsg = '```ansi\n\x1b[1m\x1b[34mA cellular automata bot for the ConwayLife Lounge Discord server\n\nCommands:\x1b[0m';
@@ -305,6 +316,8 @@ const COMMANDS: {[key: string]: (msg: Message, argv: string[]) => Promise<Respon
     savesimstats: cmdSaveSimStats,
     alias: cmdAlias,
     unalias: cmdUnalias,
+    lookup_alias: cmdLookupAlias,
+    lookupalias: cmdLookupAlias,
 
 };
 
