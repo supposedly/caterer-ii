@@ -203,6 +203,16 @@ export async function cmdLookupAlias(msg: Message, argv: string[]): Promise<Resp
             break;
         }
         out.push(alias);
+        try {
+            createPattern(alias);
+        } catch (error) {
+            if (error instanceof RuleError) {
+                continue;
+            } else {
+                throw error;
+            }
+        }
+        break;
     }
     return out.join(' -> ');
 }
