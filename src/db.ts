@@ -207,6 +207,7 @@ export async function cmdLookupAlias(msg: Message, argv: string[]): Promise<Resp
             createPattern(alias);
         } catch (error) {
             if (error instanceof RuleError) {
+                alias = alias.toLowerCase();
                 continue;
             } else {
                 throw error;
