@@ -166,11 +166,11 @@ export async function cmdAlias(msg: Message): Promise<Response> {
         }
     }
     if (isValidRule) {
-        return 'Alias is a valid rule';
+        return 'Did not add alias because it is a valid rule';
     }
     let rule = data.slice(1).join('\n');
     if (alias in aliases && !sentByAccepterer(msg)) {
-        return 'Alias is already used';
+        return 'Did not add alias because it is already used';
     }
     aliases[alias] = rule;
     await writeFile('data/aliases.json', JSON.stringify(aliases, undefined, 4));
