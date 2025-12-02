@@ -198,21 +198,20 @@ export async function cmdLookupAlias(msg: Message, argv: string[]): Promise<Resp
     let out: string[] = [alias];
     while (alias in aliases) {
         alias = aliases[alias];
-        if (out.includes(alias)) {
-            out.push(alias);
-            break;
-        }
-        out.push(alias);
         try {
             createPattern(alias);
         } catch (error) {
             if (error instanceof RuleError) {
                 alias = alias.toLowerCase();
-                continue;
+                out.push(alias);
+                if (!out.includes(alias)) {
+                    continue;
+                }
             } else {
                 throw error;
             }
         }
+        out.push(alias);
         break;
     }
     return out.join(' -> ');
