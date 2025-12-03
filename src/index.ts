@@ -9,7 +9,12 @@ import {cmdSssss, cmdDyk, cmdName, cmdRename, cmdDeleteName, cmdSimStats, cmdSav
 
 interface Help {
     desc: string;
-    args: {name: string, optional?: boolean, desc: string}[];
+    args: {
+        name: string;
+        optional?: boolean;
+        newline?: boolean;
+        desc: string;
+    }[];
     extra?: string;
     aliases?: string[];
 }
@@ -177,7 +182,8 @@ const HELP: {[key: string]: Help} = {
                 desc: 'The new alias for the rule.',
             },
             {
-                name: '\nrule',
+                name: 'rule',
+                newline: true,
                 desc: 'The rule being aliased to',
             },
         ],
@@ -227,6 +233,9 @@ for (let cmd in HELP) {
     msg += '\n' + data.desc + '.``````ansi\n\x1b[1m\x1b[34mArguments:\x1b[0m';
     for (let arg of data.args) {
         msg += '\n';
+        if (arg.newline) {
+            msg += '\n';
+        }
         if (arg.optional) {
             msg += '[' + arg.name + ']';
         } else {
