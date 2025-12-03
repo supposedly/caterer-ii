@@ -52,12 +52,16 @@ function embedIdentified(type: Identified | FullIdentified, isOutput?: boolean):
     }
     if (type.apgcode !== 'PATHOLOGICAL') {
         out += '[';
-        if (type.apgcode.length > 31) {
-            out += type.apgcode.slice(0, 14) + '...' + type.apgcode.slice(-14);
-        } else {
-            out += type.apgcode;
+        let apgcode = type.apgcode;
+        if (apgcode.length > 1280) {
+            apgcode = 'ov_' + apgcode.slice(1, apgcode.indexOf('_'));
         }
-        out += '](https://catagolue.hatsya.com/object/' + type.apgcode + '/' + toCatagolueRule(type.phases[0].ruleStr) + ')';
+        if (apgcode.length > 31) {
+            out += apgcode.slice(0, 14) + '...' + apgcode.slice(-14);
+        } else {
+            out += apgcode;
+        }
+        out += '](https://catagolue.hatsya.com/object/' + apgcode + '/' + toCatagolueRule(type.phases[0].ruleStr) + ')';
     }
     let title = 'desc' in type ? type.desc : getDescription(type);
     let name = names.get(type.apgcode);
