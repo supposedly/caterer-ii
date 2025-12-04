@@ -155,9 +155,6 @@ export async function cmdSaveSimStats(msg: Message): Promise<Response> {
 export async function cmdAlias(msg: Message): Promise<Response> {
     let data = msg.content.slice(msg.content.indexOf(' ') + 1).split('\n');
     let alias = data[0].toLowerCase().trim();
-    if (alias === '') {
-        throw new BotError('Cannot alias to an empty rule.\n\nThe proper syntax is:\n```\n!alias <alias>\n<rule>\n```');
-    }
     let isValidRule = true;
     try {
         createPattern(alias);
@@ -172,6 +169,9 @@ export async function cmdAlias(msg: Message): Promise<Response> {
         return 'Did not add alias because it is a valid rule';
     }
     let rule = data.slice(1).join('\n');
+    if (rule === '') {
+        throw new BotError('Cannot alias to an empty rule.\n\nThe proper syntax is:\n```\n!alias <alias>\n<rule>\n```');
+    }
     if (alias in aliases && !sentByAccepterer(msg)) {
         throw new BotError('Alias is already used');
     }

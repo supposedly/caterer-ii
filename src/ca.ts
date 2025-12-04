@@ -141,6 +141,7 @@ export async function cmdSim(msg: Message, argv: string[]): Promise<Response> {
         argv = argv.slice(1);
     }
     let p: Pattern;
+    let replyTo: Message;
     if (argv[1] === 'rand') {
         let height = 16;
         let width = 16;
@@ -159,12 +160,14 @@ export async function cmdSim(msg: Message, argv: string[]): Promise<Response> {
             data[i] = Math.floor(Math.random() * p.states);
         }
         p.setData(data, height, width);
+        replyTo = msg;
     } else {
         let data = await findRLE(msg);
         if (!data) {
             throw new BotError('Cannot find RLE');
         }
         p = data.p;
+        replyTo = data.msg;
     }
     for (let arg of argv.slice(1)) {
         if (arg === '>') {
@@ -337,14 +340,19 @@ export async function cmdSim(msg: Message, argv: string[]): Promise<Response> {
         simCounter = 0;
         await writeFile('data/sim_stats.json', JSON.stringify(simStats, undefined, 4));
     }
+    let out: Response;
     if (outputTime) {
         let total = Math.round(performance.now() - start) / 1000;
         let parse = Math.round(middle - start) / 1000;
-        return {
+        await replyTo.reply({
             content: `Took ${total} seconds (${parse} to parse)`,
             files: ['sim.gif'],
-        };
+            allowedMentions: {repliedUser: false},
+        });
     } else {
-        return {files: ['sim.gif']};
+        await replyTo.reply({
+            files: ['sim.gif'],
+            allowedMentions: {repliedUser: false},
+        });
     }
 }
