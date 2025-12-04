@@ -223,7 +223,7 @@ for (let cmd in HELP) {
     helpMsg += '\n' + cmd.padEnd(padding) + ' | ' + data.desc;
     let msg = '```ansi\n' + '\x1b[1m\x1b[34m!' + cmd + '\x1b[0m';
     for (let arg of data.args) {
-        msg += ' ';
+        msg += arg.newline ? '\n' : ' ';
         if (arg.optional) {
             msg += '[' + arg.name + ']';
         } else {
@@ -233,9 +233,6 @@ for (let cmd in HELP) {
     msg += '\n' + data.desc + '.``````ansi\n\x1b[1m\x1b[34mArguments:\x1b[0m';
     for (let arg of data.args) {
         msg += '\n';
-        if (arg.newline) {
-            msg += '\n';
-        }
         if (arg.optional) {
             msg += '[' + arg.name + ']';
         } else {
