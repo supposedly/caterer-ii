@@ -44,11 +44,11 @@ export async function cmdDyk(): Promise<Response> {
 
 export async function cmdName(msg: Message, argv: string[]): Promise<Response> {
     await msg.channel.sendTyping();
-    let pattern = await findRLE(msg);
-    if (!pattern) {
+    let data = await findRLE(msg);
+    if (!data) {
         throw new BotError('Cannot find RLE');
     }
-    let apgcode = identify(pattern, 4096).apgcode;
+    let apgcode = identify(data.p, 4096).apgcode;
     if (!apgcode.startsWith('x') || apgcode.startsWith('y')) {
         throw new BotError(`Apgcode is ${apgcode}`);
     }
@@ -84,11 +84,11 @@ export async function cmdRename(msg: Message, argv: string[]): Promise<Response>
     if (!sentByAccepterer(msg)) {
         throw new BotError('You are not an accepterer');
     }
-    let pattern = await findRLE(msg);
-    if (!pattern) {
+    let data = await findRLE(msg);
+    if (!data) {
         throw new BotError('Cannot find RLE');
     }
-    let apgcode = identify(pattern, 4096).apgcode;
+    let apgcode = identify(data.p, 4096).apgcode;
     if (!apgcode.startsWith('x') || apgcode.startsWith('y')) {
         throw new BotError(`Apgcode is ${apgcode}`);
     }
@@ -113,11 +113,11 @@ export async function cmdDeleteName(msg: Message, argv: string[]): Promise<Respo
     if (!sentByAccepterer(msg)) {
         throw new BotError('You are not an accepterer');
     }
-    let pattern = await findRLE(msg);
-    if (!pattern) {
+    let data = await findRLE(msg);
+    if (!data) {
         throw new BotError('Cannot find RLE');
     }
-    let apgcode = identify(pattern, 4096).apgcode;
+    let apgcode = identify(data.p, 4096).apgcode;
     if (!apgcode.startsWith('x') || apgcode.startsWith('y')) {
         throw new BotError(`Apgcode is ${apgcode}`);
     }

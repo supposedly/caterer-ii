@@ -87,11 +87,11 @@ export async function cmdIdentify(msg: Message, argv: string[]): Promise<Respons
             limit = parsed;
         }
     }
-    let pattern = await findRLE(msg);
-    if (!pattern) {
+    let data = await findRLE(msg);
+    if (!data) {
         throw new BotError('Cannot find RLE');
     }
-    return {embeds: embedIdentified(fullIdentify(pattern, limit))};
+    return {embeds: embedIdentified(fullIdentify(data.p, limit))};
 }
 
 export async function cmdBasicIdentify(msg: Message, argv: string[]): Promise<Response> {
@@ -103,11 +103,11 @@ export async function cmdBasicIdentify(msg: Message, argv: string[]): Promise<Re
             limit = parsed;
         }
     }
-    let pattern = await findRLE(msg);
-    if (!pattern) {
+    let data = await findRLE(msg);
+    if (!data) {
         throw new BotError('Cannot find RLE');
     }
-    return {embeds: embedIdentified(identify(pattern, limit))};
+    return {embeds: embedIdentified(identify(data.p, limit))};
 }
 
 export async function cmdMinmax(msg: Message, argv: string[]): Promise<Response> {
@@ -119,11 +119,11 @@ export async function cmdMinmax(msg: Message, argv: string[]): Promise<Response>
     if (Number.isNaN(gens)) {
         throw new BotError('Argument 1 is not a valid number');
     }
-    let pattern = await findRLE(msg);
-    if (!pattern) {
+    let data = await findRLE(msg);
+    if (!data) {
         throw new BotError('Cannot find RLE');
     }
-    let [min, max] = findMinmax(pattern, gens);
+    let [min, max] = findMinmax(data.p, gens);
     return `Min: ${min}\nMax: ${max}`;
 }
 
@@ -140,7 +140,7 @@ export async function cmdSim(msg: Message, argv: string[]): Promise<Response> {
         outputTime = true;
         argv = argv.slice(1);
     }
-    let pattern: Pattern;
+    let p: Pattern;
     if (argv[1] === 'rand') {
         let height = 16;
         let width = 16;
@@ -152,19 +152,19 @@ export async function cmdSim(msg: Message, argv: string[]): Promise<Response> {
         }
         let rule = argv[2];
         argv = argv.slice(2);
-        pattern = createPattern(rule);
+        p = createPattern(rule);
         let size = height * width;
         let data = new Uint8Array(size);
         for (let i = 0; i < size; i++) {
-            data[i] = Math.floor(Math.random() * pattern.states);
+            data[i] = Math.floor(Math.random() * p.states);
         }
-        pattern.setData(data, height, width);
+        p.setData(data, height, width);
     } else {
-        let p = await findRLE(msg);
-        if (!p) {
+        let data = await findRLE(msg);
+        if (!data) {
             throw new BotError('Cannot find RLE');
         }
-        pattern = p;
+        p = data.p;
     }
     for (let arg of argv.slice(1)) {
         if (arg === '>') {
@@ -184,7 +184,7 @@ export async function cmdSim(msg: Message, argv: string[]): Promise<Response> {
     if (parts[0] && parts[0][1] === 'fps' && typeof parts[0][0] === 'number') {
         frameTime = Math.ceil(100 / parts[0][0]) * 10;
     }
-    let frames: [Pattern, number][] = [[pattern.copy(), frameTime]];
+    let frames: [Pattern, number][] = [[p.copy(), frameTime]];
     let gifSize = 100;
     for (let part of parts) {
         if (part[1] === 'fps' && typeof part[0] === 'number') {
@@ -198,15 +198,15 @@ export async function cmdSim(msg: Message, argv: string[]): Promise<Response> {
         if (typeof part[0] === 'number') {
             if (typeof part[1] === 'number') {
                 for (let i = parts.length > 1 ? 0 : 1; i < Math.ceil(part[0] / part[1]); i++) {
-                    pattern.run(part[1]);
-                    frames.push([pattern.copy(), frameTime]);
+                    p.run(part[1]);
+                    frames.push([p.copy(), frameTime]);
                 }
             } else if (typeof part[1] === 'string') {
                 throw new BotError(`Invalid part: ${part.join(' ')}`);
             } else {
                 for (let i = parts.length > 1 ? 0 : 1; i < part[0]; i++) {
-                    pattern.runGeneration();
-                    frames.push([pattern.copy(), frameTime]);
+                    p.runGeneration();
+                    frames.push([p.copy(), frameTime]);
                 }
             }
         } else if (part[0] === 'wait') {
@@ -214,13 +214,13 @@ export async function cmdSim(msg: Message, argv: string[]): Promise<Response> {
                 throw new BotError(`Invalid part: ${part.join(' ')}`);
             }
             for (let i = 0; i < part[1]; i++) {
-                frames.push([pattern.copy(), frameTime]);
+                frames.push([p.copy(), frameTime]);
             }
         } else if (part[0] === 'jump') {
             if (typeof part[1] !== 'number' || part.length > 2) {
                 throw new BotError(`Invalid part: ${part.join(' ')}`);
             }
-            pattern.run(part[1]);
+            p.run(part[1]);
         } else if (part[0] !== undefined) {
             throw new BotError(`Invalid part: ${part.join(' ')}`);
         }
@@ -265,7 +265,7 @@ export async function cmdSim(msg: Message, argv: string[]): Promise<Response> {
     maxY++;
     let width = maxX - minX;
     let height = maxY - minY;
-    if (pattern instanceof CoordPattern) {
+    if (p instanceof CoordPattern) {
         width++;
         height++;
     }
@@ -327,10 +327,10 @@ export async function cmdSim(msg: Message, argv: string[]): Promise<Response> {
     let scale = Math.ceil(gifSize / Math.min(width, height));
     gifSize = Math.min(width, height) * scale;
     execSync(`gifsicle --resize-${width < height ? 'width' : 'height'} ${gifSize} sim_base.gif > sim.gif`);
-    if (pattern.ruleStr in simStats) {
-        simStats[pattern.ruleStr]++;
+    if (p.ruleStr in simStats) {
+        simStats[p.ruleStr]++;
     } else {
-        simStats[pattern.ruleStr] = 1;
+        simStats[p.ruleStr] = 1;
     }
     simCounter++;
     if (simCounter === 16) {

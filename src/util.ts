@@ -72,21 +72,26 @@ function findRLEFromText(data: string): Pattern | undefined {
     return parse(data.slice(0, index + 1), aliases);
 }
 
-async function findRLEFromMessage(msg: Message): Promise<Pattern | undefined> {
+async function findRLEFromMessage(msg: Message): Promise<{msg: Message, p: Pattern} | undefined> {
     let out = findRLEFromText(msg.content);
     if (out) {
-        return out;
+        return {msg, p: out};
     }
     if (msg.attachments.size > 0) {
         let attachment = msg.attachments.first();
         if (attachment) {
             let data = await (await fetch(attachment.url)).text();
-            return findRLEFromText(data);
+            let out = findRLEFromText(data);
+            if (out) {
+                return {msg, p: out};
+            } else {
+                return undefined;
+            }
         }
     }
 }
 
-export async function findRLE(msg: Message): Promise<Pattern | undefined> {
+export async function findRLE(msg: Message): Promise<{msg: Message, p: Pattern} | undefined> {
     let out = await findRLEFromMessage(msg);
     if (out) {
         return out;
