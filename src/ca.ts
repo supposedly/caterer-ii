@@ -309,7 +309,7 @@ export async function cmdSim(msg: Message, argv: string[]): Promise<Response> {
                 if (value) {
                     array[j++] = 0xff;
                     if (p.states > 2) {
-                        array[j++] = Math.ceil(value / (p.states - 1) * 256) - 1;
+                        array[j++] = Math.ceil((value - 1) / (p.states - 2) * 256) - 1;
                         array[j++] = 0;
                     } else {
                         array[j++] = 0xff;
