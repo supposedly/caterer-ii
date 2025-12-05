@@ -2,7 +2,7 @@
 import * as lifeweb from '../lifeweb/lib/index.js';
 import {inspect} from 'node:util';
 import {Client, GatewayIntentBits} from 'discord.js';
-import {BotError, Response, Message, config, sentByAdmin} from './util.js';
+import {BotError, Response, Message, config, sentByAdmin, aliases} from './util.js';
 import {cmdIdentify, cmdBasicIdentify, cmdMinmax, cmdSim} from './ca.js';
 import {cmdSssss, cmdDyk, cmdName, cmdRename, cmdDeleteName, cmdSimStats, cmdSaveSimStats, cmdAlias, cmdUnalias, cmdLookupAlias} from './db.js';
 
@@ -255,7 +255,7 @@ for (let cmd in HELP) {
 helpMsg += '```';
 
 
-const EVAL_PREFIX = `\nlet {RuleError, APGCODE_CHARS, SYMMETRY_COMBINE, SYMMETRY_LEAST, symmetryFromBases, Pattern, TRANSITIONS, VALID_TRANSITIONS, HEX_TRANSITIONS, VALID_HEX_TRANSITIONS, parseTransitions, unparseTransitions, transitionsToArray, arrayToTransitions, parseIsotropic, parseMAP, unparseMAP, findSymmetry, MAPPattern, MAPB0Pattern, MAPGenPattern, MAPB0GenPattern, AlternatingPattern, findType, identify, findMinmax, classifyLinear, findOscillatorInfo, fullIdentify, getKnots, INTSeperator, createPattern, parse, toCatagolueRule} = lifeweb;\n`;
+const EVAL_PREFIX = `\nlet {APGCODE_CHARS, AlternatingPattern, COORD_BIAS, COORD_WIDTH, CoordPattern, DataPattern, HEX_CHARS, HEX_TRANSITIONS, HROTB0Pattern, HROTPattern, INTSeparator, MAPB0GenPattern, MAPB0Pattern, MAPGenPattern, MAPPattern, RLE_CHARS, RuleError, SYMMETRY_COMBINE, SYMMETRY_LEAST, TRANSITIONS, TreePattern, VALID_HEX_TRANSITIONS, VALID_TRANSITIONS, arrayToTransitions, atRuleToString, censusINT, classifyLinear, create16Trs, createPattern, findMinmax, findOscillatorInfo, findSymmetry, findType, fullIdentify, getDescription, getHashsoup, getKnots, identify, parse, parseAtRule, parseCatagolueHROTRule, parseCompatibility, parseHROTRule, parseIsotropic, parseMAP, parseTransitions, randomHashsoup, soupSearch, stabilize, symmetryFromBases, toCatagolueRule, transitionsToArray, unparseHROTRanges, unparseMAP, unparseTransitions} = lifeweb;\n`;
 
 
 const COMMANDS: {[key: string]: (msg: Message, argv: string[]) => Promise<Response>} = {
@@ -283,7 +283,7 @@ const COMMANDS: {[key: string]: (msg: Message, argv: string[]) => Promise<Respon
             if (!code.includes(';') && !code.includes('\n')) {
                 code = 'return ' + code;
             }
-            let out = (new Function('client', 'msg', 'lifeweb', '"use strict";' + EVAL_PREFIX + code))(client, msg, lifeweb);
+            let out = (new Function('client', 'msg', 'lifeweb', 'aliases', '"use strict";' + EVAL_PREFIX + code))(client, msg, lifeweb, aliases);
             return '```ansi\n' + inspect(out, {
                 colors: true,
                 depth: 2, 
