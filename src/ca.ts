@@ -2,7 +2,7 @@
 /// <reference path="./pencil.js__canvas-gif-encoder.d.ts" />
 
 import {execSync} from 'node:child_process';
-import {Pattern, CoordPattern, Identified, FullIdentified, identify, findMinmax, getDescription, fullIdentify, createPattern, toCatagolueRule} from '../lifeweb/lib/index.js';
+import {Pattern, CoordPattern, TreePattern, Identified, FullIdentified, identify, findMinmax, getDescription, fullIdentify, createPattern, toCatagolueRule} from '../lifeweb/lib/index.js';
 import {EmbedBuilder} from 'discord.js';
 import {BotError, Message, Response, writeFile, names, simStats, findRLE} from './util.js';
 import CanvasGifEncoder from '@pencil.js/canvas-gif-encoder';
@@ -308,7 +308,12 @@ export async function cmdSim(msg: Message, argv: string[]): Promise<Response> {
                 let value = pData[i++];
                 if (value) {
                     array[j++] = 0xff;
-                    if (p.states > 2) {
+                    if (p instanceof TreePattern && p.rule.colors && p.rule.colors[value]) {
+                        let [r, g, b] = p.rule.colors[value];
+                        array[j++] = r;
+                        array[j++] = g;
+                        array[j++] = b;
+                    } else if (p.states > 2) {
                         array[j++] = Math.ceil((value - 1) / (p.states - 2) * 256) - 1;
                         array[j++] = 0;
                     } else {
