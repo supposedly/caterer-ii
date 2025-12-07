@@ -37,8 +37,7 @@ export async function cmdSssss(msg: Message, argv: string[]): Promise<Response> 
 
 export async function cmdDyk(): Promise<Response> {
     let num = Math.floor(Math.random() * dyks.length);
-    let out = '**#' + (num + 1) + ':** ' + dyks[num] + '\n\n-# Licensed under the [GNU Free Documentation License 1.2](https://www.gnu.org/licenses/fdl-1.3.html)';
-    return {embeds: [new EmbedBuilder().setTitle('Did you know...').setDescription(out)]};
+    return `Did you know... (#${num + 1}): ${dyks[num]}\n-# Licensed under the [GNU Free Documentation License 1.2](https://www.gnu.org/licenses/fdl-1.3.html)`;
 }
 
 

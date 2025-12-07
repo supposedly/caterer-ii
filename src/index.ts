@@ -2,7 +2,7 @@
 import * as lifeweb from '../lifeweb/lib/index.js';
 import {inspect} from 'node:util';
 import {Client, GatewayIntentBits} from 'discord.js';
-import {BotError, Response, Message, config, sentByAdmin, aliases} from './util.js';
+import {BotError, Response, Message, config, sentByAdmin, aliases, findRLE} from './util.js';
 import {cmdIdentify, cmdBasicIdentify, cmdMinmax, cmdSim} from './ca.js';
 import {cmdSssss, cmdDyk, cmdName, cmdRename, cmdDeleteName, cmdSimStats, cmdSaveSimStats, cmdAlias, cmdUnalias, cmdLookupAlias} from './db.js';
 
@@ -255,7 +255,7 @@ for (let cmd in HELP) {
 helpMsg += '```';
 
 
-const EVAL_PREFIX = `\nlet {APGCODE_CHARS, AlternatingPattern, COORD_BIAS, COORD_WIDTH, CoordPattern, DataPattern, HEX_CHARS, HEX_TRANSITIONS, HROTB0Pattern, HROTPattern, INTSeparator, MAPB0GenPattern, MAPB0Pattern, MAPGenPattern, MAPPattern, RLE_CHARS, RuleError, SYMMETRY_COMBINE, SYMMETRY_LEAST, TRANSITIONS, TreePattern, VALID_HEX_TRANSITIONS, VALID_TRANSITIONS, arrayToTransitions, atRuleToString, censusINT, classifyLinear, create16Trs, createPattern, findMinmax, findOscillatorInfo, findSymmetry, findType, fullIdentify, getDescription, getHashsoup, getKnots, identify, parse, parseAtRule, parseCatagolueHROTRule, parseCompatibility, parseHROTRule, parseIsotropic, parseMAP, parseTransitions, randomHashsoup, soupSearch, stabilize, symmetryFromBases, toCatagolueRule, transitionsToArray, unparseHROTRanges, unparseMAP, unparseTransitions} = lifeweb;\n`;
+const EVAL_PREFIX = '\nlet {' + Object.keys(lifeweb).join(', ') + '} = lifeweb;\n';
 
 
 const COMMANDS: {[key: string]: (msg: Message, argv: string[]) => Promise<Response>} = {
@@ -283,7 +283,7 @@ const COMMANDS: {[key: string]: (msg: Message, argv: string[]) => Promise<Respon
             if (!code.includes(';') && !code.includes('\n')) {
                 code = 'return ' + code;
             }
-            let out = (new Function('client', 'msg', 'lifeweb', 'aliases', '"use strict";' + EVAL_PREFIX + code))(client, msg, lifeweb, aliases);
+            let out = (new Function('client', 'msg', 'lifeweb', 'aliases', 'findRLE', '"use strict";' + EVAL_PREFIX + code))(client, msg, lifeweb, aliases, findRLE);
             return '```ansi\n' + inspect(out, {
                 colors: true,
                 depth: 2, 
