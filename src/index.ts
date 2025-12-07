@@ -3,7 +3,7 @@ import * as lifeweb from '../lifeweb/lib/index.js';
 import {inspect} from 'node:util';
 import {Client, GatewayIntentBits} from 'discord.js';
 import {BotError, Response, Message, config, sentByAdmin, aliases, findRLE} from './util.js';
-import {cmdIdentify, cmdBasicIdentify, cmdMinmax, cmdSim} from './ca.js';
+import {cmdIdentify, cmdBasicIdentify, cmdMinmax, cmdSim, cmdHashsoup, cmdApgencode, cmdApgdecode} from './ca.js';
 import {cmdSssss, cmdDyk, cmdName, cmdRename, cmdDeleteName, cmdSimStats, cmdSaveSimStats, cmdAlias, cmdUnalias, cmdLookupAlias} from './db.js';
 
 
@@ -28,7 +28,7 @@ const HELP: {[key: string]: Help} = {
                 name: 'command',
                 optional: true,
                 desc: 'Command to display infomation for. If omitted or invalid, displays generic help/info message.'
-            }
+            },
         ],
         extra: 'If an argument looks like <arg>, it is required. If it looks like [arg], it is optional.'
     },
@@ -205,10 +205,48 @@ const HELP: {[key: string]: Help} = {
         args: [
             {
                 name: 'alias',
-                desc: 'The alias to look up.'
-            }
+                desc: 'The alias to look up.',
+            },
         ],
         aliases: ['lookupalias'],
+    },
+
+    hashsoup: {
+        desc: 'Get a Catagolue hashsoup.',
+        args: [
+            {
+                name: 'rule',
+                desc: 'The rule to use.',
+            },
+            {
+                name: 'symmetry',
+                desc: 'The symmetry to use.',
+            },
+            {
+                name: 'seed',
+                desc: 'The seed for the soup (k_whatever).',
+            },
+        ],
+    },
+
+    apgencode: {
+        desc: 'Get an unprefixed apgcode for any pattern',
+        args: [],
+    },
+
+    apgdecode: {
+        desc: 'Decode an unprefixed apgcode.',
+        args: [
+            {
+                name: 'apgcode',
+                desc: 'The apgcode to decode.',
+            },
+            {
+                name: 'rule',
+                optional: true,
+                desc: 'The rule to use (default B3/S23).',
+            },
+        ],
     },
 
 };
@@ -327,6 +365,10 @@ const COMMANDS: {[key: string]: (msg: Message, argv: string[]) => Promise<Respon
     deletealias: cmdUnalias,
     lookup_alias: cmdLookupAlias,
     lookupalias: cmdLookupAlias,
+
+    hashsoup: cmdHashsoup,
+    apgencode: cmdApgencode,
+    apgdecode: cmdApgdecode,
 
 };
 

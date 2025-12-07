@@ -2,9 +2,9 @@
 /// <reference path="./pencil.js__canvas-gif-encoder.d.ts" />
 
 import {execSync} from 'node:child_process';
-import {Pattern, CoordPattern, TreePattern, Identified, FullIdentified, identify, findMinmax, getDescription, fullIdentify, createPattern, toCatagolueRule} from '../lifeweb/lib/index.js';
+import {Pattern, CoordPattern, TreePattern, Identified, FullIdentified, identify, findMinmax, getDescription, fullIdentify, createPattern, toCatagolueRule, getHashsoup} from '../lifeweb/lib/index.js';
 import {EmbedBuilder} from 'discord.js';
-import {BotError, Message, Response, writeFile, names, simStats, findRLE} from './util.js';
+import {BotError, Message, Response, writeFile, names, aliases, simStats, findRLE} from './util.js';
 import CanvasGifEncoder from '@pencil.js/canvas-gif-encoder';
 
 
@@ -365,5 +365,28 @@ export async function cmdSim(msg: Message, argv: string[]): Promise<Response> {
             files: ['sim.gif'],
             allowedMentions: {repliedUser: false},
         });
+    }
+}
+
+
+export async function cmdHashsoup(msg: Message, argv: string[]): Promise<Response> {
+    return createPattern(argv[1], await getHashsoup(argv[2], argv[3]), aliases).toRLE();
+}
+
+export async function cmdApgencode(msg: Message, argv: string[]): Promise<Response> {
+    let data = await findRLE(msg);
+    if (!data) {
+        throw new BotError('Cannot find RLE');
+    }
+    return data.p.toApgcode();
+}
+
+let lifePattern = createPattern('B3/S23');
+
+export async function cmdApgdecode(msg: Message, argv: string[]): Promise<Response> {
+    if (!argv[2]) {
+        return lifePattern.loadApgcode(argv[1]).toRLE();
+    } else {
+        return createPattern(argv[2], undefined, aliases).loadApgcode(argv[1]).toRLE();
     }
 }
