@@ -370,7 +370,7 @@ export async function cmdSim(msg: Message, argv: string[]): Promise<Response> {
 
 
 export async function cmdHashsoup(msg: Message, argv: string[]): Promise<Response> {
-    return createPattern(argv[1], await getHashsoup(argv[2], argv[3]), aliases).toRLE();
+    return createPattern(argv[1], await getHashsoup(argv[3], argv[2]), aliases).toRLE();
 }
 
 export async function cmdApgencode(msg: Message, argv: string[]): Promise<Response> {
