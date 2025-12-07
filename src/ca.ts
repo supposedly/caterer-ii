@@ -339,6 +339,7 @@ export async function cmdSim(msg: Message, argv: string[]): Promise<Response> {
     encoder.flush();
     await writeFile('sim_base.gif', gif);
     let scale = Math.ceil(gifSize / Math.min(width, height));
+    return String(scale);
     gifSize = Math.min(width, height) * scale;
     execSync(`gifsicle --resize-${width < height ? 'width' : 'height'} ${gifSize} sim_base.gif > sim.gif`);
     if (p.ruleStr in simStats) {
@@ -351,7 +352,6 @@ export async function cmdSim(msg: Message, argv: string[]): Promise<Response> {
         simCounter = 0;
         await writeFile('data/sim_stats.json', JSON.stringify(simStats, undefined, 4));
     }
-    let out: Response;
     if (outputTime) {
         let total = Math.round(performance.now() - start) / 1000;
         let parse = Math.round(middle - start) / 1000;
