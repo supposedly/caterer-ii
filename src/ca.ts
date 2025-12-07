@@ -66,7 +66,13 @@ function embedIdentified(type: Identified | FullIdentified, isOutput?: boolean):
     let title = 'desc' in type ? type.desc : getDescription(type);
     let name = names.get(type.apgcode);
     if (name !== undefined) {
-        title = name[0].toUpperCase() + name.slice(1) + ' (' + title + ')';
+        if (type.stabilizedAt > 0) {
+            title = 'Stabilizes into ' + name + ' (' + title + ')';
+        } else {
+            title = name[0].toUpperCase() + name.slice(1) + ' (' + title + ')';
+        }
+    } else if (type.stabilizedAt > 0) {
+        title = 'Stabilizes into ' + title;
     }
     if (isOutput) {
         title = 'Output: ' + title;
