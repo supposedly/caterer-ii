@@ -344,9 +344,19 @@ export async function cmdSim(msg: Message, argv: string[]): Promise<Response> {
     let dim = Math.min(width, height);
     let scale = Math.ceil(gifSize / dim);
     if (scale * dim > 500) {
-        scale = 2**Math.floor(Math.log2(scale));
+        if (scale > 1) {
+            while (scale * dim > 500) {
+                scale--;
+            }
+        } else {
+            let div = 1;
+            while (dim / div > 500) {
+                div++;
+            }
+            scale = 1/div;
+        }
     }
-    gifSize = Math.ceil(dim * scale);
+    gifSize = Math.ceil(scale * dim);
     execSync(`gifsicle --resize-${width < height ? 'width' : 'height'} ${gifSize} sim_base.gif > sim.gif`);
     if (p.ruleStr in simStats) {
         simStats[p.ruleStr]++;
