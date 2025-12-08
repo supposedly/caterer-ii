@@ -45,7 +45,6 @@ client.on('messageCreate', async msg => {
             str = String(error);
         }
         await msg.reply('```' + str + '```');
-        throw error;
     }
 });
 
