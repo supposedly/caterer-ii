@@ -323,7 +323,6 @@ export async function cmdSim(msg: Message, argv: string[]): Promise<Response> {
             for (let x = startX; x < startX + p.width; x++) {
                 let value = pData[i++];
                 if (value) {
-                    return p.constructor.name;
                     if (p instanceof TreePattern && p.rule.colors && p.rule.colors[value]) {
                         let [r, g, b] = p.rule.colors[value];
                         array[j++] = r;
