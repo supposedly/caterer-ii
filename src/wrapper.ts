@@ -38,7 +38,14 @@ client.on('messageCreate', async msg => {
             await msg.reply('Invalid command!');
         }
     } catch (error) {
-        await msg.reply('`' + String(error) + '`');
+        let str: string;
+        if (error && typeof error === 'object' && 'stack' in error) {
+            str = String(error.stack);
+        } else {
+            str = String(error);
+        }
+        await msg.reply('```' + str + '```');
+        throw error;
     }
 });
 

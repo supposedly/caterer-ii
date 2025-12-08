@@ -402,6 +402,7 @@ async function runCommand(msg: Message): Promise<void> {
                     console.log(str);
                     previousMsgs.push([msg.id, await msg.reply('```' + str + '```')]);
                 }
+                throw error;
             }
             if (previousMsgs.length > 2000) {
                 previousMsgs = previousMsgs.slice(1000);
@@ -438,7 +439,7 @@ client.on('messageUpdate', async (old, msg) => {
             str = String(error);
         }
         await msg.reply('```' + str + '```');
-        return;
+        throw error;
     }
     runCommand(msg);
 });
