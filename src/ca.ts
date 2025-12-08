@@ -313,16 +313,17 @@ export async function cmdSim(msg: Message, argv: string[]): Promise<Response> {
             for (let x = startX; x < startX + p.width; x++) {
                 let value = pData[i++];
                 if (value) {
-                    array[j++] = 0xff;
                     if (p instanceof TreePattern && p.rule.colors && p.rule.colors[value]) {
                         let [r, g, b] = p.rule.colors[value];
                         array[j++] = r;
                         array[j++] = g;
                         array[j++] = b;
                     } else if (p.states > 2) {
+                        array[j++] = 0xff;
                         array[j++] = Math.ceil((value - 1) / (p.states - 2) * 256) - 1;
                         array[j++] = 0;
                     } else {
+                        array[j++] = 0xff;
                         array[j++] = 0xff;
                         array[j++] = 0xff;
                     }
