@@ -187,6 +187,7 @@ const HELP: {[key: string]: Help} = {
                 desc: 'The rule being aliased to',
             },
         ],
+        aliases: ['upload'],
     },
 
     unalias: {
@@ -360,6 +361,7 @@ const COMMANDS: {[key: string]: (msg: Message, argv: string[]) => Promise<Respon
     save_sim_stats: cmdSaveSimStats,
     savesimstats: cmdSaveSimStats,
     alias: cmdAlias,
+    upload: cmdAlias,
     unalias: cmdUnalias,
     delete_alias: cmdUnalias,
     deletealias: cmdUnalias,

@@ -169,7 +169,15 @@ export async function cmdAlias(msg: Message): Promise<Response> {
     }
     let rule = data.slice(1).join('\n');
     if (rule === '') {
-        throw new BotError('Cannot alias to an empty rule.\n\nThe proper syntax is:\n```\n!alias <alias>\n<rule>\n```');
+        if (msg.attachments.size > 0) {
+            let attachment = msg.attachments.first();
+            if (attachment) {
+                rule = await (await fetch(attachment.url)).text();
+            }
+        }
+        if (rule === '') {
+            throw new BotError('Cannot alias to an empty rule.\n\nThe proper syntax is:\n```\n!alias <alias>\n<rule>\n```');
+        }
     }
     if (alias in aliases && !sentByAccepterer(msg)) {
         throw new BotError('Alias is already used');
