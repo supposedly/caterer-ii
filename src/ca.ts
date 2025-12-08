@@ -338,9 +338,6 @@ export async function cmdSim(msg: Message, argv: string[]): Promise<Response> {
     let gif = encoder.end();
     encoder.flush();
     await writeFile('sim_base.gif', gif);
-    if (gifSize > 500) {
-        gifSize = 500;
-    }
     let dim = Math.min(width, height);
     let scale = Math.ceil(gifSize / dim);
     if (scale * dim > 500) {
