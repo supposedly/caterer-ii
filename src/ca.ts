@@ -2,10 +2,20 @@
 /// <reference path="./pencil.js__canvas-gif-encoder.d.ts" />
 
 import {execSync} from 'node:child_process';
-import {Pattern, CoordPattern, TreePattern, Identified, FullIdentified, identify, findMinmax, getDescription, fullIdentify, createPattern, toCatagolueRule, getHashsoup} from '../lifeweb/lib/index.js';
+import {Pattern, CoordPattern, TreePattern, Identified, FullIdentified, identify, findMinmax, getDescription, fullIdentify, createPattern, toCatagolueRule, getHashsoup, DataHistoryPattern, CoordHistoryPattern} from '../lifeweb/lib/index.js';
 import {EmbedBuilder} from 'discord.js';
 import {BotError, Message, Response, writeFile, names, aliases, simStats, findRLE} from './util.js';
 import CanvasGifEncoder from '@pencil.js/canvas-gif-encoder';
+
+
+const HISTORY_COLORS: [number, number, number][] = [
+    [0, 255, 0],
+    [0, 0, 128],
+    [216, 255, 216],
+    [255, 0, 0],
+    [255, 255, 0],
+    [96, 96, 96],
+];
 
 
 function embedIdentified(type: Identified | FullIdentified, isOutput?: boolean): EmbedBuilder[] {
@@ -315,6 +325,11 @@ export async function cmdSim(msg: Message, argv: string[]): Promise<Response> {
                 if (value) {
                     if (p instanceof TreePattern && p.rule.colors && p.rule.colors[value]) {
                         let [r, g, b] = p.rule.colors[value];
+                        array[j++] = r;
+                        array[j++] = g;
+                        array[j++] = b;
+                    } else if (p instanceof DataHistoryPattern || p instanceof CoordHistoryPattern) {
+                        let [r, g, b] = HISTORY_COLORS[value - 1];
                         array[j++] = r;
                         array[j++] = g;
                         array[j++] = b;
