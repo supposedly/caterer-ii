@@ -383,11 +383,11 @@ async function runCommand(msg: Message): Promise<void> {
     if (data.startsWith('!')) {
         data = data.slice(1);
     } else if (data.startsWith('ca.')) {
-        data = data.slice(1);
+        data = data.slice(3);
     } else {
         return;
     }
-    let argv = data.slice(1).split(' ');
+    let argv = data.split(' ');
     let cmd = argv[0].toLowerCase();
     if (cmd in COMMANDS) {
         try {
