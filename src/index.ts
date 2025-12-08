@@ -184,7 +184,7 @@ const HELP: {[key: string]: Help} = {
             {
                 name: 'rule',
                 newline: true,
-                desc: 'The rule being aliased to',
+                desc: 'The rule being aliased to. Must be on a new line. Can be a file.',
             },
         ],
         aliases: ['upload'],
