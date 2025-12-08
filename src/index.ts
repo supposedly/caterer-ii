@@ -381,32 +381,37 @@ async function runCommand(msg: Message): Promise<void> {
     }
     let data = msg.content;
     if (data.startsWith('!')) {
-        let argv = data.slice(1).split(' ');
-        let cmd = argv[0].toLowerCase();
-        if (cmd in COMMANDS) {
-            try {
-                let out = await COMMANDS[cmd](msg, argv);
-                if (out) {
-                    previousMsgs.push([msg.id, await msg.reply(out)]);
-                }
-            } catch (error) {
-                if (error instanceof BotError || error instanceof lifeweb.RuleError) {
-                    previousMsgs.push([msg.id, await msg.reply('Error: ' + error.message)]);
+        data = data.slice(1);
+    } else if (data.startsWith('ca.')) {
+        data = data.slice(1);
+    } else {
+        return;
+    }
+    let argv = data.slice(1).split(' ');
+    let cmd = argv[0].toLowerCase();
+    if (cmd in COMMANDS) {
+        try {
+            let out = await COMMANDS[cmd](msg, argv);
+            if (out) {
+                previousMsgs.push([msg.id, await msg.reply(out)]);
+            }
+        } catch (error) {
+            if (error instanceof BotError || error instanceof lifeweb.RuleError) {
+                previousMsgs.push([msg.id, await msg.reply('Error: ' + error.message)]);
+            } else {
+                let str: string;
+                if (error && typeof error === 'object' && 'stack' in error) {
+                    str = String(error.stack);
                 } else {
-                    let str: string;
-                    if (error && typeof error === 'object' && 'stack' in error) {
-                        str = String(error.stack);
-                    } else {
-                        str = String(error);
-                    }
-                    console.log(str);
-                    previousMsgs.push([msg.id, await msg.reply('```' + str + '```')]);
+                    str = String(error);
                 }
-                throw error;
+                console.log(str);
+                previousMsgs.push([msg.id, await msg.reply('```' + str + '```')]);
             }
-            if (previousMsgs.length > 2000) {
-                previousMsgs = previousMsgs.slice(1000);
-            }
+            throw error;
+        }
+        if (previousMsgs.length > 2000) {
+            previousMsgs = previousMsgs.slice(1000);
         }
     }
 }
