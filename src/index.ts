@@ -283,7 +283,7 @@ for (let cmd in HELP) {
         msg += '``````ansi\n' + data.extra;
     }
     if (data.aliases) {
-        msg += '``````ansi\n\x1b[1m\x1b[34mAliases:\x1b[0m' + data.aliases.join(' ');
+        msg += '``````ansi\n\x1b[1m\x1b[34mAliases: \x1b[0m' + data.aliases.join(' ');
     }
     msg += '```';
     helpMsgs[cmd] = msg;
