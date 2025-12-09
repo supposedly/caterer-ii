@@ -169,7 +169,7 @@ export async function cmdSim(msg: Message, argv: string[]): Promise<Response> {
         }
         let fill = 0.5;
         if (argv[2].endsWith('%')) {
-            fill = parseFloat(argv[0]) / 100;
+            fill = parseFloat(argv[2]) / 100;
             argv = argv.slice(1);
         }
         let rule = argv[2];
