@@ -167,13 +167,13 @@ export async function cmdSim(msg: Message, argv: string[]): Promise<Response> {
             height = parseInt(data[1]);
             argv = argv.slice(1);
         }
-        let rule = argv[2];
-        argv = argv.slice(2);
         let fill = 0.5;
-        if (argv[0].endsWith('%')) {
+        if (argv[2].endsWith('%')) {
             fill = parseFloat(argv[0]) / 100;
             argv = argv.slice(1);
         }
+        let rule = argv[2];
+        argv = argv.slice(2);
         p = createPattern(rule);
         let size = height * width;
         let data = new Uint8Array(size);
