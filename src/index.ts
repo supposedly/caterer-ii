@@ -106,6 +106,11 @@ const HELP: {[key: string]: Help} = {
                 desc: 'The size of the pattern, such as 20x20 or 8x32 (default 16x16).',
             },
             {
+                name: 'percent',
+                optional: true,
+                desc: 'The percentage to fill the pattern (must end in %, default 50%).',
+            },
+            {
                 name: 'rule',
                 desc: 'The rule to simulate it in.'
             },
