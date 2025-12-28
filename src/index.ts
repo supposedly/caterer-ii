@@ -487,7 +487,11 @@ setInterval(async () => {
                     }
                 }
                 if (improvedShips.length > 0) {
-                    text += `${improvedShips.length} improved speed${improvedShips.length === 1 ? '' : 's'} in ${TYPE_NAMES[type]}: ${improvedShips.map(x => `${x[1]} (${x[2]} cells to ${x[3]} cells)`).join(', ')}`;
+                    if (improvedShips.length === 1) {
+                        text += `Improved speed in ${TYPE_NAMES[type]}: ${improvedShips[0][1]} (${improvedShips[0][3]} cells to ${improvedShips[0][2]} cells)`;
+                    } else {
+                        text += `${improvedShips.length} improved speeds in ${TYPE_NAMES[type]}: ${improvedShips.map(x => `${x[1]} (${x[3]} cells to ${x[2]} cells)`).join(', ')}`;
+                    }
                 }
             }
             let channel = client.channels.cache.get(config.sssssChannel);
