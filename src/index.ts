@@ -125,6 +125,11 @@ const HELP: {[key: string]: Help} = {
         desc: 'Query the 5S database',
         args: [
             {
+                name: 'type',
+                optional: true,
+                desc: 'The rulespace to use: [int|ot](gen)?(b0)?, default int.',
+            },
+            {
                 name: 'speed',
                 desc: 'A speed, such as c/2, c/2o, c/2d, (2, 1)c/5, etc',
             },

@@ -1,37 +1,21 @@
 
-import {parse, identify, createPattern, RuleError} from '../lifeweb/lib/index.js';
+import {identify, createPattern, RuleError} from '../lifeweb/lib/index.js';
+import {findSpeedRLE} from '../data/sssss/lib/index.js';
 import {EmbedBuilder} from 'discord.js';
-import {BotError, Message, Response, NAME_CHARS, dyks, names, simStats, aliases, readFile, writeFile, sentByAccepterer, findRLE, parseSpeed} from './util.js';
+import {BotError, Message, Response, NAME_CHARS, dyks, names, simStats, aliases, writeFile, sentByAccepterer, findRLE} from './util.js';
 
 
 export async function cmdSssss(msg: Message, argv: string[]): Promise<Response> {
     await msg.channel.sendTyping();
-    let speed = parseSpeed(argv.slice(1).join(' '));
-    speed.x = Math.abs(speed.x);
-    speed.y = Math.abs(speed.y);
-    if (speed.x < speed.y) {
-        let temp = speed.y;
-        speed.y = speed.x;
-        speed.x = temp;
-    }
-    let file = 'data/sssss/';
-    if (speed.y === 0) {
-        file += 'Orthogonal';
-    } else if (speed.x === speed.y) {
-        file += 'Diagonal';
+    let type = 'int';
+    let speed: string;
+    if (argv[1].includes('/')) {
+        speed = argv[1];
     } else {
-        file += 'Oblique';
+        type = argv[0];
+        speed = argv[1];
     }
-    file += ' ships.sss.txt';
-    let data = (await readFile(file)).toString().split('\n');
-    for (let line of data) {
-        let [pop, rule, dx, dy, period, rle] = line.split(', ');
-        if (speed.p === parseInt(period) && speed.x === parseInt(dx) && speed.y === parseInt(dy)) {
-            rle = parse(`x = 0, y = 0, rule = ${rule}\n${rle}`).toRLE();
-            return `\`\`\`\n#C (${dx}, ${dy})c/${period}, population ${pop}\n${rle}\`\`\``;
-        }
-    }
-    return 'No such ship found in database!';
+    return await findSpeedRLE(type, speed);
 }
 
 
