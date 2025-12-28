@@ -37,7 +37,7 @@ client.on('messageCreate', async msg => {
         } else if (msg.content === '!!update_5s') {
             await msg.reply('Updating...');
             execSync('systemctl stop caterer');
-            execSync(import.meta.dirname + '/../update_5s.sh');
+            execSync(import.meta.dirname + '/../update_5s2.sh');
             execSync('systemctl start caterer');
             await msg.channel.send('Update complete!');
         } else {
