@@ -6,5 +6,6 @@
     "accepterers":[
         "the accepterer role"
     ],
-    "wrapperToken": "the wrapper token"
+    "wrapperToken": "the wrapper token",
+    "sssssChannel": "the 5s notifier channel"
 }

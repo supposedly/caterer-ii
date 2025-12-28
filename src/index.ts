@@ -1,6 +1,7 @@
 
 import * as lifeweb from '../lifeweb/lib/index.js';
 import {inspect} from 'node:util';
+import {TYPES, TYPE_NAMES} from '../data/sssss/lib/index.js';
 import {Client, GatewayIntentBits} from 'discord.js';
 import {BotError, Response, Message, config, sentByAdmin, aliases, findRLE} from './util.js';
 import {cmdIdentify, cmdBasicIdentify, cmdMinmax, cmdSim, cmdHashsoup, cmdApgencode, cmdApgdecode} from './ca.js';
@@ -462,5 +463,59 @@ client.on('messageUpdate', async (old, msg) => {
     }
     runCommand(msg);
 });
+
+setInterval(async () => {
+    try {
+        let resp = await fetch('https://speedydelete.com/5s/api/getnewships');
+        if (resp.ok) {
+            let data = await resp.json() as {newShips: [string, string, number][], improvedShips: [string, string, number, number][]};
+            if (data.newShips.length === 0 && data.improvedShips.length === 0) {
+                return;
+            }
+            let text = '';
+            for (let type of TYPES) {
+                let newShips = data.newShips.filter(x => x[0] === type);
+                let improvedShips = data.improvedShips.filter(x => x[0] === type);
+                if (newShips.length === 0 && improvedShips.length === 0) {
+                    continue;
+                }
+                if (newShips.length > 0) {
+                    if (newShips.length === 1) {
+                        text += `New speed in ${TYPE_NAMES[type]}: ${newShips[0][1]} (${newShips[0][2]} cells)`
+                    } else {
+                        text += `${newShips.length} new speeds in ${TYPE_NAMES[type]}: ${newShips.map(x => `${x[1]} (${x[2]} cells)`).join(', ')}`;
+                    }
+                }
+                if (improvedShips.length > 0) {
+                    text += `${improvedShips.length} improved speed${improvedShips.length === 1 ? '' : 's'} in ${TYPE_NAMES[type]}: ${improvedShips.map(x => `${x[1]} (${x[2]} cells to ${x[3]} cells)`).join(', ')}`;
+                }
+            }
+            let channel = client.channels.cache.get(config.sssssChannel);
+            if (!channel) {
+                channel = await client.channels.fetch(config.sssssChannel) ?? (() => {throw new Error('Channel does not exist')})();
+            }
+            if (channel.isSendable()) {
+                await channel.send(text);
+            }
+        } else {
+            console.log(`${resp.status} ${resp.statusText} while fetching new ships`);
+        }
+    } catch (error) {
+        console.log(error);
+        let channel = client.channels.cache.get(config.sssssChannel);
+        if (!channel) {
+            channel = await client.channels.fetch(config.sssssChannel) ?? (() => {throw new Error('Channel does not exist')})();
+        }
+        if (channel.isSendable()) {
+            let str: string;
+            if (error && typeof error === 'object' && 'stack' in error) {
+                str = String(error.stack);
+            } else {
+                str = String(error);
+            }
+            await channel.send('```' + str + '```');
+        }
+    }
+}, 60000);
 
 client.login(config.token);

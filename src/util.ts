@@ -17,6 +17,7 @@ export interface Config {
     admins: string[];
     accepterers: string[];
     wrapperToken: string;
+    sssssChannel: string;
 }
 
 
