@@ -12,10 +12,10 @@ export async function cmdSssss(msg: Message, argv: string[]): Promise<Response> 
     if (argv[1].includes('/')) {
         speed = argv[1];
     } else {
-        type = argv[0];
-        speed = argv[1];
+        type = argv[1];
+        speed = argv[2];
     }
-    return await findSpeedRLE(type, speed);
+    return '```\n' + await findSpeedRLE(type, speed) + '\n```';
 }
 
 
