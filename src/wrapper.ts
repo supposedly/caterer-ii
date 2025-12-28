@@ -34,6 +34,12 @@ client.on('messageCreate', async msg => {
             execSync(import.meta.dirname + '/../update2.sh');
             execSync('systemctl start caterer');
             await msg.channel.send('Update complete!');
+        } else if (msg.content === '!!update') {
+            await msg.reply('Updating...');
+            execSync('systemctl stop caterer');
+            execSync(import.meta.dirname + '/../update_5s.sh');
+            execSync('systemctl start caterer');
+            await msg.channel.send('Update complete!');
         } else {
             await msg.reply('Invalid command!');
         }
