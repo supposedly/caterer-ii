@@ -472,6 +472,7 @@ setInterval(async () => {
             if (data.newShips.length === 0 && data.improvedShips.length === 0) {
                 return;
             }
+            let cache: string[] = [];
             let text = '';
             for (let type of TYPES) {
                 let newShips = data.newShips.filter(x => x[0] === type);
@@ -481,17 +482,21 @@ setInterval(async () => {
                 }
                 if (newShips.length > 0) {
                     if (newShips.length === 1) {
-                        text += `New speed in ${TYPE_NAMES[type]}: ${newShips[0][1]} (${newShips[0][2]} cells)`
+                        text += `New speed in ${TYPE_NAMES[type]}: ${newShips[0][1]} (${newShips[0][2]} cells)\n`;
                     } else {
-                        text += `${newShips.length} new speeds in ${TYPE_NAMES[type]}: ${newShips.map(x => `${x[1]} (${x[2]} cells)`).join(', ')}`;
+                        text += `${newShips.length} new speeds in ${TYPE_NAMES[type]}: ${newShips.map(x => `${x[1]} (${x[2]} cells)`).join(', ')}\n`;
                     }
                 }
                 if (improvedShips.length > 0) {
                     if (improvedShips.length === 1) {
-                        text += `Improved speed in ${TYPE_NAMES[type]}: ${improvedShips[0][1]} (${improvedShips[0][3]} cells to ${improvedShips[0][2]} cells)`;
+                        text += `Improved speed in ${TYPE_NAMES[type]}: ${improvedShips[0][1]} (${improvedShips[0][3]} cells to ${improvedShips[0][2]} cells)\n`;
                     } else {
-                        text += `${improvedShips.length} improved speeds in ${TYPE_NAMES[type]}: ${improvedShips.map(x => `${x[1]} (${x[3]} cells to ${x[2]} cells)`).join(', ')}`;
+                        text += `${improvedShips.length} improved speeds in ${TYPE_NAMES[type]}: ${improvedShips.map(x => `${x[1]} (${x[3]} cells to ${x[2]} cells)`).join(', ')}\n`;
                     }
+                }
+                if (text.length > 2000) {
+                    cache.push(text);
+                    text = '';
                 }
             }
             let channel = client.channels.cache.get(config.sssssChannel);
@@ -499,6 +504,9 @@ setInterval(async () => {
                 channel = await client.channels.fetch(config.sssssChannel) ?? (() => {throw new Error('Channel does not exist')})();
             }
             if (channel.isSendable()) {
+                for (let text of cache) {
+                    await channel.send(text);
+                }
                 await channel.send(text);
             }
         } else {
