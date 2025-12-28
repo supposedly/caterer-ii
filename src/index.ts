@@ -516,6 +516,10 @@ setInterval(async () => {
                     }
                 }
                 if (current !== '') {
+                    while (current.length > 2000) {
+                        await channel.send(current.slice(0, 1999));
+                        current = current.slice(1999);
+                    }
                     await channel.send(current);
                 }
             }
