@@ -472,8 +472,7 @@ setInterval(async () => {
             if (data.newShips.length === 0 && data.improvedShips.length === 0) {
                 return;
             }
-            let cache: string[] = [];
-            let text = '';
+            let lines: string[] = [];
             for (let type of TYPES) {
                 let newShips = data.newShips.filter(x => x[0] === type);
                 let improvedShips = data.improvedShips.filter(x => x[0] === type);
@@ -482,21 +481,17 @@ setInterval(async () => {
                 }
                 if (newShips.length > 0) {
                     if (newShips.length === 1) {
-                        text += `New speed in ${TYPE_NAMES[type]}: ${newShips[0][1]} (${newShips[0][2]} cells)\n`;
+                        lines.push(`New speed in ${TYPE_NAMES[type]}: ${newShips[0][1]} (${newShips[0][2]} cells)`);
                     } else {
-                        text += `${newShips.length} new speeds in ${TYPE_NAMES[type]}: ${newShips.map(x => `${x[1]} (${x[2]} cells)`).join(', ')}\n`;
+                        lines.push(`${newShips.length} new speeds in ${TYPE_NAMES[type]}: ${newShips.map(x => `${x[1]} (${x[2]} cells)`).join(', ')}`);
                     }
                 }
                 if (improvedShips.length > 0) {
                     if (improvedShips.length === 1) {
-                        text += `Improved speed in ${TYPE_NAMES[type]}: ${improvedShips[0][1]} (${improvedShips[0][3]} cells to ${improvedShips[0][2]} cells)\n`;
+                        lines.push(`Improved speed in ${TYPE_NAMES[type]}: ${improvedShips[0][1]} (${improvedShips[0][3]} cells to ${improvedShips[0][2]} cells)`);
                     } else {
-                        text += `${improvedShips.length} improved speeds in ${TYPE_NAMES[type]}: ${improvedShips.map(x => `${x[1]} (${x[3]} cells to ${x[2]} cells)`).join(', ')}\n`;
+                        lines.push(`${improvedShips.length} improved speeds in ${TYPE_NAMES[type]}: ${improvedShips.map(x => `${x[1]} (${x[3]} cells to ${x[2]} cells)`).join(', ')}`);
                     }
-                }
-                if (text.length > 2000) {
-                    cache.push(text);
-                    text = '';
                 }
             }
             let channel = client.channels.cache.get(config.sssssChannel);
@@ -504,10 +499,25 @@ setInterval(async () => {
                 channel = await client.channels.fetch(config.sssssChannel) ?? (() => {throw new Error('Channel does not exist')})();
             }
             if (channel.isSendable()) {
-                for (let text of cache) {
-                    await channel.send(text);
+                let current = '';
+                for (let line of lines) {
+                    let prev = current;
+                    current += line + '\n';
+                    if (current.length > 2000) {
+                        if (prev !== '') {
+                            await channel.send(prev);
+                        }
+                        current = '';
+                        while (line.length > 2000) {
+                            await channel.send(line.slice(0, 1999));
+                            line = line.slice(1999);
+                        }
+                        await channel.send(line);
+                    }
                 }
-                await channel.send(text);
+                if (current !== '') {
+                    await channel.send(current);
+                }
             }
         } else {
             console.log(`${resp.status} ${resp.statusText} while fetching new ships`);
