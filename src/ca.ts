@@ -1,21 +1,9 @@
 
-/// <reference path="./pencil.js__canvas-gif-encoder.d.ts" />
-
-import {execSync} from 'node:child_process';
-import {Pattern, CoordPattern, TreePattern, Identified, FullIdentified, identify, findMinmax, getDescription, fullIdentify, createPattern, toCatagolueRule, getHashsoup, DataHistoryPattern, CoordHistoryPattern} from '../lifeweb/lib/index.js';
+import {join} from 'node:path';
+import {Worker} from 'node:worker_threads';
 import {EmbedBuilder} from 'discord.js';
+import {Pattern, Identified, FullIdentified, identify, findMinmax, getDescription, fullIdentify, createPattern, toCatagolueRule, getHashsoup} from '../lifeweb/lib/index.js';
 import {BotError, Message, Response, writeFile, names, aliases, simStats, findRLE} from './util.js';
-import CanvasGifEncoder from '@pencil.js/canvas-gif-encoder';
-
-
-const HISTORY_COLORS: [number, number, number][] = [
-    [0, 255, 0],
-    [0, 0, 128],
-    [216, 255, 216],
-    [255, 0, 0],
-    [255, 255, 0],
-    [96, 96, 96],
-];
 
 
 function embedIdentified(type: Identified | FullIdentified, isOutput?: boolean): EmbedBuilder[] {
@@ -146,11 +134,75 @@ export async function cmdMinmax(msg: Message, argv: string[]): Promise<Response>
 
 let simCounter = 0;
 
+type WorkerResult = {id: number, ok: true, parseTime: number} | {id: number, ok: false, error: string};
+
+interface JobData {
+    resolve: (data: number) => void;
+    reject: (reason?: any) => void;
+    timeout: NodeJS.Timeout;
+}
+
+let worker: Worker;
+
+let jobs = new Map<number, JobData>();
+let nextID = 0;
+
+function workerOnMessage(msg: WorkerResult): void {
+    let job = jobs.get(msg.id);
+    if (!job) {
+        return;
+    }
+    if (!msg.ok) {
+        job.reject(msg.error);
+    } else {
+        job.resolve(msg.parseTime);
+    }
+    clearTimeout(job.timeout);
+    jobs.delete(msg.id);
+}
+
+let restarting = false;
+
+function restartWorker() {
+    if (restarting) {
+        return;
+    }
+    restarting = true;
+    try {
+        worker.terminate();
+    } catch {}
+    worker = new Worker(join(import.meta.dirname, 'server_worker.js'));
+    worker.on('message', workerOnMessage);
+    worker.on('error', workerOnError);
+    worker.on('exit', workerOnExit);
+    restarting = false;
+}
+
+restartWorker();
+
+function workerHandleFatal(error: Error): void {
+    for (let job of jobs.values()) {
+        clearTimeout(job.timeout);
+        job.reject(error);
+    }
+    jobs.clear();
+    restartWorker();
+}
+
+function workerOnError(error: Error): void {
+    console.log(error);
+    workerHandleFatal(error);
+}
+
+function workerOnExit(code: number): void {
+    let msg = 'Worker exited with code ' + code;
+    console.log(msg + ' restarting worker');
+    workerHandleFatal(new Error(msg));
+}
+
 export async function cmdSim(msg: Message, argv: string[]): Promise<Response> {
-    let start = performance.now();
+    let startTime = performance.now();
     await msg.channel.sendTyping();
-    let parts: (string | number)[][] = [];
-    let currentPart: (string | number)[] = [];
     let outputTime = false;
     if (argv[1] === 'time') {
         outputTime = true;
@@ -192,178 +244,19 @@ export async function cmdSim(msg: Message, argv: string[]): Promise<Response> {
         p = data.p;
         replyTo = data.msg;
     }
-    for (let arg of argv.slice(1)) {
-        if (arg === '>') {
-            parts.push(currentPart);
-            currentPart = [];
-        } else {
-            let num = parseFloat(arg);
-            if (Number.isNaN(num)) {
-                currentPart.push(arg);
-            } else {
-                currentPart.push(num);
-            }
-        }
-    }
-    parts.push(currentPart);
-    let frameTime = 50;
-    if (parts[0] && parts[0][1] === 'fps' && typeof parts[0][0] === 'number') {
-        frameTime = Math.ceil(100 / parts[0][0]) * 10;
-    }
-    let frames: [Pattern, number][] = [[p.copy(), frameTime]];
-    let gifSize = 100;
-    for (let part of parts) {
-        if (part[1] === 'fps' && typeof part[0] === 'number') {
-            frameTime = Math.ceil(100 / part[0]) * 10;
-            part = part.slice(2);
-        }
-        if (part[0] === 'size' && typeof part[1] === 'number') {
-            gifSize = part[1];
-            part = part.slice(2);
-        }
-        if (typeof part[0] === 'number') {
-            if (typeof part[1] === 'number') {
-                for (let i = parts.length > 1 ? 0 : 1; i < Math.ceil(part[0] / part[1]); i++) {
-                    p.run(part[1]);
-                    frames.push([p.copy(), frameTime]);
-                }
-            } else if (typeof part[1] === 'string') {
-                throw new BotError(`Invalid part: ${part.join(' ')}`);
-            } else {
-                for (let i = parts.length > 1 ? 0 : 1; i < part[0]; i++) {
-                    p.runGeneration();
-                    frames.push([p.copy(), frameTime]);
-                }
-            }
-        } else if (part[0] === 'wait') {
-            if (typeof part[1] !== 'number' || part.length > 2) {
-                throw new BotError(`Invalid part: ${part.join(' ')}`);
-            }
-            for (let i = 0; i < part[1]; i++) {
-                frames.push([p.copy(), frameTime]);
-            }
-        } else if (part[0] === 'jump') {
-            if (typeof part[1] !== 'number' || part.length > 2) {
-                throw new BotError(`Invalid part: ${part.join(' ')}`);
-            }
-            p.run(part[1]);
-        } else if (part[0] !== undefined) {
-            throw new BotError(`Invalid part: ${part.join(' ')}`);
-        }
-    }
-    let minX = Infinity;
-    let maxX = -Infinity;
-    let minY = Infinity;
-    let maxY = -Infinity;
-    for (let [p] of frames) {
-        if (p instanceof CoordPattern) {
-            let data = p.getMinMaxCoords();
-            if (data.minX < minX) {
-                minX = data.minX;
-            }
-            if (data.maxX > maxX) {
-                maxX = data.maxX;
-            }
-            if (data.minY < minY) {
-                minY = data.minY;
-            }
-            if (data.maxY > maxY) {
-                maxY = data.maxY;
-            }
-        } else {
-            if (p.xOffset < minX) {
-                minX = p.xOffset;
-            }
-            if (p.xOffset + p.width > maxX) {
-                maxX = p.xOffset + p.width;
-            }
-            if (p.yOffset < minY) {
-                minY = p.yOffset;
-            }
-            if (p.yOffset + p.height > maxY) {
-                maxY = p.yOffset + p.height;
-            }
-        }
-    }
-    minX--;
-    maxX++;
-    minY--;
-    maxY++;
-    let width = maxX - minX;
-    let height = maxY - minY;
-    if (p instanceof CoordPattern) {
-        width++;
-        height++;
-    }
-    let size = width * height;
-    let array = new Uint8ClampedArray(size * 4);
-    let empty = new Uint8ClampedArray(size * 4);
-    let j = 0;
-    for (let i = 0; i < size; i++) {
-        empty[j++] = 0x36;
-        empty[j++] = 0x39;
-        empty[j++] = 0x3e;
-        empty[j++] = 0;
-    }
-    let encoder = new CanvasGifEncoder(width, height, {
-        alphaThreshold: 0,
-        quality: 1,
+    let parseTime = await new Promise<number | null>((resolve, reject) => {
+        let id = nextID++;
+        let timeout = setTimeout(() => {
+            jobs.delete(id);
+            resolve(null);
+            restartWorker();
+        }, 30000);
+        jobs.set(id, {resolve, reject, timeout});
+        worker.postMessage({id, argv, rle: p.toRLE()});
     });
-    let middle = performance.now();
-    for (let [p, frameTime] of frames) {
-        let startY: number;
-        let startX: number;
-        if (p instanceof CoordPattern) {
-            let data = p.getMinMaxCoords();
-            startY = data.minY - minY;
-            startX = data.minX - minX;
-        } else {
-            startY = p.yOffset - minY;
-            startX = p.xOffset - minX;
-        }
-        array.set(empty);
-        let i = 0;
-        let j = startY * width * 4;
-        let pData = p.getData();
-        for (let y = startY; y < startY + p.height; y++) {
-            j += startX * 4;
-            for (let x = startX; x < startX + p.width; x++) {
-                let value = pData[i++];
-                if (value) {
-                    if (p instanceof TreePattern && p.rule.colors && p.rule.colors[value]) {
-                        let [r, g, b] = p.rule.colors[value];
-                        array[j++] = r;
-                        array[j++] = g;
-                        array[j++] = b;
-                    } else if (p instanceof DataHistoryPattern || p instanceof CoordHistoryPattern) {
-                        let [r, g, b] = HISTORY_COLORS[value - 1];
-                        array[j++] = r;
-                        array[j++] = g;
-                        array[j++] = b;
-                    } else if (p.states > 2) {
-                        array[j++] = 0xff;
-                        array[j++] = Math.ceil((value - 1) / (p.states - 2) * 256) - 1;
-                        array[j++] = 0;
-                    } else {
-                        array[j++] = 0xff;
-                        array[j++] = 0xff;
-                        array[j++] = 0xff;
-                    }
-                    array[j++] = 0;
-                } else {
-                    j += 4;
-                }
-            }
-            j += (width - startX - p.width) * 4;
-        }
-        encoder.addFrame({height, width, data: array}, frameTime);
+    if (!parseTime) {
+        return 'Error: Timed out!';
     }
-    let gif = encoder.end();
-    encoder.flush();
-    await writeFile('sim_base.gif', gif);
-    let scale = Math.ceil(gifSize / Math.min(width, height));
-    gifSize = Math.min(width, height) * scale;
-    execSync(`gifsicle --resize-${width < height ? 'width' : 'height'} ${gifSize} sim_base.gif > sim.gif`);
     if (p.ruleStr in simStats) {
         simStats[p.ruleStr]++;
     } else {
@@ -375,8 +268,8 @@ export async function cmdSim(msg: Message, argv: string[]): Promise<Response> {
         await writeFile('data/sim_stats.json', JSON.stringify(simStats, undefined, 4));
     }
     if (outputTime) {
-        let total = Math.round(performance.now() - start) / 1000;
-        let parse = Math.round(middle - start) / 1000;
+        let total = Math.round(performance.now() - startTime) / 1000;
+        let parse = Math.round(parseTime - startTime) / 1000;
         await replyTo.reply({
             content: `Took ${total} seconds (${parse} to parse)`,
             files: ['sim.gif'],
