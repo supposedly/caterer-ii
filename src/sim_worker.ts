@@ -279,6 +279,8 @@ parentPort.on('message', async ({id, argv, rle}: {id: number, argv: string[], rl
         throw new Error('No parent port');
     }
     try {
+        throw new BotError('hi');
+        // @ts-ignore
         parentPort.postMessage({id, ok: true, parseTime: await runSim(argv, rle)});
     } catch (error) {
         parentPort.postMessage({id, ok: false, error: (error instanceof Error && error.stack) ? error.stack : String(error)});
