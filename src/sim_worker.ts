@@ -270,19 +270,19 @@ async function runSim(argv: string[], rle: string): Promise<number> {
 }
 
 
-if (!parentPort) {
-    throw new Error('No parent port');
-}
+throw new Error('hi');
 
-parentPort.on('message', async ({id, argv, rle}: {id: number, argv: string[], rle: string}) => {
-    if (!parentPort) {
-        throw new Error('No parent port');
-    }
-    try {
-        throw new BotError('hi');
-        // @ts-ignore
-        parentPort.postMessage({id, ok: true, parseTime: await runSim(argv, rle)});
-    } catch (error) {
-        parentPort.postMessage({id, ok: false, error: (error instanceof Error && error.stack) ? error.stack : String(error)});
-    }
-});
+// if (!parentPort) {
+//     throw new Error('No parent port');
+// }
+
+// parentPort.on('message', async ({id, argv, rle}: {id: number, argv: string[], rle: string}) => {
+//     if (!parentPort) {
+//         throw new Error('No parent port');
+//     }
+//     try {
+//         parentPort.postMessage({id, ok: true, parseTime: await runSim(argv, rle)});
+//     } catch (error) {
+//         parentPort.postMessage({id, ok: false, error: (error instanceof Error && error.stack) ? error.stack : String(error)});
+//     }
+// });
