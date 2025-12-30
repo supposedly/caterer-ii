@@ -1,8 +1,6 @@
 
 /// <reference path="./pencil.js__canvas-gif-encoder.d.ts" />
 
-console.log('STARTING WORKER');
-
 import {join} from 'node:path';
 import {writeFile} from 'node:fs/promises';
 import {execSync} from 'node:child_process';
@@ -10,8 +8,6 @@ import {parentPort} from 'node:worker_threads';
 import CanvasGifEncoder from '@pencil.js/canvas-gif-encoder';
 import {Pattern, CoordPattern, TreePattern, DataHistoryPattern, CoordHistoryPattern, DataSuperPattern, CoordSuperPattern, InvestigatorPattern, RuleLoaderBgollyPattern, parse} from '../lifeweb/lib/index.js';
 import {BotError} from './util.js';
-
-console.log('IMPORTS SUCCEEDED');
 
 
 const HISTORY_COLORS: [number, number, number][] = [

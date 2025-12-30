@@ -144,6 +144,8 @@ interface Job {
 
 let worker: Worker;
 
+let workerAlive = false;
+
 let jobs = new Map<number, Job>();
 let nextID = 0;
 
@@ -168,20 +170,22 @@ function restartWorker() {
         return;
     }
     restarting = true;
-    try {
-        worker.terminate();
-    } catch {}
+    if (workerAlive) {
+        try {
+            worker.terminate();
+        } catch {}
+    }
     worker = new Worker(join(import.meta.dirname, 'sim_worker.js'));
     worker.on('message', workerOnMessage);
     worker.on('error', workerOnError);
     worker.on('exit', workerOnExit);
     restarting = false;
+    workerAlive = true;
 }
 
 restartWorker();
 
 function workerHandleFatal(error: Error): void {
-    restartWorker();
     let rejects: ((reason: any) => void)[] = [];
     for (let [id, job] of jobs) {
         clearTimeout(job.timeout);
@@ -191,6 +195,7 @@ function workerHandleFatal(error: Error): void {
     for (let reject of rejects) {
         reject(error);
     }
+    restartWorker();
 }
 
 function workerOnError(error: Error): void {
@@ -199,6 +204,7 @@ function workerOnError(error: Error): void {
 }
 
 function workerOnExit(code: number): void {
+    workerAlive = false;
     let msg = 'Worker exited with code ' + code;
     console.log(msg + ', restarting worker');
     workerHandleFatal(new Error(msg));
