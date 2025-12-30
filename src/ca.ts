@@ -136,7 +136,7 @@ let simCounter = 0;
 
 type WorkerResult = {id: number, ok: true, parseTime: number} | {id: number, ok: false, error: string};
 
-interface JobData {
+interface Job {
     resolve: (data: number) => void;
     reject: (reason?: any) => void;
     timeout: NodeJS.Timeout;
@@ -144,7 +144,7 @@ interface JobData {
 
 let worker: Worker;
 
-let jobs = new Map<number, JobData>();
+let jobs = new Map<number, Job>();
 let nextID = 0;
 
 function workerOnMessage(msg: WorkerResult): void {
@@ -181,12 +181,16 @@ function restartWorker() {
 restartWorker();
 
 function workerHandleFatal(error: Error): void {
-    for (let job of jobs.values()) {
-        clearTimeout(job.timeout);
-        job.reject(error);
-    }
-    jobs.clear();
     restartWorker();
+    let rejects: ((reason: any) => void)[] = [];
+    for (let [id, job] of jobs) {
+        clearTimeout(job.timeout);
+        jobs.delete(id);
+        rejects.push(job.reject);
+    }
+    for (let reject of rejects) {
+        reject(error);
+    }
 }
 
 function workerOnError(error: Error): void {
