@@ -171,7 +171,7 @@ function restartWorker() {
     try {
         worker.terminate();
     } catch {}
-    worker = new Worker(join(import.meta.dirname, 'server_worker.js'));
+    worker = new Worker(join(import.meta.dirname, 'sim_worker.js'));
     worker.on('message', workerOnMessage);
     worker.on('error', workerOnError);
     worker.on('exit', workerOnExit);
