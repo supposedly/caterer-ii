@@ -202,7 +202,13 @@ async function runSim(argv: string[], rle: string): Promise<number> {
         alphaThreshold: 0,
         quality: 1,
     });
+    let done = false;
     for (let [p, frameTime] of frames) {
+        if (!done) {
+            done = true;
+        } else {
+            throw new Error(p.toRLE());
+        }
         let startY: number;
         let startX: number;
         if (p instanceof CoordPattern) {
@@ -258,7 +264,7 @@ async function runSim(argv: string[], rle: string): Promise<number> {
             }
             j += (width - startX - p.width) * 4;
         }
-        encoder.addFrame({height, width, data: array.slice()}, frameTime);
+        encoder.addFrame({height, width, data: array}, frameTime);
     }
     let gif = encoder.end();
     encoder.flush();
