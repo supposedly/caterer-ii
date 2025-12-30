@@ -189,10 +189,10 @@ import {inspect} from 'node:util';
 
 async function runSim(argv: string[], rle: string): Promise<number> {
     let {frames, gifSize, minX, minY, width, height} = runPattern(argv, rle);
-    throw new Error('```ansi\n' + inspect(frames.map(x => [x[0].toRLE(), x[1]]), {
+    throw new Error('```\n```ansi\n' + inspect(frames.map(x => [x[0].toRLE(), x[1]]), {
                 colors: true,
                 depth: 2, 
-            }) + '```');
+            }) + '```\n```');
     // let parseTime = performance.now();
     // let size = width * height;
     // let array = new Uint8ClampedArray(size * 4);
