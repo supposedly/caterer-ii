@@ -7,7 +7,7 @@ import {execSync} from 'node:child_process';
 import {parentPort} from 'node:worker_threads';
 import CanvasGifEncoder from '@pencil.js/canvas-gif-encoder';
 import {Pattern, CoordPattern, TreePattern, DataHistoryPattern, CoordHistoryPattern, DataSuperPattern, CoordSuperPattern, InvestigatorPattern, RuleLoaderBgollyPattern, parse} from '../lifeweb/lib/index.js';
-import {BotError} from './util.js';
+import {BotError, aliases} from './util.js';
 
 
 const HISTORY_COLORS: [number, number, number][] = [
@@ -74,7 +74,7 @@ const INVESTIGATOR_COLORS: [number, number, number][] = [
 let dir = join(import.meta.dirname, '..');
 
 async function runPattern(argv: string[], rle: string): Promise<{frames: [Pattern, number][], gifSize: number, minX: number, minY: number, width: number, height: number}> {
-    let p = parse(rle);
+    let p = parse(rle, aliases, true);
     let parts: (string | number)[][] = [];
     let currentPart: (string | number)[] = [];
     for (let arg of argv.slice(1)) {
