@@ -196,7 +196,7 @@ function workerOnError(error: Error): void {
 
 function workerOnExit(code: number): void {
     let msg = 'Worker exited with code ' + code;
-    console.log(msg + ' restarting worker');
+    console.log(msg + ', restarting worker');
     workerHandleFatal(new Error(msg));
 }
 
