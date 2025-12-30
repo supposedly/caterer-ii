@@ -258,7 +258,7 @@ async function runSim(argv: string[], rle: string): Promise<number> {
             }
             j += (width - startX - p.width) * 4;
         }
-        encoder.addFrame({height, width, data: array}, frameTime);
+        encoder.addFrame({height, width, data: array}, frameTime * 1000);
     }
     let gif = encoder.end();
     encoder.flush();
