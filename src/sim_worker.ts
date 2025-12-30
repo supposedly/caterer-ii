@@ -115,7 +115,7 @@ function runPattern(argv: string[], rle: string): {frames: [Pattern, number][], 
             if (p instanceof RuleLoaderBgollyPattern) {
 
             } else {
-                for (let i = parts.length > 1 ? 0 : 1; i < Math.ceil(part[0] / part[1]); i++) {
+                for (let i = parts.length > 1 ? 0 : 1; i < Math.ceil(part[0] / step); i++) {
                     p.run(step);
                     frames.push([p.copy(), frameTime]);
                 }
@@ -136,53 +136,52 @@ function runPattern(argv: string[], rle: string): {frames: [Pattern, number][], 
             throw new BotError(`Invalid part: ${part.join(' ')}`);
         }
     }
-    throw new Error(String(frames.length));
-    // let minX = Infinity;
-    // let maxX = -Infinity;
-    // let minY = Infinity;
-    // let maxY = -Infinity;
-    // for (let [p] of frames) {
-    //     if (p instanceof CoordPattern) {
-    //         let data = p.getMinMaxCoords();
-    //         if (data.minX < minX) {
-    //             minX = data.minX;
-    //         }
-    //         if (data.maxX > maxX) {
-    //             maxX = data.maxX;
-    //         }
-    //         if (data.minY < minY) {
-    //             minY = data.minY;
-    //         }
-    //         if (data.maxY > maxY) {
-    //             maxY = data.maxY;
-    //         }
-    //     } else {
-    //         if (p.xOffset < minX) {
-    //             minX = p.xOffset;
-    //         }
-    //         if (p.xOffset + p.width > maxX) {
-    //             maxX = p.xOffset + p.width;
-    //         }
-    //         if (p.yOffset < minY) {
-    //             minY = p.yOffset;
-    //         }
-    //         if (p.yOffset + p.height > maxY) {
-    //             maxY = p.yOffset + p.height;
-    //         }
-    //     }
-    // }
-    // minX--;
-    // maxX++;
-    // minY--;
-    // maxY++;
-    // let width = maxX - minX;
-    // let height = maxY - minY;
-    // if (p instanceof CoordPattern) {
-    //     width++;
-    //     height++;
-    // }
-    // let defaultTime = Math.min(0.1, Math.max(1/60, 5 / frames.length));
-    // return {frames: frames.map(([p, time]) => [p, time ?? defaultTime]), gifSize, minX, minY, width, height};
+    let minX = Infinity;
+    let maxX = -Infinity;
+    let minY = Infinity;
+    let maxY = -Infinity;
+    for (let [p] of frames) {
+        if (p instanceof CoordPattern) {
+            let data = p.getMinMaxCoords();
+            if (data.minX < minX) {
+                minX = data.minX;
+            }
+            if (data.maxX > maxX) {
+                maxX = data.maxX;
+            }
+            if (data.minY < minY) {
+                minY = data.minY;
+            }
+            if (data.maxY > maxY) {
+                maxY = data.maxY;
+            }
+        } else {
+            if (p.xOffset < minX) {
+                minX = p.xOffset;
+            }
+            if (p.xOffset + p.width > maxX) {
+                maxX = p.xOffset + p.width;
+            }
+            if (p.yOffset < minY) {
+                minY = p.yOffset;
+            }
+            if (p.yOffset + p.height > maxY) {
+                maxY = p.yOffset + p.height;
+            }
+        }
+    }
+    minX--;
+    maxX++;
+    minY--;
+    maxY++;
+    let width = maxX - minX;
+    let height = maxY - minY;
+    if (p instanceof CoordPattern) {
+        width++;
+        height++;
+    }
+    let defaultTime = Math.min(0.1, Math.max(1/60, 5 / frames.length));
+    return {frames: frames.map(([p, time]) => [p, time ?? defaultTime]), gifSize, minX, minY, width, height};
 }
 
 
