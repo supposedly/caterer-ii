@@ -112,14 +112,15 @@ function runPattern(argv: string[], rle: string): {frames: [Pattern, number][], 
                 throw new BotError(`Invalid part: ${part.join(' ')}`);
             }
             let step = part[1] ?? 1;
-            if (p instanceof RuleLoaderBgollyPattern) {
+            throw new Error('hi');
+            // if (p instanceof RuleLoaderBgollyPattern) {
 
-            } else {
-                for (let i = parts.length > 1 ? 0 : 1; i < Math.ceil(part[0] / part[1]); i++) {
-                    p.run(step);
-                    frames.push([p.copy(), frameTime]);
-                }
-            }
+            // } else {
+            //     for (let i = parts.length > 1 ? 0 : 1; i < Math.ceil(part[0] / part[1]); i++) {
+            //         p.run(step);
+            //         frames.push([p.copy(), frameTime]);
+            //     }
+            // }
         } else if (part[0] === 'wait') {
             if (typeof part[1] !== 'number' || part.length > 2) {
                 throw new BotError(`Invalid part: ${part.join(' ')}`);
