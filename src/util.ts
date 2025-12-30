@@ -70,7 +70,7 @@ function findRLEFromText(data: string): Pattern | undefined {
     if (index === -1) {
         return;
     }
-    return parse(data.slice(0, index + 1), aliases);
+    return parse(data.slice(0, index + 1), aliases, true);
 }
 
 async function findRLEFromMessage(msg: Message): Promise<{msg: Message, p: Pattern} | undefined> {
