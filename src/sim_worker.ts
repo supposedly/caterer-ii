@@ -119,7 +119,6 @@ function runPattern(argv: string[], rle: string): {frames: [Pattern, number][], 
                     p.run(step);
                     frames.push([p.copy(), frameTime]);
                 }
-                throw new Error('hi');
             }
         } else if (part[0] === 'wait') {
             if (typeof part[1] !== 'number' || part.length > 2) {
@@ -137,52 +136,53 @@ function runPattern(argv: string[], rle: string): {frames: [Pattern, number][], 
             throw new BotError(`Invalid part: ${part.join(' ')}`);
         }
     }
-    let minX = Infinity;
-    let maxX = -Infinity;
-    let minY = Infinity;
-    let maxY = -Infinity;
-    for (let [p] of frames) {
-        if (p instanceof CoordPattern) {
-            let data = p.getMinMaxCoords();
-            if (data.minX < minX) {
-                minX = data.minX;
-            }
-            if (data.maxX > maxX) {
-                maxX = data.maxX;
-            }
-            if (data.minY < minY) {
-                minY = data.minY;
-            }
-            if (data.maxY > maxY) {
-                maxY = data.maxY;
-            }
-        } else {
-            if (p.xOffset < minX) {
-                minX = p.xOffset;
-            }
-            if (p.xOffset + p.width > maxX) {
-                maxX = p.xOffset + p.width;
-            }
-            if (p.yOffset < minY) {
-                minY = p.yOffset;
-            }
-            if (p.yOffset + p.height > maxY) {
-                maxY = p.yOffset + p.height;
-            }
-        }
-    }
-    minX--;
-    maxX++;
-    minY--;
-    maxY++;
-    let width = maxX - minX;
-    let height = maxY - minY;
-    if (p instanceof CoordPattern) {
-        width++;
-        height++;
-    }
-    let defaultTime = Math.min(0.1, Math.max(1/60, 5 / frames.length));
-    return {frames: frames.map(([p, time]) => [p, time ?? defaultTime]), gifSize, minX, minY, width, height};
+    throw new Error(String(frames.length));
+    // let minX = Infinity;
+    // let maxX = -Infinity;
+    // let minY = Infinity;
+    // let maxY = -Infinity;
+    // for (let [p] of frames) {
+    //     if (p instanceof CoordPattern) {
+    //         let data = p.getMinMaxCoords();
+    //         if (data.minX < minX) {
+    //             minX = data.minX;
+    //         }
+    //         if (data.maxX > maxX) {
+    //             maxX = data.maxX;
+    //         }
+    //         if (data.minY < minY) {
+    //             minY = data.minY;
+    //         }
+    //         if (data.maxY > maxY) {
+    //             maxY = data.maxY;
+    //         }
+    //     } else {
+    //         if (p.xOffset < minX) {
+    //             minX = p.xOffset;
+    //         }
+    //         if (p.xOffset + p.width > maxX) {
+    //             maxX = p.xOffset + p.width;
+    //         }
+    //         if (p.yOffset < minY) {
+    //             minY = p.yOffset;
+    //         }
+    //         if (p.yOffset + p.height > maxY) {
+    //             maxY = p.yOffset + p.height;
+    //         }
+    //     }
+    // }
+    // minX--;
+    // maxX++;
+    // minY--;
+    // maxY++;
+    // let width = maxX - minX;
+    // let height = maxY - minY;
+    // if (p instanceof CoordPattern) {
+    //     width++;
+    //     height++;
+    // }
+    // let defaultTime = Math.min(0.1, Math.max(1/60, 5 / frames.length));
+    // return {frames: frames.map(([p, time]) => [p, time ?? defaultTime]), gifSize, minX, minY, width, height};
 }
 
 
