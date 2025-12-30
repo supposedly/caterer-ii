@@ -185,94 +185,88 @@ function runPattern(argv: string[], rle: string): {frames: [Pattern, number][], 
 }
 
 
-import {inspect} from 'node:util';
-
 async function runSim(argv: string[], rle: string): Promise<number> {
     let {frames, gifSize, minX, minY, width, height} = runPattern(argv, rle);
-    throw new Error('```\n```ansi\n' + inspect(frames.map(x => [x[0].toRLE(), x[1]]), {
-                colors: true,
-                depth: 2, 
-            }) + '```\n```');
-    // let parseTime = performance.now();
-    // let size = width * height;
-    // let array = new Uint8ClampedArray(size * 4);
-    // let empty = new Uint8ClampedArray(size * 4);
-    // let j = 0;
-    // for (let i = 0; i < size; i++) {
-    //     empty[j++] = 0x36;
-    //     empty[j++] = 0x39;
-    //     empty[j++] = 0x3e;
-    //     empty[j++] = 0;
-    // }
-    // let encoder = new CanvasGifEncoder(width, height, {
-    //     alphaThreshold: 0,
-    //     quality: 1,
-    // });
-    // for (let [p, frameTime] of frames) {
-    //     let startY: number;
-    //     let startX: number;
-    //     if (p instanceof CoordPattern) {
-    //         let data = p.getMinMaxCoords();
-    //         startY = data.minY - minY;
-    //         startX = data.minX - minX;
-    //     } else {
-    //         startY = p.yOffset - minY;
-    //         startX = p.xOffset - minX;
-    //     }
-    //     array.set(empty);
-    //     let i = 0;
-    //     let j = startY * width * 4;
-    //     let pData = p.getData();
-    //     for (let y = startY; y < startY + p.height; y++) {
-    //         j += startX * 4;
-    //         for (let x = startX; x < startX + p.width; x++) {
-    //             let value = pData[i++];
-    //             if (value) {
-    //                 if (p.states === 2) {
-    //                     array[j++] = 0xff;
-    //                     array[j++] = 0xff;
-    //                     array[j++] = 0xff;
-    //                 } else if (p instanceof TreePattern && p.rule.colors && p.rule.colors[value]) {
-    //                     let [r, g, b] = p.rule.colors[value];
-    //                     array[j++] = r;
-    //                     array[j++] = g;
-    //                     array[j++] = b;
-    //                 } else if (p instanceof DataHistoryPattern || p instanceof CoordHistoryPattern) {
-    //                     let [r, g, b] = HISTORY_COLORS[value - 1];
-    //                     array[j++] = r;
-    //                     array[j++] = g;
-    //                     array[j++] = b;
-    //                 } else if (p instanceof DataSuperPattern || p instanceof CoordSuperPattern) {
-    //                     let [r, g, b] = SUPER_COLORS[value - 1];
-    //                     array[j++] = r;
-    //                     array[j++] = g;
-    //                     array[j++] = b;
-    //                 } else if (p instanceof InvestigatorPattern) {
-    //                     let [r, g, b] = INVESTIGATOR_COLORS[value - 1];
-    //                     array[j++] = r;
-    //                     array[j++] = g;
-    //                     array[j++] = b;
-    //                 } else {
-    //                     array[j++] = 0xff;
-    //                     array[j++] = Math.ceil((value - 1) / (p.states - 2) * 256) - 1;
-    //                     array[j++] = 0;
-    //                 }
-    //                 array[j++] = 0;
-    //             } else {
-    //                 j += 4;
-    //             }
-    //         }
-    //         j += (width - startX - p.width) * 4;
-    //     }
-    //     encoder.addFrame({height, width, data: array}, frameTime);
-    // }
-    // let gif = encoder.end();
-    // encoder.flush();
-    // await writeFile('sim_base.gif', gif);
-    // let scale = Math.ceil(gifSize / Math.min(width, height));
-    // gifSize = Math.min(width, height) * scale;
-    // execSync(`gifsicle --resize-${width < height ? 'width' : 'height'} ${gifSize} sim_base.gif > sim.gif`);
-    // return parseTime;
+    let parseTime = performance.now();
+    let size = width * height;
+    let array = new Uint8ClampedArray(size * 4);
+    let empty = new Uint8ClampedArray(size * 4);
+    let j = 0;
+    for (let i = 0; i < size; i++) {
+        empty[j++] = 0x36;
+        empty[j++] = 0x39;
+        empty[j++] = 0x3e;
+        empty[j++] = 0;
+    }
+    let encoder = new CanvasGifEncoder(width, height, {
+        alphaThreshold: 0,
+        quality: 1,
+    });
+    for (let [p, frameTime] of frames) {
+        let startY: number;
+        let startX: number;
+        if (p instanceof CoordPattern) {
+            let data = p.getMinMaxCoords();
+            startY = data.minY - minY;
+            startX = data.minX - minX;
+        } else {
+            startY = p.yOffset - minY;
+            startX = p.xOffset - minX;
+        }
+        array.set(empty);
+        let i = 0;
+        let j = startY * width * 4;
+        let pData = p.getData();
+        for (let y = startY; y < startY + p.height; y++) {
+            j += startX * 4;
+            for (let x = startX; x < startX + p.width; x++) {
+                let value = pData[i++];
+                if (value) {
+                    if (p.states === 2) {
+                        array[j++] = 0xff;
+                        array[j++] = 0xff;
+                        array[j++] = 0xff;
+                    } else if (p instanceof TreePattern && p.rule.colors && p.rule.colors[value]) {
+                        let [r, g, b] = p.rule.colors[value];
+                        array[j++] = r;
+                        array[j++] = g;
+                        array[j++] = b;
+                    } else if (p instanceof DataHistoryPattern || p instanceof CoordHistoryPattern) {
+                        let [r, g, b] = HISTORY_COLORS[value - 1];
+                        array[j++] = r;
+                        array[j++] = g;
+                        array[j++] = b;
+                    } else if (p instanceof DataSuperPattern || p instanceof CoordSuperPattern) {
+                        let [r, g, b] = SUPER_COLORS[value - 1];
+                        array[j++] = r;
+                        array[j++] = g;
+                        array[j++] = b;
+                    } else if (p instanceof InvestigatorPattern) {
+                        let [r, g, b] = INVESTIGATOR_COLORS[value - 1];
+                        array[j++] = r;
+                        array[j++] = g;
+                        array[j++] = b;
+                    } else {
+                        array[j++] = 0xff;
+                        array[j++] = Math.ceil((value - 1) / (p.states - 2) * 256) - 1;
+                        array[j++] = 0;
+                    }
+                    array[j++] = 0;
+                } else {
+                    j += 4;
+                }
+            }
+            j += (width - startX - p.width) * 4;
+        }
+        encoder.addFrame({height, width, data: array}, frameTime);
+    }
+    let gif = encoder.end();
+    encoder.flush();
+    await writeFile('sim_base.gif', gif);
+    let scale = Math.ceil(gifSize / Math.min(width, height));
+    gifSize = Math.min(width, height) * scale;
+    execSync(`gifsicle --resize-${width < height ? 'width' : 'height'} ${gifSize} sim_base.gif > sim.gif`);
+    return parseTime;
 }
 
 
