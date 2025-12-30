@@ -2,7 +2,7 @@
 /// <reference path="./pencil.js__canvas-gif-encoder.d.ts" />
 
 import {join} from 'node:path';
-import {writeFile} from 'node:fs/promises';
+import * as fs from 'node:fs/promises';
 import {execSync} from 'node:child_process';
 import {parentPort} from 'node:worker_threads';
 import CanvasGifEncoder from '@pencil.js/canvas-gif-encoder';
@@ -73,8 +73,7 @@ const INVESTIGATOR_COLORS: [number, number, number][] = [
 
 let dir = join(import.meta.dirname, '..');
 
-
-function runPattern(argv: string[], rle: string): {frames: [Pattern, number][], gifSize: number, minX: number, minY: number, width: number, height: number} {
+async function runPattern(argv: string[], rle: string): Promise<{frames: [Pattern, number][], gifSize: number, minX: number, minY: number, width: number, height: number}> {
     let p = parse(rle);
     let parts: (string | number)[][] = [];
     let currentPart: (string | number)[] = [];
@@ -112,14 +111,19 @@ function runPattern(argv: string[], rle: string): {frames: [Pattern, number][], 
                 throw new BotError(`Invalid part: ${part.join(' ')}`);
             }
             let step = part[1] ?? 1;
-            if (p instanceof RuleLoaderBgollyPattern) {
-
-            } else {
+            // if (p instanceof RuleLoaderBgollyPattern) {
+            //     await fs.writeFile(join(dir, 'in.rle'), p.toRLE());
+            //     for (let i = parts.length > 1 ? 0 : 1; i < Math.ceil(part[0] / step); i++) {
+            //         execSync()
+            //         p.run(step);
+            //         frames.push([p.copy(), frameTime]);
+            //     }
+            // } else {
                 for (let i = parts.length > 1 ? 0 : 1; i < Math.ceil(part[0] / step); i++) {
                     p.run(step);
                     frames.push([p.copy(), frameTime]);
                 }
-            }
+            // }
         } else if (part[0] === 'wait') {
             if (typeof part[1] !== 'number' || part.length > 2) {
                 throw new BotError(`Invalid part: ${part.join(' ')}`);
@@ -186,7 +190,7 @@ function runPattern(argv: string[], rle: string): {frames: [Pattern, number][], 
 
 
 async function runSim(argv: string[], rle: string): Promise<number> {
-    let {frames, gifSize, minX, minY, width, height} = runPattern(argv, rle);
+    let {frames, gifSize, minX, minY, width, height} = await runPattern(argv, rle);
     let parseTime = performance.now();
     let size = width * height;
     let array = new Uint8ClampedArray(size * 4);
@@ -262,7 +266,7 @@ async function runSim(argv: string[], rle: string): Promise<number> {
     }
     let gif = encoder.end();
     encoder.flush();
-    await writeFile('sim_base.gif', gif);
+    await fs.writeFile('sim_base.gif', gif);
     let scale = Math.ceil(gifSize / Math.min(width, height));
     gifSize = Math.min(width, height) * scale;
     execSync(`gifsicle --resize-${width < height ? 'width' : 'height'} ${gifSize} sim_base.gif > sim.gif`);
