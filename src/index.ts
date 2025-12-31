@@ -6,6 +6,7 @@ import {Client, GatewayIntentBits} from 'discord.js';
 import {BotError, Response, Message, config, sentByAdmin, aliases, findRLE} from './util.js';
 import {cmdIdentify, cmdBasicIdentify, cmdMinmax, cmdSim, cmdHashsoup, cmdApgencode, cmdApgdecode} from './ca.js';
 import {cmdSssss, cmdDyk, cmdName, cmdRename, cmdDeleteName, cmdSimStats, cmdSaveSimStats, cmdAlias, cmdUnalias, cmdLookupAlias} from './db.js';
+import {cmdWiki} from './wiki.js';
 
 
 interface Help {
@@ -122,6 +123,44 @@ const HELP: {[key: string]: Help} = {
         ],
     },
 
+    hashsoup: {
+        desc: 'Get a Catagolue hashsoup.',
+        args: [
+            {
+                name: 'rule',
+                desc: 'The rule to use.',
+            },
+            {
+                name: 'symmetry',
+                desc: 'The symmetry to use.',
+            },
+            {
+                name: 'seed',
+                desc: 'The seed for the soup (k_whatever).',
+            },
+        ],
+    },
+
+    apgencode: {
+        desc: 'Get an unprefixed apgcode for any pattern',
+        args: [],
+    },
+
+    apgdecode: {
+        desc: 'Decode an unprefixed apgcode.',
+        args: [
+            {
+                name: 'apgcode',
+                desc: 'The apgcode to decode.',
+            },
+            {
+                name: 'rule',
+                optional: true,
+                desc: 'The rule to use (default B3/S23).',
+            },
+        ],
+    },
+
     sssss: {
         desc: 'Query the 5S database',
         args: [
@@ -223,40 +262,12 @@ const HELP: {[key: string]: Help} = {
         aliases: ['lookupalias'],
     },
 
-    hashsoup: {
-        desc: 'Get a Catagolue hashsoup.',
+    wiki: {
+        desc: 'Look up something on the ConwayLife.com wiki',
         args: [
             {
-                name: 'rule',
-                desc: 'The rule to use.',
-            },
-            {
-                name: 'symmetry',
-                desc: 'The symmetry to use.',
-            },
-            {
-                name: 'seed',
-                desc: 'The seed for the soup (k_whatever).',
-            },
-        ],
-    },
-
-    apgencode: {
-        desc: 'Get an unprefixed apgcode for any pattern',
-        args: [],
-    },
-
-    apgdecode: {
-        desc: 'Decode an unprefixed apgcode.',
-        args: [
-            {
-                name: 'apgcode',
-                desc: 'The apgcode to decode.',
-            },
-            {
-                name: 'rule',
-                optional: true,
-                desc: 'The rule to use (default B3/S23).',
+                name: 'page',
+                desc: 'The page to look up',
             },
         ],
     },
@@ -387,6 +398,8 @@ const COMMANDS: {[key: string]: (msg: Message, argv: string[]) => Promise<Respon
     hashsoup: cmdHashsoup,
     apgencode: cmdApgencode,
     apgdecode: cmdApgdecode,
+
+    wiki: cmdWiki,
 
 };
 
