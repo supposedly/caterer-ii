@@ -253,7 +253,8 @@ async function runSim(argv: string[], rle: string): Promise<number> {
                     } else {
                         array[j++] = 0xff;
                         if (value === 2) {
-                            throw new Error(value + ' ' + p.states + ' ' + Math.max(0, Math.ceil((value - 1) / (p.states - 2) * 256) - 1));
+                            const {inspect} = await import('node:util');
+                            throw new Error(value + '\n\n```\n```ansi' + inspect(p, {colors: true}) + '```\n```');
                         }
                         array[j++] = Math.max(0, Math.ceil((value - 1) / (p.states - 2) * 256) - 1);
                         array[j++] = 0;
