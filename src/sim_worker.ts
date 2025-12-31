@@ -106,24 +106,19 @@ async function runPattern(argv: string[], rle: string): Promise<{frames: [Patter
             gifSize = part[1];
             part = part.slice(2);
         }
+        if (part[1] === 'fps' && typeof part[0] === 'number') {
+            frameTime = Math.ceil(100 / part[0]) * 10;
+            part = part.slice(2);
+        }
         if (typeof part[0] === 'number') {
             if (typeof part[1] === 'string') {
                 throw new BotError(`Invalid part: ${part.join(' ')}`);
             }
             let step = part[1] ?? 1;
-            // if (p instanceof RuleLoaderBgollyPattern) {
-            //     await fs.writeFile(join(dir, 'in.rle'), p.toRLE());
-            //     for (let i = parts.length > 1 ? 0 : 1; i < Math.ceil(part[0] / step); i++) {
-            //         execSync()
-            //         p.run(step);
-            //         frames.push([p.copy(), frameTime]);
-            //     }
-            // } else {
-                for (let i = parts.length > 1 ? 0 : 1; i < Math.ceil(part[0] / step); i++) {
-                    p.run(step);
-                    frames.push([p.copy(), frameTime]);
-                }
-            // }
+            for (let i = parts.length > 1 ? 0 : 1; i < Math.ceil(part[0] / step); i++) {
+                p.run(step);
+                frames.push([p.copy(), frameTime]);
+            }
         } else if (part[0] === 'wait') {
             if (typeof part[1] !== 'number' || part.length > 2) {
                 throw new BotError(`Invalid part: ${part.join(' ')}`);
@@ -184,7 +179,7 @@ async function runPattern(argv: string[], rle: string): Promise<{frames: [Patter
         width++;
         height++;
     }
-    let defaultTime = Math.min(0.1, Math.max(1/60, 5 / frames.length));
+    let defaultTime = Math.min(0.1, Math.max(1/60, 5 / frames.length)) * 1000;
     return {frames: frames.map(([p, time]) => [p, time ?? defaultTime]), gifSize, minX, minY, width, height};
 }
 
@@ -262,7 +257,7 @@ async function runSim(argv: string[], rle: string): Promise<number> {
             }
             j += (width - startX - p.width) * 4;
         }
-        encoder.addFrame({height, width, data: array}, frameTime * 1000);
+        encoder.addFrame({height, width, data: array}, frameTime);
     }
     let gif = encoder.end();
     encoder.flush();
