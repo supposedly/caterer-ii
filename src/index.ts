@@ -353,7 +353,7 @@ const COMMANDS: {[key: string]: (msg: Message, argv: string[]) => Promise<Respon
             return '```ansi\n' + inspect(out, {
                 colors: true,
                 depth: 2, 
-            }).replaceAll('\x1b[1m', '') + '```';
+            }).replaceAll('\x1b[1m', '').replaceAll('\x1b[39m', '\x1b[0m') + '```';
         }
     },
 
