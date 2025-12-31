@@ -350,10 +350,10 @@ const COMMANDS: {[key: string]: (msg: Message, argv: string[]) => Promise<Respon
             }
             code = `return (async () => {${code}})()`;
             let out = await (new Function('client', 'msg', 'lifeweb', 'aliases', 'findRLE', '"use strict";' + EVAL_PREFIX + code))(client, msg, lifeweb, aliases, findRLE);
-            return '```ansi\n\x1b[0m' + inspect(out, {
+            return '```ansi\n' + inspect(out, {
                 colors: true,
                 depth: 2, 
-            }) + '```';
+            }).replaceAll('\x1b[1m', '') + '```';
         }
     },
 
