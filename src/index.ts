@@ -352,8 +352,8 @@ const COMMANDS: {[key: string]: (msg: Message, argv: string[]) => Promise<Respon
             let out = await (new Function('client', 'msg', 'lifeweb', 'aliases', 'findRLE', '"use strict";' + EVAL_PREFIX + code))(client, msg, lifeweb, aliases, findRLE);
             return '```ansi\n' + inspect(out, {
                 colors: true,
-                depth: 2, 
-            }).replaceAll('\x1b[1m', '').replaceAll('\x1b[39m', '\x1b[0m') + '```';
+                depth: 2,
+            }).replaceAll('\x1b[22m', '\x1b[0m').replaceAll('\x1b[39m', '\x1b[0m') + '```';
         }
     },
 
