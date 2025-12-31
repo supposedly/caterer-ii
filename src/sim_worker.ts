@@ -252,6 +252,9 @@ async function runSim(argv: string[], rle: string): Promise<number> {
                         array[j++] = b;
                     } else {
                         array[j++] = 0xff;
+                        if (value === 2) {
+                        throw new Error(value + ' ' + Math.max(0, Math.ceil((value - 1) / (p.states - 2) * 256) - 1));
+                        }
                         array[j++] = Math.max(0, Math.ceil((value - 1) / (p.states - 2) * 256) - 1);
                         array[j++] = 0;
                     }
