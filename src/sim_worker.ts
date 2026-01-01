@@ -115,9 +115,28 @@ async function runPattern(argv: string[], rle: string): Promise<{frames: [Patter
                 throw new BotError(`Invalid part: ${part.join(' ')}`);
             }
             let step = part[1] ?? 1;
-            for (let i = parts.length > 1 ? 0 : 1; i < Math.ceil(part[0] / step); i++) {
-                p.run(step);
-                frames.push([p.copy(), frameTime]);
+            if (p instanceof RuleLoaderBgollyPattern) {
+                await fs.writeFile(join(dir, 'in.rle'), p.toRLE());
+                execSync(`rm ${join(dir, 'out.rle')}`);
+                execSync(`${join(dir, 'bgolly')} -a RuleLoader -s ./ -o out.rle -q -q -m ${part[0]} -i ${step} in.rle`);
+                let data = (await fs.readFile(join(dir, 'out.rle'))).toString();
+                let xOffset: number | null = null;
+                let yOffset: number | null = null;
+                for (let line of data.split('\n')) {
+                    if (line.includes(',')) {
+                        if (xOffset === null && yOffset === null) {
+                            [xOffset, yOffset] = line.split(',').map(x => parseInt(x));
+                        }
+                    } else {
+                        let q = parse(`x = 0, y = 0, rule = ${p.ruleStr}\n${line}`, aliases, true);
+                        
+                    }
+                }
+            } else {
+                for (let i = parts.length > 1 ? 0 : 1; i < Math.ceil(part[0] / step); i++) {
+                    p.run(step);
+                    frames.push([p.copy(), frameTime]);
+                }
             }
         } else if (part[0] === 'wait') {
             if (typeof part[1] !== 'number' || part.length > 2) {
