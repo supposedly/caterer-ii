@@ -322,6 +322,7 @@ export async function cmdPopulation(msg: Message, argv: string[]): Promise<Respo
         throw new Error('Cannot find RLE!');
     }
     let p = data.p;
+    msg = data.msg;
     if (p.states === 2) {
         await msg.reply(String(p.population));
     } else {
