@@ -3,7 +3,7 @@ import * as lifeweb from '../lifeweb/lib/index.js';
 import {inspect} from 'node:util';
 import {TYPES, TYPE_NAMES} from '../data/sssss/lib/index.js';
 import {Client, GatewayIntentBits} from 'discord.js';
-import {BotError, Response, Message, config, sentByAdmin, aliases, findRLE} from './util.js';
+import {BotError, Response, Message, readFile, writeFile, config, sentByAdmin, aliases, noReplyPings, findRLE} from './util.js';
 import {cmdIdentify, cmdBasicIdentify, cmdMinmax, cmdSim, cmdHashsoup, cmdApgencode, cmdApgdecode, cmdPopulation} from './ca.js';
 import {cmdSssss, cmdDyk, cmdName, cmdRename, cmdDeleteName, cmdSimStats, cmdSaveSimStats, cmdAlias, cmdUnalias, cmdLookupAlias} from './db.js';
 import {cmdWiki} from './wiki.js';
@@ -124,7 +124,7 @@ const HELP: {[key: string]: Help} = {
     },
 
     hashsoup: {
-        desc: 'Get a Catagolue hashsoup.',
+        desc: 'Get a Catagolue hashsoup',
         args: [
             {
                 name: 'symmetry',
@@ -278,6 +278,16 @@ const HELP: {[key: string]: Help} = {
         ],
     },
 
+    noreplypings: {
+        desc: 'Disables reply pings when using commands',
+        args: [],
+    },
+
+    yesreplypings: {
+        desc: 'Enables reply pings when using commands (This command removes you from the list of no-reply-ping users, and therefore deletes your data)',
+        args: [],
+    },
+
 };
 
 let helpMsg = '```ansi\n\x1b[1m\x1b[34mA cellular automata bot for the ConwayLife Lounge Discord server\n\nCommands:\x1b[0m';
@@ -355,7 +365,7 @@ const COMMANDS: {[key: string]: (msg: Message, argv: string[]) => Promise<Respon
                 code = 'return ' + code;
             }
             code = `return (async () => {${code}})()`;
-            let out = await (new Function('client', 'msg', 'lifeweb', 'aliases', 'findRLE', '"use strict";' + EVAL_PREFIX + code))(client, msg, lifeweb, aliases, findRLE);
+            let out = await (new Function('client', 'msg', 'lifeweb', 'aliases', 'findRLE', 'readFile', 'writeFile', '"use strict";' + EVAL_PREFIX + code))(client, msg, lifeweb, aliases, findRLE, readFile, writeFile);
             return '```ansi\n' + inspect(out, {
                 colors: true,
                 depth: 2,
@@ -363,18 +373,40 @@ const COMMANDS: {[key: string]: (msg: Message, argv: string[]) => Promise<Respon
         }
     },
 
-    async ping(msg: Message): Promise<undefined> {
-        let msg2 = await msg.reply('Pong!');
+    async ping(msg: Message): Promise<Response> {
+        let msg2 = await msg.reply({content: 'Pong!', allowedMentions: {repliedUser: noReplyPings.includes(msg.author.id)}});
         msg2.edit(`Pong! Latency: ${Math.round(msg2.createdTimestamp - msg.createdTimestamp)} ms (Discord WebSocket: ${Math.round(client.ws.ping)} ms)`)
     },
 
-    async pig(msg: Message): Promise<undefined> {
+    async pig(msg: Message): Promise<Response> {
         if (msg.reference) {
             await (await msg.fetchReference()).react('🐷');
         } else {
             await msg.react('🐷');
         }
     },
+
+    async noreplypings(msg: Message): Promise<Response> {
+        if (noReplyPings.includes(msg.author.id)) {
+            throw new BotError(`You already have reply pings disabled!`);
+        } else {
+            noReplyPings.push(msg.author.id);
+            await writeFile('data/no_reply_pings.json', JSON.stringify(noReplyPings, undefined, 4));
+            return 'Pings disabled!';
+        }
+    },
+
+    async yesreplypings(msg: Message): Promise<Response> {
+        let index = noReplyPings.indexOf(msg.author.id);
+        if (index === -1) {
+            throw new BotError(`You already have reply pings enabled!`);
+        } else {
+            noReplyPings.splice(index, 1);
+            await writeFile('data/no_reply_pings.json', JSON.stringify(noReplyPings, undefined, 4));
+            return 'Pings enabled!';
+        }
+    },
+
 
     identify: cmdIdentify,
     basic_identify: cmdBasicIdentify,

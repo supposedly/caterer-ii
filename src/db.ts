@@ -104,9 +104,10 @@ export async function cmdDeleteName(msg: Message, argv: string[]): Promise<Respo
     if (!apgcode.startsWith('x') || apgcode.startsWith('y')) {
         throw new BotError(`Apgcode is ${apgcode}`);
     }
-    if (names.has(apgcode)) {
+    let name = names.get(apgcode);
+    if (typeof name === 'string') {
         names.delete(apgcode);
-        await msg.reply('Name deleted');
+        return `Name deleted! Pattern was named \`${name}\``;
     } else {
         throw new BotError('Pattern is not named');
     }

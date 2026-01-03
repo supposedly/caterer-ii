@@ -42,6 +42,7 @@ export let dyks = (await readFile('data/dyk.txt')).split('\n').slice(1);
 export let simStats = JSON.parse(await readFile('data/sim_stats.json')) as {[key: string]: number};
 export let names = new Map((await readFile('data/names.txt')).split('\n').map(x => x.split(' ')).map(x => [x[0], x.slice(1).join(' ')]));
 export let aliases = JSON.parse(await readFile('data/aliases.json')) as {[key: string]: string};
+export let noReplyPings = JSON.parse(await readFile('data/no_reply_pings.json')) as string[];
 
 
 export function sentByAdmin(msg: Message): boolean {
