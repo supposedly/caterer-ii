@@ -336,6 +336,6 @@ export async function cmdPopulation(msg: Message, argv: string[]): Promise<Respo
                 total++;
             }
         }
-        let text = `${total} total cells\n${counts.map((x, i) => `${x} state ${i} cells`).join('\n')}`;
+        await msg.reply(`${total} total cells\n${counts.map((x, i) => `${x} state ${i} cells`).join('\n')}`);
     }
 }
