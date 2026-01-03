@@ -324,7 +324,10 @@ export async function cmdPopulation(msg: Message, argv: string[]): Promise<Respo
     let p = data.p;
     msg = data.msg;
     if (p.states === 2) {
-        await msg.reply(String(p.population));
+        await msg.reply({
+            content: String(p.population),
+            allowedMentions: {repliedUser: false},
+        });
     } else {
         let counts = [];
         for (let i = 0; i < p.states; i++) {
@@ -337,6 +340,9 @@ export async function cmdPopulation(msg: Message, argv: string[]): Promise<Respo
                 total++;
             }
         }
-        await msg.reply(`${total} total live cells\n${counts.map((x, i) => `${x} state ${i} cells`).join('\n')}`);
+        await msg.reply({
+            content: `${total} total live cells\n${counts.map((x, i) => `${x} state cells`).join('\n')}`,
+            allowedMentions: {repliedUser: false},
+        });
     }
 }
