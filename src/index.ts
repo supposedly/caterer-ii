@@ -2,7 +2,7 @@
 import * as lifeweb from '../lifeweb/lib/index.js';
 import {inspect} from 'node:util';
 import {TYPES, TYPE_NAMES} from '../data/sssss/lib/index.js';
-import {Client, GatewayIntentBits} from 'discord.js';
+import {Client, GatewayIntentBits, MessageReplyOptions} from 'discord.js';
 import {BotError, Response, Message, readFile, writeFile, config, sentByAdmin, aliases, noReplyPings, findRLE} from './util.js';
 import {cmdIdentify, cmdBasicIdentify, cmdMinmax, cmdSim, cmdHashsoup, cmdApgencode, cmdApgdecode, cmdPopulation} from './ca.js';
 import {cmdSssss, cmdDyk, cmdName, cmdRename, cmdDeleteName, cmdSimStats, cmdSaveSimStats, cmdAlias, cmdUnalias, cmdLookupAlias} from './db.js';
@@ -374,7 +374,7 @@ const COMMANDS: {[key: string]: (msg: Message, argv: string[]) => Promise<Respon
     },
 
     async ping(msg: Message): Promise<Response> {
-        let msg2 = await msg.reply({content: 'Pong!', allowedMentions: {repliedUser: noReplyPings.includes(msg.author.id)}});
+        let msg2 = await msg.reply({content: 'Pong!', allowedMentions: {repliedUser: !noReplyPings.includes(msg.author.id)}});
         msg2.edit(`Pong! Latency: ${Math.round(msg2.createdTimestamp - msg.createdTimestamp)} ms (Discord WebSocket: ${Math.round(client.ws.ping)} ms)`)
     },
 
@@ -464,11 +464,16 @@ async function runCommand(msg: Message): Promise<void> {
         try {
             let out = await COMMANDS[cmd](msg, argv);
             if (out) {
-                previousMsgs.push([msg.id, await msg.reply(out)]);
+                if (typeof out === 'string') {
+                    previousMsgs.push([msg.id, await msg.reply({content: out, allowedMentions: {repliedUser: !noReplyPings.includes(msg.author.id)}})]);
+                } else {
+                    (out as MessageReplyOptions).allowedMentions = {repliedUser: !noReplyPings.includes(msg.author.id)};
+                    previousMsgs.push([msg.id, await msg.reply(out)]);
+                }
             }
         } catch (error) {
             if (error instanceof BotError || error instanceof lifeweb.RuleError) {
-                previousMsgs.push([msg.id, await msg.reply('Error: ' + error.message)]);
+                previousMsgs.push([msg.id, await msg.reply({content: 'Error: ' + error.message, allowedMentions: {repliedUser: !noReplyPings.includes(msg.author.id)}})]);
             } else {
                 let str: string;
                 if (error && typeof error === 'object' && 'stack' in error) {
@@ -477,7 +482,7 @@ async function runCommand(msg: Message): Promise<void> {
                     str = String(error);
                 }
                 console.log(str);
-                previousMsgs.push([msg.id, await msg.reply('```' + str + '```')]);
+                previousMsgs.push([msg.id, await msg.reply({content: '```' + str + '```', allowedMentions: {repliedUser: !noReplyPings.includes(msg.author.id)}})]);
             }
         }
         if (previousMsgs.length > 2000) {
@@ -513,7 +518,7 @@ client.on('messageUpdate', async (old, msg) => {
         } else {
             str = String(error);
         }
-        await msg.reply('```' + str + '```');
+        await msg.reply({content: '```' + str + '```', allowedMentions: {repliedUser: !noReplyPings.includes(msg.author.id)}});
     }
     runCommand(msg);
 });
