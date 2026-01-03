@@ -295,7 +295,7 @@ export async function cmdSim(msg: Message, argv: string[]): Promise<Response> {
 
 
 export async function cmdHashsoup(msg: Message, argv: string[]): Promise<Response> {
-    return createPattern(argv[1], await getHashsoup(argv[3], argv[2]), aliases).toRLE();
+    return createPattern(argv[3] ?? 'B3/S23', await getHashsoup(argv[2], argv[1]), aliases).toRLE();
 }
 
 export async function cmdApgencode(msg: Message, argv: string[]): Promise<Response> {
@@ -313,5 +313,29 @@ export async function cmdApgdecode(msg: Message, argv: string[]): Promise<Respon
         return lifePattern.loadApgcode(argv[1]).toRLE();
     } else {
         return createPattern(argv[2], undefined, aliases).loadApgcode(argv[1]).toRLE();
+    }
+}
+
+export async function cmdPopulation(msg: Message, argv: string[]): Promise<Response> {
+    let data = await findRLE(msg);
+    if (!data) {
+        throw new Error('Cannot find RLE!');
+    }
+    let p = data.p;
+    if (p.states === 2) {
+        await msg.reply(String(p.population));
+    } else {
+        let counts = [];
+        for (let i = 0; i < p.states; i++) {
+            counts.push(0);
+        }
+        let total = 0;
+        for (let cell of p.getData()) {
+            counts[cell]++;
+            if (cell > 0) {
+                total++;
+            }
+        }
+        let text = `${total} total cells\n${counts.map((x, i) => `${x} state ${i} cells`).join('\n')}`;
     }
 }

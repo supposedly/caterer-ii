@@ -4,7 +4,7 @@ import {inspect} from 'node:util';
 import {TYPES, TYPE_NAMES} from '../data/sssss/lib/index.js';
 import {Client, GatewayIntentBits} from 'discord.js';
 import {BotError, Response, Message, config, sentByAdmin, aliases, findRLE} from './util.js';
-import {cmdIdentify, cmdBasicIdentify, cmdMinmax, cmdSim, cmdHashsoup, cmdApgencode, cmdApgdecode} from './ca.js';
+import {cmdIdentify, cmdBasicIdentify, cmdMinmax, cmdSim, cmdHashsoup, cmdApgencode, cmdApgdecode, cmdPopulation} from './ca.js';
 import {cmdSssss, cmdDyk, cmdName, cmdRename, cmdDeleteName, cmdSimStats, cmdSaveSimStats, cmdAlias, cmdUnalias, cmdLookupAlias} from './db.js';
 import {cmdWiki} from './wiki.js';
 
@@ -127,16 +127,16 @@ const HELP: {[key: string]: Help} = {
         desc: 'Get a Catagolue hashsoup.',
         args: [
             {
-                name: 'rule',
-                desc: 'The rule to use.',
-            },
-            {
                 name: 'symmetry',
                 desc: 'The symmetry to use.',
             },
             {
                 name: 'seed',
                 desc: 'The seed for the soup (k_whatever).',
+            },
+            {
+                name: 'rule',
+                desc: 'The rule to use.',
             },
         ],
     },
@@ -159,6 +159,12 @@ const HELP: {[key: string]: Help} = {
                 desc: 'The rule to use (default B3/S23).',
             },
         ],
+    },
+
+    population: {
+        desc: 'Get the population of a pattern',
+        args: [],
+        aliases: ['pop'],
     },
 
     sssss: {
@@ -376,6 +382,12 @@ const COMMANDS: {[key: string]: (msg: Message, argv: string[]) => Promise<Respon
     minmax: cmdMinmax,
     sim: cmdSim,
 
+    hashsoup: cmdHashsoup,
+    apgencode: cmdApgencode,
+    apgdecode: cmdApgdecode,
+    population: cmdPopulation,
+    pop: cmdPopulation,
+
     sssss: cmdSssss,
     '5s': cmdSssss,
     dyk: cmdDyk,
@@ -394,10 +406,6 @@ const COMMANDS: {[key: string]: (msg: Message, argv: string[]) => Promise<Respon
     deletealias: cmdUnalias,
     lookup_alias: cmdLookupAlias,
     lookupalias: cmdLookupAlias,
-
-    hashsoup: cmdHashsoup,
-    apgencode: cmdApgencode,
-    apgdecode: cmdApgdecode,
 
     wiki: cmdWiki,
 
