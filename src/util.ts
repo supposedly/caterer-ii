@@ -79,7 +79,7 @@ async function findRLEFromMessage(msg: Message): Promise<{msg: Message, p: Patte
     if (out) {
         return {msg, p: out};
     }
-    if (msg.attachments.size > 0) {
+    if (!msg.author.bot && msg.attachments.size > 0) {
         let attachment = msg.attachments.first();
         if (attachment) {
             let data = await (await fetch(attachment.url)).text();
@@ -107,9 +107,6 @@ export async function findRLE(msg: Message): Promise<{msg: Message, p: Pattern} 
     }
     let msgs = await msg.channel.messages.fetch({limit: 50});
     for (let msg of msgs) {
-        if (msg[1].author.bot) {
-            continue;
-        }
         if (out = await findRLEFromMessage(msg[1] as Message)) {
             return out;
         }
