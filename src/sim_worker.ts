@@ -3,9 +3,8 @@ import {join} from 'node:path';
 import * as fs from 'node:fs/promises';
 import {execSync} from 'node:child_process';
 import {parentPort} from 'node:worker_threads';
-import {RuleError, Pattern, CoordPattern, TreePattern, DataHistoryPattern, CoordHistoryPattern, DataSuperPattern, CoordSuperPattern, InvestigatorPattern, RuleLoaderBgollyPattern, parse} from '../lifeweb/lib/index.js';
+import {RuleError, RLE_CHARS, Pattern, CoordPattern, MAPPattern, TreePattern, DataHistoryPattern, CoordHistoryPattern, DataSuperPattern, CoordSuperPattern, InvestigatorPattern, RuleLoaderBgollyPattern, parse} from '../lifeweb/lib/index.js';
 import {BotError, aliases} from './util.js';
-import {userInfo} from 'node:os';
 
 
 const HISTORY_COLORS: [number, number, number][] = [
@@ -147,19 +146,77 @@ async function runPattern(argv: string[], rle: string): Promise<{frames: [Patter
                         } else {
                             execSync(`${join(dir, 'lifeweb', 'bgolly')} -a RuleLoader -s ${join(dir, 'lifeweb')}/ -o ${join(dir, 'out.rle')} -m ${part[0]} -i ${step} ${join(dir, 'in.rle')}`);
                         }
-                        let data = (await fs.readFile(join(dir, 'out.rle'))).toString();
-                        let xOffset: number | null = null;
-                        let yOffset: number | null = null;
-                        for (let line of data.split('\n')) {
-                            if (line.includes(',')) {
-                                if (xOffset === null && yOffset === null) {
-                                    [xOffset, yOffset] = line.split(',').map(x => parseInt(x));
+                        let rle = (await fs.readFile(join(dir, 'out.rle'))).toString().split('\n').slice(1).join('\n').slice(0, -1);
+                        let raw: number[][] = [];
+                        let num = '';
+                        let prefix = '';
+                        let currentLine: number[] = [];
+                        for (let i = 0; i < rle.length; i++) {
+                            let char = rle[i];
+                            if (char === 'b' || char === 'o') {
+                                let value = char === 'o' ? 1 : 0;
+                                if (num === '') {
+                                    currentLine.push(value);
+                                } else {
+                                    let count = parseInt(num);
+                                    for (let i = 0; i < count; i++) {
+                                        currentLine.push(value);
+                                    }
+                                    num = '';
                                 }
-                            } else {
-                                let q = parse(`x = 0, y = 0, rule = ${p.ruleStr}\n${line}`, aliases, true);
-                                frames.push([q, frameTime]);
+                            } else if ('0123456789'.includes(char)) {
+                                num += char;
+                            } else if (char === '\u0024') {
+                                raw.push(currentLine);
+                                currentLine = [];
+                                if (num !== '') {
+                                    let count = parseInt(num);
+                                    for (let i = 1; i < count; i++) {
+                                        raw.push([]);
+                                    }
+                                    num = '';
+                                }
+                            } else if (char === '.') {
+                                if (num === '') {
+                                    currentLine.push(0);
+                                } else {
+                                    let count = parseInt(num);
+                                    for (let i = 0; i < count; i++) {
+                                        currentLine.push(0);
+                                    }
+                                    num = '';
+                                }
+                            } else if ('ABCDEFGHIJKLMNOPQRSTUVWX'.includes(char)) {
+                                if (prefix) {
+                                    char = prefix + char;
+                                }
+                                let value = RLE_CHARS.indexOf(char);
+                                if (num === '') {
+                                    currentLine.push(value);
+                                } else {
+                                    let count = parseInt(num);
+                                    for (let i = 0; i < count; i++) {
+                                        currentLine.push(value);
+                                    }
+                                    num = '';
+                                }
+                            } else if ('pqrstuvwxy'.includes(char)) {
+                                prefix = char;
                             }
                         }
+                        raw.push(currentLine);
+                        let height = raw.length;
+                        let width = Math.max(...raw.map(x => x.length));
+                        let data = new Uint8Array(height * width);
+                        for (let y = 0; y < raw.length; y++) {
+                            let i = y * width;
+                            let line = raw[y];
+                            for (let x = 0; x < line.length; x++) {
+                                data[i] = line[x];
+                                i++;
+                            }
+                        }
+                        frames.push([new MAPPattern(height, width, data, new Uint8Array(0), p.ruleStr, p.ruleSymmetry), frameTime]);
                     } else {
                         for (let i = parts.length > 1 ? 0 : 1; i < Math.ceil(part[0] / step); i++) {
                             p.run(step);
