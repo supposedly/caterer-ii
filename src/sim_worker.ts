@@ -3,7 +3,7 @@ import {join} from 'node:path';
 import * as fs from 'node:fs/promises';
 import {execSync} from 'node:child_process';
 import {parentPort} from 'node:worker_threads';
-import {Pattern, CoordPattern, TreePattern, DataHistoryPattern, CoordHistoryPattern, DataSuperPattern, CoordSuperPattern, InvestigatorPattern, RuleLoaderBgollyPattern, parse} from '../lifeweb/lib/index.js';
+import {RuleError, Pattern, CoordPattern, TreePattern, DataHistoryPattern, CoordHistoryPattern, DataSuperPattern, CoordSuperPattern, InvestigatorPattern, RuleLoaderBgollyPattern, parse} from '../lifeweb/lib/index.js';
 import {BotError, aliases} from './util.js';
 
 
@@ -355,6 +355,10 @@ parentPort.on('message', async ({id, argv, rle}: {id: number, argv: string[], rl
     try {
         parentPort.postMessage({id, ok: true, parseTime: await runSim(argv, rle)});
     } catch (error) {
-        parentPort.postMessage({id, ok: false, error: (error instanceof Error && error.stack) ? error.stack : String(error), type: error && typeof error === 'object' && 'constructor' in error ? String(error.constructor.name) : null});
+        if (error instanceof BotError || error instanceof RuleError) {
+            parentPort.postMessage({id, ok: false, error: error.message, intentional: true, type: error.constructor.name});
+        } else {
+            parentPort.postMessage({id, ok: false, error: (error instanceof Error && error.stack) ? error.stack : String(error), intentional: false});
+        }
     }
 });

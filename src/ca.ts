@@ -8,7 +8,7 @@ import {BotError, Message, Response, writeFile, names, aliases, simStats, findRL
 
 let simCounter = 0;
 
-type WorkerResult = {id: number, ok: true, parseTime: number} | {id: number, ok: false, error: string, type: null | string};
+type WorkerResult = {id: number, ok: true, parseTime: number} | {id: number, ok: false, error: string, intentional: boolean, type: string};
 
 interface Job {
     resolve: (data: number) => void;
@@ -29,10 +29,12 @@ function workerOnMessage(msg: WorkerResult): void {
         return;
     }
     if (!msg.ok) {
-        if (msg.type === 'BotError') {
-            job.reject(new BotError(msg.error));
-        } else if (msg.type === 'RuleError') {
-            job.reject(new RuleError(msg.error));
+        if (msg.intentional) {
+            if (msg.type === 'BotError') {
+                job.reject(new BotError(msg.error));
+            } else {
+                job.reject(new RuleError(msg.error));
+            }
         } else {
             job.reject(msg.error);
         }
