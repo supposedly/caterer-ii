@@ -68,7 +68,7 @@ const INVESTIGATOR_COLORS: [number, number, number][] = [
 ];
 
 
-let dir = join(import.meta.dirname, '..');
+let dir = join(import.meta.dirname, '../lifeweb');
 
 async function runPattern(argv: string[], rle: string): Promise<{frames: [Pattern, number][], gifSize: number, minX: number, minY: number, width: number, height: number}> {
     let p = parse(rle, aliases, true);
@@ -79,11 +79,33 @@ async function runPattern(argv: string[], rle: string): Promise<{frames: [Patter
             parts.push(currentPart);
             currentPart = [];
         } else {
-            let num = parseFloat(arg);
-            if (Number.isNaN(num)) {
-                currentPart.push(arg);
-            } else {
-                currentPart.push(num);
+            let isNumber = false;
+            let current = '';
+            for (let char of arg) {
+                if ('0123456789.'.includes(char)) {
+                    if (isNumber) {
+                        current += char;
+                    } else {
+                        currentPart.push(current);
+                        isNumber = true;
+                        current = char;
+                    }
+                } else {
+                    if (isNumber) {
+                        currentPart.push(parseFloat(current));
+                        isNumber = false;
+                        current = char;
+                    } else {
+                        current += char;
+                    }
+                }
+            }
+            if (current !== '') {
+                if (isNumber) {
+                    currentPart.push(parseFloat(current));
+                } else {
+                    currentPart.push(current);
+                }
             }
         }
     }
@@ -95,60 +117,62 @@ async function runPattern(argv: string[], rle: string): Promise<{frames: [Patter
     let frames: [Pattern, number | null][] = [[p.copy(), frameTime]];
     let gifSize = 200;
     for (let part of parts) {
-        if (part[1] === 'fps' && typeof part[0] === 'number') {
-            frameTime = Math.ceil(100 / part[0]);
-            part = part.slice(2);
-        }
-        if (part[0] === 'size' && typeof part[1] === 'number') {
-            gifSize = part[1];
-            part = part.slice(2);
-        }
-        if (part[1] === 'fps' && typeof part[0] === 'number') {
-            frameTime = Math.ceil(100 / part[0]);
-            part = part.slice(2);
-        }
-        if (typeof part[0] === 'number') {
-            if (typeof part[1] === 'string') {
-                throw new BotError(`Invalid part: ${part.join(' ')}`);
-            }
-            let step = part[1] ?? 1;
-            if (p instanceof RuleLoaderBgollyPattern) {
-                await fs.writeFile(join(dir, 'in.rle'), p.toRLE());
-                execSync(`rm ${join(dir, 'out.rle')}`);
-                execSync(`${join(dir, 'bgolly')} -a RuleLoader -s ./ -o out.rle -q -q -m ${part[0]} -i ${step} in.rle`);
-                let data = (await fs.readFile(join(dir, 'out.rle'))).toString();
-                let xOffset: number | null = null;
-                let yOffset: number | null = null;
-                for (let line of data.split('\n')) {
-                    if (line.includes(',')) {
-                        if (xOffset === null && yOffset === null) {
-                            [xOffset, yOffset] = line.split(',').map(x => parseInt(x));
+        while (part.length > 0) {
+            if (typeof part[0] === 'number') {
+                if (part[1] === 'fps') {
+                    frameTime = Math.ceil(100 / part[0]);
+                    part = part.slice(2);
+                } else if (typeof part[1] === 'string') {
+                    throw new BotError(`Invalid part: ${part.join(' ')}`);
+                } else {
+                    let step = part[1] ?? 1;
+                    if (p instanceof RuleLoaderBgollyPattern) {
+                        await fs.writeFile(join(dir, 'in.rle'), p.toRLE());
+                        execSync(`rm ${join(dir, 'out.rle')}`);
+                        execSync(`${join(dir, 'bgolly')} -a RuleLoader -s ./ -o out.rle -q -q -m ${part[0]} -i ${step} in.rle`);
+                        let data = (await fs.readFile(join(dir, 'out.rle'))).toString();
+                        let xOffset: number | null = null;
+                        let yOffset: number | null = null;
+                        for (let line of data.split('\n')) {
+                            if (line.includes(',')) {
+                                if (xOffset === null && yOffset === null) {
+                                    [xOffset, yOffset] = line.split(',').map(x => parseInt(x));
+                                }
+                            } else {
+                                let q = parse(`x = 0, y = 0, rule = ${p.ruleStr}\n${line}`, aliases, true);
+                                frames.push([q, frameTime]);
+                            }
                         }
                     } else {
-                        let q = parse(`x = 0, y = 0, rule = ${p.ruleStr}\n${line}`, aliases, true);
-                        
+                        for (let i = parts.length > 1 ? 0 : 1; i < Math.ceil(part[0] / step); i++) {
+                            p.run(step);
+                            frames.push([p.copy(), frameTime]);
+                        }
                     }
                 }
-            } else {
-                for (let i = parts.length > 1 ? 0 : 1; i < Math.ceil(part[0] / step); i++) {
-                    p.run(step);
+            } else if (part[0] === 'size') {
+                if (typeof part[1] !== 'number') {
+                    throw new BotError(`Invalid part: ${part.join(' ')}`);
+                }
+                gifSize = part[1];
+                part = part.slice(2);
+            } else if (part[0] === 'wait') {
+                if (typeof part[1] !== 'number') {
+                    throw new BotError(`Invalid part: ${part.join(' ')}`);
+                }
+                for (let i = 0; i < part[1]; i++) {
                     frames.push([p.copy(), frameTime]);
                 }
-            }
-        } else if (part[0] === 'wait') {
-            if (typeof part[1] !== 'number' || part.length > 2) {
+                part = part.slice(2);
+            } else if (part[0] === 'jump') {
+                if (typeof part[1] !== 'number') {
+                    throw new BotError(`Invalid part: ${part.join(' ')}`);
+                }
+                p.run(part[1]);
+                part = part.slice(2);
+            } else {
                 throw new BotError(`Invalid part: ${part.join(' ')}`);
             }
-            for (let i = 0; i < part[1]; i++) {
-                frames.push([p.copy(), frameTime]);
-            }
-        } else if (part[0] === 'jump') {
-            if (typeof part[1] !== 'number' || part.length > 2) {
-                throw new BotError(`Invalid part: ${part.join(' ')}`);
-            }
-            p.run(part[1]);
-        } else if (part[0] !== undefined) {
-            throw new BotError(`Invalid part: ${part.join(' ')}`);
         }
     }
     let minX = Infinity;
