@@ -1,6 +1,5 @@
 
-import {identify, createPattern, RuleError} from '../lifeweb/lib/index.js';
-import {findSpeedRLE} from '../data/sssss/lib/index.js';
+import {RuleError, identify, createPattern, parseSpeed} from '../lifeweb/lib/index.js';
 import {EmbedBuilder} from 'discord.js';
 import {BotError, Message, Response, NAME_CHARS, dyks, names, simStats, aliases, writeFile, sentByAccepterer, findRLE} from './util.js';
 
@@ -15,7 +14,13 @@ export async function cmdSssss(msg: Message, argv: string[]): Promise<Response> 
         type = argv[1].toLowerCase();
         speed = argv[2];
     }
-    return '```\n' + await findSpeedRLE(type, speed) + '\n```';
+    let {dx, dy, period} = parseSpeed(speed);
+    let resp = await fetch(`https://speedydelete.com/5s/api/get?type=${type}&dx=${dx}&dy=${dy}&period=${period}`);
+    if (resp.ok) {
+        return await resp.text();
+    } else {
+        throw new BotError(`Server returned ${resp.status} ${resp.statusText}`);
+    }
 }
 
 

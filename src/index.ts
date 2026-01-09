@@ -1,7 +1,6 @@
 
 import * as lifeweb from '../lifeweb/lib/index.js';
 import {inspect} from 'node:util';
-import {TYPES, TYPE_NAMES} from '../data/sssss/lib/index.js';
 import {Client, GatewayIntentBits, MessageReplyOptions} from 'discord.js';
 import {BotError, Response, Message, readFile, writeFile, config, sentByAdmin, aliases, noReplyPings, findRLE} from './util.js';
 import {cmdIdentify, cmdBasicIdentify, cmdMinmax, cmdSim, cmdHashsoup, cmdApgencode, cmdApgdecode, cmdPopulation} from './ca.js';
@@ -523,6 +522,17 @@ client.on('messageUpdate', async (old, msg) => {
     runCommand(msg);
 });
 
+const TYPE_NAMES: {[key: string]: string} = {
+    'int': 'INT',
+    'intb0': 'INT B0',
+    'ot': 'OT',
+    'otb0': 'OT B0',
+    'intgen': 'INT Generations',
+    'intgenb0': 'INT Generations B0',
+    'otgen': 'OT Generations',
+    'otgenb0': 'OT Generations B0',
+};
+
 setInterval(async () => {
     try {
         let resp = await fetch('https://speedydelete.com/5s/api/getnewships');
@@ -532,7 +542,7 @@ setInterval(async () => {
                 return;
             }
             let lines: string[] = [];
-            for (let type of TYPES) {
+            for (let type of Object.keys(TYPE_NAMES)) {
                 let newShips = data.newShips.filter(x => x[0] === type);
                 let improvedShips = data.improvedShips.filter(x => x[0] === type);
                 if (newShips.length === 0 && improvedShips.length === 0) {
