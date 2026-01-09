@@ -135,6 +135,10 @@ async function runPattern(argv: string[], rle: string): Promise<{frames: [Patter
                         step = part[1];
                         remove = 2;
                     }
+                    if (parts.length === 1 && part[0] === 1) {
+                        part = part.slice(remove);
+                        continue;
+                    }
                     if (useCAViewer || p instanceof RuleLoaderBgollyPattern) {
                         await fs.writeFile(join(dir, 'in.rle'), p.toRLE());
                         execSync(`rm -f ${join(dir, 'lifeweb', 'out.rle')}`);
