@@ -86,13 +86,17 @@ async function runPattern(argv: string[], rle: string): Promise<{frames: [Patter
                     if (isNumber) {
                         current += char;
                     } else {
-                        currentPart.push(current);
+                        if (current !== '') {
+                            currentPart.push(current);
+                        }
                         isNumber = true;
                         current = char;
                     }
                 } else {
                     if (isNumber) {
-                        currentPart.push(parseFloat(current));
+                        if (current !== '') {
+                            currentPart.push(parseFloat(current));
+                        }
                         isNumber = false;
                         current = char;
                     } else {
@@ -110,8 +114,6 @@ async function runPattern(argv: string[], rle: string): Promise<{frames: [Patter
         }
     }
     parts.push(currentPart);
-    throw new Error(String(parts));
-    /*
     let frameTime: number | null = null;
     if (parts[0] && parts[0][1] === 'fps' && typeof parts[0][0] === 'number') {
         frameTime = Math.ceil(100 / parts[0][0]);
@@ -223,7 +225,6 @@ async function runPattern(argv: string[], rle: string): Promise<{frames: [Patter
     }
     let defaultTime = Math.min(1, Math.max(1/60, 5 / frames.length)) * 100;
     return {frames: frames.map(([p, time]) => [p, time ?? defaultTime]), gifSize, minX, minY, width, height};
-    */
 }
 
 async function runSim(argv: string[], rle: string): Promise<number> {
