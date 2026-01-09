@@ -126,10 +126,13 @@ async function runPattern(argv: string[], rle: string): Promise<{frames: [Patter
                 if (part[1] === 'fps') {
                     frameTime = Math.ceil(100 / part[0]);
                     part = part.slice(2);
-                } else if (typeof part[1] === 'string') {
-                    throw new BotError(`Invalid part: ${part.join(' ')}`);
                 } else {
-                    let step = part[1] ?? 1;
+                    let step = 1;
+                    let remove = 1;
+                    if (typeof part[1] === 'number') {
+                        step = part[1];
+                        remove = 2;
+                    }
                     if (p instanceof RuleLoaderBgollyPattern) {
                         await fs.writeFile(join(dir, 'in.rle'), p.toRLE());
                         execSync(`rm ${join(dir, 'out.rle')}`);
@@ -153,6 +156,7 @@ async function runPattern(argv: string[], rle: string): Promise<{frames: [Patter
                             frames.push([p.copy(), frameTime]);
                         }
                     }
+                    part = part.slice(remove);
                 }
             } else if (part[0] === 'size') {
                 if (typeof part[1] !== 'number') {
