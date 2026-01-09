@@ -349,7 +349,7 @@ const COMMANDS: {[key: string]: (msg: Message, argv: string[]) => Promise<Respon
             if (cmd in helpMsgs) {
                 return helpMsgs[cmd];
             } else {
-                return `No command called !${cmd}`;
+                throw new BotError(`No command called !${cmd}`);
             }
         } else {
             return helpMsg;

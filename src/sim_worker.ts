@@ -6,7 +6,7 @@ import * as fs from 'node:fs/promises';
 import {execSync} from 'node:child_process';
 import {parentPort} from 'node:worker_threads';
 import CanvasGifEncoder from '@pencil.js/canvas-gif-encoder';
-import {Pattern, CoordPattern, TreePattern, DataHistoryPattern, CoordHistoryPattern, DataSuperPattern, CoordSuperPattern, InvestigatorPattern, RuleLoaderBgollyPattern, parse} from '../lifeweb/lib/index.js';
+import {RuleError, Pattern, CoordPattern, TreePattern, DataHistoryPattern, CoordHistoryPattern, DataSuperPattern, CoordSuperPattern, InvestigatorPattern, RuleLoaderBgollyPattern, parse} from '../lifeweb/lib/index.js';
 import {BotError, aliases} from './util.js';
 
 
@@ -204,8 +204,9 @@ async function runPattern(argv: string[], rle: string): Promise<{frames: [Patter
 
 
 async function runSim(argv: string[], rle: string): Promise<number> {
+    let startTime = performance.now();
     let {frames, gifSize, minX, minY, width, height} = await runPattern(argv, rle);
-    let parseTime = performance.now();
+    let parseTime = performance.now() - startTime;
     let size = width * height;
     let array = new Uint8ClampedArray(size * 4);
     let empty = new Uint8ClampedArray(size * 4);
@@ -299,6 +300,6 @@ parentPort.on('message', async ({id, argv, rle}: {id: number, argv: string[], rl
     try {
         parentPort.postMessage({id, ok: true, parseTime: await runSim(argv, rle)});
     } catch (error) {
-        parentPort.postMessage({id, ok: false, error: (error instanceof Error && error.stack) ? error.stack : String(error)});
+        parentPort.postMessage({id, ok: false, error: (error instanceof Error && error.stack) ? error.stack : String(error), type: error && typeof error === 'object' && 'constructor' in error ? String(error.constructor.name) : null});
     }
 });
