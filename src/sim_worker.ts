@@ -195,7 +195,7 @@ async function runPattern(argv: string[], rle: string): Promise<{frames: [Patter
         width++;
         height++;
     }
-    let defaultTime = Math.min(0.1, Math.max(1/60, 5 / frames.length)) * 1000;
+    let defaultTime = Math.min(1, Math.max(1/60, 5 / frames.length)) * 100;
     return {frames: frames.map(([p, time]) => [p, time ?? defaultTime]), gifSize, minX, minY, width, height};
 }
 
