@@ -120,6 +120,7 @@ async function runPattern(argv: string[], rle: string): Promise<{frames: [Patter
     }
     let frames: [Pattern, number | null][] = [[p.copy(), frameTime]];
     let gifSize = 200;
+    let useCAViewer = false;
     for (let part of parts) {
         while (part.length > 0) {
             if (typeof part[0] === 'number') {
@@ -178,6 +179,9 @@ async function runPattern(argv: string[], rle: string): Promise<{frames: [Patter
                 }
                 p.run(part[1]);
                 part = part.slice(2);
+            } else if (part[0] === 'ca') {
+                useCAViewer = true;
+                part = part.slice(1);
             } else {
                 throw new BotError(`Invalid part: ${part.join(' ')}`);
             }
