@@ -145,7 +145,7 @@ async function runPattern(argv: string[], rle: string): Promise<{frames: [Patter
                         if (useCAViewer) {
                             execSync(`/home/opc/qemu/build/qemu-i386 /home/opc/caviewer/bin/CAViewer sim -g ${part[0]} -s ${step} -i in.rle -o out.rle`);
                         } else {
-                            execSync(`${join(dir, 'lifeweb', 'bgolly')} -a RuleLoader -s ${join(dir, 'lifeweb')} -o ${join(dir, 'out.rle')} -m ${part[0]} -i ${step} ${join(dir, 'in.rle')}`);
+                            execSync(`${join(dir, 'lifeweb', 'bgolly')} -a RuleLoader -s ${join(dir, 'lifeweb')}/ -o ${join(dir, 'out.rle')} -m ${part[0]} -i ${step} ${join(dir, 'in.rle')}`);
                         }
                         let data = (await fs.readFile(join(dir, 'out.rle'))).toString();
                         let xOffset: number | null = null;
