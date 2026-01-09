@@ -68,7 +68,7 @@ const INVESTIGATOR_COLORS: [number, number, number][] = [
 ];
 
 
-let dir = join(import.meta.dirname, '../lifeweb');
+let dir = join(import.meta.dirname, '..', 'lifeweb');
 
 async function runPattern(argv: string[], rle: string): Promise<{frames: [Pattern, number][], gifSize: number, minX: number, minY: number, width: number, height: number}> {
     let p = parse(rle, aliases, true);
@@ -110,6 +110,8 @@ async function runPattern(argv: string[], rle: string): Promise<{frames: [Patter
         }
     }
     parts.push(currentPart);
+    throw new Error(String(parts));
+    /*
     let frameTime: number | null = null;
     if (parts[0] && parts[0][1] === 'fps' && typeof parts[0][0] === 'number') {
         frameTime = Math.ceil(100 / parts[0][0]);
@@ -221,17 +223,7 @@ async function runPattern(argv: string[], rle: string): Promise<{frames: [Patter
     }
     let defaultTime = Math.min(1, Math.max(1/60, 5 / frames.length)) * 100;
     return {frames: frames.map(([p, time]) => [p, time ?? defaultTime]), gifSize, minX, minY, width, height};
-}
-
-
-const REVERSERS: Uint8Array[] = [];
-for (let width = 0; width < 9; width++) {
-    let size = 2**width;
-    let out = new Uint8Array(size);
-    for (let i = 0; i < size; i++) {
-        out[i] = parseInt(Array.from(i.toString(2).padStart(width, '0')).reverse().join(''), 2);
-    }
-    REVERSERS.push(out);
+    */
 }
 
 async function runSim(argv: string[], rle: string): Promise<number> {
