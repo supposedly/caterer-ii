@@ -137,7 +137,7 @@ async function runPattern(argv: string[], rle: string): Promise<{frames: [Patter
                     }
                     if (useCAViewer || p instanceof RuleLoaderBgollyPattern) {
                         await fs.writeFile(join(dir, 'in.rle'), p.toRLE());
-                        execSync(`rm ${join(dir, 'out.rle')}`);
+                        execSync(`rm -f ${join(dir, 'lifeweb', 'out.rle')}`);
                         if (useCAViewer) {
                             execSync(`/home/opc/qemu/build/qemu-i386 /home/opc/caviewer/bin/CAViewer sim -g ${part[0]} -s ${step} -i in.rle -o out.rle`);
                         } else {
