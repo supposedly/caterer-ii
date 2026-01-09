@@ -5,6 +5,7 @@ import {execSync} from 'node:child_process';
 import {parentPort} from 'node:worker_threads';
 import {RuleError, Pattern, CoordPattern, TreePattern, DataHistoryPattern, CoordHistoryPattern, DataSuperPattern, CoordSuperPattern, InvestigatorPattern, RuleLoaderBgollyPattern, parse} from '../lifeweb/lib/index.js';
 import {BotError, aliases} from './util.js';
+import {userInfo} from 'node:os';
 
 
 const HISTORY_COLORS: [number, number, number][] = [
@@ -68,7 +69,7 @@ const INVESTIGATOR_COLORS: [number, number, number][] = [
 ];
 
 
-let dir = join(import.meta.dirname, '..', 'lifeweb');
+let dir = join(import.meta.dirname, '..');
 
 async function runPattern(argv: string[], rle: string): Promise<{frames: [Pattern, number][], gifSize: number, minX: number, minY: number, width: number, height: number}> {
     let p = parse(rle, aliases, true);
@@ -134,10 +135,14 @@ async function runPattern(argv: string[], rle: string): Promise<{frames: [Patter
                         step = part[1];
                         remove = 2;
                     }
-                    if (p instanceof RuleLoaderBgollyPattern) {
+                    if (useCAViewer || p instanceof RuleLoaderBgollyPattern) {
                         await fs.writeFile(join(dir, 'in.rle'), p.toRLE());
                         execSync(`rm ${join(dir, 'out.rle')}`);
-                        execSync(`${join(dir, 'bgolly')} -a RuleLoader -s ./ -o out.rle -q -q -m ${part[0]} -i ${step} in.rle`);
+                        if (useCAViewer) {
+                            execSync(`/home/opc/qemu/build/qemu-i386 /home/opc/caviewer/bin/CAViewer sim -g ${part[0]} -s ${step} -i in.rle -o out.rle`);
+                        } else {
+                            execSync(`${join(dir, 'lifeweb', 'bgolly')} -a RuleLoader -s ./ -o out.rle -m ${part[0]} -i ${step} in.rle`);
+                        }
                         let data = (await fs.readFile(join(dir, 'out.rle'))).toString();
                         let xOffset: number | null = null;
                         let yOffset: number | null = null;
@@ -364,7 +369,7 @@ async function runSim(argv: string[], rle: string): Promise<number> {
     await fs.writeFile('sim_base.gif', out);
     let scale = Math.ceil(gifSize / Math.min(width, height));
     gifSize = Math.min(width, height) * scale;
-    execSync(`gifsicle --resize-${width < height ? 'width' : 'height'} ${gifSize} sim_base.gif > sim.gif`);
+    execSync(`gifsicle --resize-${width < height ? 'width' : 'height'} ${gifSize} -O3 sim_base.gif > sim.gif`);
     return parseTime;
 }
 
