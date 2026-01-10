@@ -219,19 +219,22 @@ async function updateStarboard(data: MessageReaction | PartialMessageReaction): 
                 if (msg.id in starboard) {
                     await starboardChannel.messages.edit(starboard[msg.id][0], {content: text, files: [attachment.url]});
                 } else {
-                    await starboardChannel.send({content: text, allowedMentions: {parse: []}});
-                    await msg.forward(starboardChannel);
+                    let msg0 = await starboardChannel.send({content: text, allowedMentions: {parse: []}});
+                    let msg1 = await msg.forward(starboardChannel);
+                    starboard[msg.id] = [msg0.id, msg1.id];
                 }
             }
         } else {
-            if (data.message.id in starboard) {
+            if (msg.id in starboard) {
                 await starboardChannel.messages.edit(starboard[data.message.id][0], text);
             } else {
-                await starboardChannel.send({content: text, allowedMentions: {parse: []}});
-                await data.message.forward(starboardChannel);
+                let msg0 = await starboardChannel.send({content: text, allowedMentions: {parse: []}});
+                let msg1 = await data.message.forward(starboardChannel);
+                starboard[msg.id] = [msg0.id, msg1.id];
             }
         }
     } else if (msg.id in starboard) {
+        starboard[msg.id]
         await starboardChannel.messages.delete(starboard[msg.id][0]);
         await starboardChannel.messages.delete(starboard[msg.id][1]);
     }
