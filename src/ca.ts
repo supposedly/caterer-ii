@@ -129,7 +129,7 @@ export async function cmdSim(msg: Message, argv: string[]): Promise<Response> {
         p.setData(data, height, width);
         replyTo = msg;
     } else {
-        let data = await findRLE(msg, true);
+        let data = await findRLE(msg, argv.join(' ').includes('ca'));
         if (!data) {
             throw new BotError('Cannot find RLE');
         }
