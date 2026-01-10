@@ -105,7 +105,8 @@ export async function cmdWiki(msg: Message, argv: string[]): Promise<Response> {
     text = text.replaceAll(/(?<=\n)\n+(?=# )/g, '');
     text = text.trim();
     if (text.length > 1900) {
-        text = text.slice(0, 1900) + '...';
+        text = text.slice(0, 1900);
+        text = text.slice(0, text.lastIndexOf(' ')) + '...';
     }
-    return {embeds: [(new EmbedBuilder()).setTitle(title).setURL(url).setDescription(text)]};
+    return {embeds: [(new EmbedBuilder()).setTitle(title).setURL(url).setDescription(text).setImage(image)]};
 }
