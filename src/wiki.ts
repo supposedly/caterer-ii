@@ -34,6 +34,37 @@ const NAMESPACES: {[key: string]: number} = {
     'special': -1,
 };
 
+const REVERSE_NAMESPACES: {[key: number]: string} = {
+    0: '',
+    1: 'Talk',
+    2: 'User',
+    3: 'User talk',
+    4: 'LifeWiki',
+    5: 'LifeWiki talk',
+    6: 'File',
+    7: 'File talk',
+    8: 'MediaWiki',
+    9: 'MediaWiki talk',
+    10: 'Template',
+    11: 'Template talk',
+    12: 'Help',
+    13: 'Help talk',
+    14: 'Category',
+    15: 'Category talk',
+    16: 'ConwayLife.com',
+    17: 'ConwayLife.com talk',
+    102: 'OCA',
+    103: 'OCA talk',
+    3782: 'LV',
+    3783: 'LV talk',
+    3792: 'RLE',
+    3793: 'RLE talk',
+    3794: 'Rule',
+    3795: 'Rule talk',
+    '-2': 'Media',
+    '-1': 'Special',
+};
+
 
 export async function cmdWiki(msg: Message, argv: string[]): Promise<Response> {
     let query = argv.slice(1).join(' ').toLowerCase();
@@ -46,17 +77,32 @@ export async function cmdWiki(msg: Message, argv: string[]): Promise<Response> {
         namespace = NAMESPACES[parts[0]];
         query = parts[1];
     }
-    let resp = await fetch(`https://conwaylife.com/w/api.php?action=query&list=search&srnamespace=${namespace}&srsearch=${encodeURIComponent(query)}&srlimit=1&format=json`);
+    let resp = await fetch(`https://conwaylife.com/w/api.php?action=query&titles=${namespace === 0 ? '' : REVERSE_NAMESPACES[namespace] + ':'}${query}&redirects&format=json`);
     if (!resp.ok) {
         throw new BotError(`Server returned ${resp.status} ${resp.statusText}`);
     }
-    let data = JSON.parse(await resp.text()).query.search;
-    if (data.length === 0) {
-        throw new BotError('No such page exists!');
+    let data = JSON.parse(await resp.text())?.query?.pages;
+    if (!data || typeof data !== 'object') {
+        throw new Error('Invalid API response!');
     }
-    let title = data[0].title;
-    let url = `https://conwaylife.com/wiki/${encodeURIComponent(data[0].title).replaceAll('%20', '_')}`;
-    let id = data[0].pageid;
+    if (Object.keys(data).length === 0) {
+        let resp = await fetch(`https://conwaylife.com/w/api.php?action=query&list=search&srnamespace=${namespace}&srsearch=${encodeURIComponent(query)}&srlimit=1&format=json`);
+        if (!resp.ok) {
+            throw new BotError(`Server returned ${resp.status} ${resp.statusText}`);
+        }
+        let data = JSON.parse(await resp.text())?.query?.search;
+        if (!Array.isArray(data)) {
+            throw new Error('Invalid API response!');
+        }
+        if (data.length === 0) {
+            throw new BotError('No such page exists!');
+        }
+    } else {
+        data = data[Object.keys(data)[0]];
+    }
+    let title = data.title;
+    let url = `https://conwaylife.com/wiki/${encodeURIComponent(data.title).replaceAll('%20', '_')}`;
+    let id = data.pageid;
     resp = await fetch(`https://conwaylife.com/w/api.php?action=query&prop=revisions&rvprop=content&rvslots=main&pageids=${id}&format=json`);
     if (!resp.ok) {
         throw new BotError(`Server returned ${resp.status} ${resp.statusText}`);
