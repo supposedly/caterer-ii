@@ -49,9 +49,7 @@ export async function cmdWiki(msg: Message, argv: string[]): Promise<Response> {
     if (!resp.ok) {
         throw new BotError(`Server returned ${resp.status} ${resp.statusText}`);
     }
-    let data = JSON.parse(await resp.text());
-    throw new Error(JSON.stringify(data, undefined, 4));
-    data = data.query.search;
+    let data = JSON.parse(await resp.text()).query.search[0];
     let title = `[${data.title}](https://conwaylife.com/wiki/${encodeURIComponent(data.title)})`;
     let text = data.snippet;
     throw new Error(title + '\n\n' + text);
