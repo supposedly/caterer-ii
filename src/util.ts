@@ -69,9 +69,11 @@ export function parseSpecial(data: string): Pattern {
         }
         console.log('bye', data);
         let value = /rule\s*=\s*([.*])\n/.exec(data);
+        console.log(value);
         if (!value) {
             throw error;
         }
+        console.log(`x = 0, y = 0, rule = B3/S23\n${data.slice(value.index + value[0].length + 1)}`);
         let p = parse(`x = 0, y = 0, rule = B3/S23\n${data.slice(value.index + value[0].length + 1)}`) as MAPPattern;
         return new RuleLoaderBgollyPattern(p.height, p.width, p.data, value[1], undefined, true);
     }
