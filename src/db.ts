@@ -1,7 +1,7 @@
 
 import {RuleError, identify, createPattern, parseSpeed} from '../lifeweb/lib/index.js';
 import {EmbedBuilder} from 'discord.js';
-import {BotError, Message, Response, NAME_CHARS, dyks, names, simStats, aliases, writeFile, sentByAccepterer, findRLE} from './util.js';
+import {BotError, Message, Response, NAME_CHARS, readFile, writeFile, aliases, names, simStats, sentByAccepterer, findRLE} from './util.js';
 
 
 export async function cmdSssss(msg: Message, argv: string[]): Promise<Response> {
@@ -23,6 +23,8 @@ export async function cmdSssss(msg: Message, argv: string[]): Promise<Response> 
     }
 }
 
+
+export let dyks = (await readFile('data/dyk.txt')).split('\n').slice(1);
 
 export async function cmdDyk(): Promise<Response> {
     let num = Math.floor(Math.random() * dyks.length);
