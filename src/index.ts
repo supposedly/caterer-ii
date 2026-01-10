@@ -256,7 +256,6 @@ client.on('messageReactionRemoveAll', async msg => {
 });
 
 
-
 const TYPE_NAMES: {[key: string]: string} = {
     'int': 'INT',
     'intb0': 'INT B0',
