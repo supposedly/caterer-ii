@@ -102,7 +102,7 @@ export async function cmdWiki(msg: Message, argv: string[]): Promise<Response> {
     text = text.replaceAll(/<ref[^>]*>.*?<\/ref>/gs, '');
     text = text.replaceAll(/\[\[(File|Image):[^\]]+\]\]/gi, '');
     text = text.replaceAll(/\n{3,}/g, '\n\n');
-    text = text.replaceAll(/\n+(?=#+ )/g, '');
+    text = text.replaceAll(/(?<=\n)\n+(?=#+ )/g, '');
     text = text.trim();
     if (text.length > 1900) {
         text = text.slice(0, 1900);
