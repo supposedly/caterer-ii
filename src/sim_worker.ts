@@ -145,7 +145,7 @@ async function runPattern(argv: string[], rle: string): Promise<{frames: [Patter
                         await fs.writeFile(join(dir, 'in.rle'), p.toRLE());
                         execSync(`rm -f ${join(dir, 'out.rle')}`);
                         if (useCAViewer) {
-                            execSync(`/home/opc/qemu/build/qemu-i386 /home/opc/caviewer/bin/CAViewer sim -g ${part[0]} -s ${step} -i in.rle -o out.rle`);
+                            execSync(`box64 /home/opc/caviewer/lib/runtime/bin/java -p /home/opc/caviewer/app -m CAViewer/application.Main sim -g ${part[0]} -s ${step} -i in.rle -o out.rle`);
                         } else {
                             execSync(`${join(dir, 'lifeweb', 'bgolly')} -a RuleLoader -s ${join(dir, 'lifeweb')}/ -o ${join(dir, 'out.rle')} -m ${part[0]} -i ${step} ${join(dir, 'in.rle')}`);
                         }
