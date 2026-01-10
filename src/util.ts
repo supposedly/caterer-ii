@@ -79,6 +79,7 @@ export function parseSpecial(data: string): Pattern {
 }
 
 function findRLEFromText(data: string, special?: boolean): Pattern | undefined {
+    console.log(special);
     let match = RLE_HEADER.exec(data);
     if (!match) {
         return;
