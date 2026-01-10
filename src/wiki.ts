@@ -66,12 +66,10 @@ export async function cmdWiki(msg: Message, argv: string[]): Promise<Response> {
         let resp = await fetch(`https://conwaylife.com/w/api.php?action=query&titles=File:${title.replaceAll(' ', '')}.gif&prop=imageinfo&iiprop=url&format=json`);
         if (resp.ok) {
             let data = JSON.parse(await resp.text()).query.pages;
-            let startData = data;
-            data = data[Object.keys(data)[0]].imageinfo.url;
+            data = data[Object.keys(data)[0]].imageinfo[0].url;
             if (typeof data === 'string') {
                 image = data;
             } else {
-                throw new Error(data + '\n\n' + JSON.stringify(startData[Object.keys(startData)[0]], undefined, 4));
             }
         } else {
             throw new Error(resp.status + ': ' + resp.statusText);
