@@ -20,7 +20,6 @@ export interface Config {
     sssssChannel: string;
     starboardChannel: string;
     starThreshold: number;
-    starEmojis: string[];
 }
 
 

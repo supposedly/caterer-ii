@@ -1,7 +1,7 @@
 
 import * as lifeweb from '../lifeweb/lib/index.js';
 import {inspect} from 'node:util';
-import {Client, GatewayIntentBits, MessageReplyOptions} from 'discord.js';
+import {Client, GatewayIntentBits, MessageReplyOptions, TextChannel} from 'discord.js';
 import {BotError, Response, Message, readFile, writeFile, config, sentByAdmin, aliases, noReplyPings, findRLE} from './util.js';
 import {cmdHelp} from './help.js';
 import {cmdIdentify, cmdBasicIdentify, cmdMinmax, cmdSim, cmdHashsoup, cmdApgencode, cmdApgdecode, cmdPopulation} from './ca.js';
@@ -158,7 +158,14 @@ let client = new Client({intents: [
     GatewayIntentBits.GuildMessageReactions,
 ]});
 
-client.once('clientReady', () => console.log('Logged in'));
+let starboardChannel: TextChannel;
+let sssssChannel: TextChannel;
+
+client.once('clientReady', async () => {
+    console.log('Logged in');
+    starboardChannel = await client.channels.fetch(config.starboardChannel) as TextChannel;
+    sssssChannel = await client.channels.fetch(config.sssssChannel) as TextChannel;
+});
 
 client.on('messageCreate', runCommand);
 
@@ -181,6 +188,55 @@ client.on('messageUpdate', async (old, msg) => {
     }
     runCommand(msg);
 });
+
+
+let starboard: {[key: string]: [string, string]} = JSON.parse(await readFile('data/starboard.json'));
+
+client.on('messageReactionAdd', async data => {
+    if (data.count === null) {
+        return;
+    }
+    if (data.count >= config.starThreshold) {
+        let text: string;
+        if (data.count < Math.floor(config.starThreshold * 2)) {
+            text = '⭐';
+        } else if (data.count < Math.floor(config.starThreshold * 3)) {
+            text = '🌟';
+        } else if (data.count < Math.floor(config.starThreshold * 4)) {
+            text = '💫';
+        } else {
+            text = '✨';
+        }
+        text += ` **${data.count}** https://discord.com/channels/${data.message.guildId}/${data.message.channelId}/${data.message.id}`;
+        if (data.message.author?.id === data.client.user.id && data.message.attachments.size === 1) {
+            text += `Sim by <@${(await data.message.fetchReference()).author.id}>`;
+            let attachment = data.message.attachments.first();
+            if (attachment) {
+                if (data.message.id in starboard) {
+                    await starboardChannel.messages.edit(starboard[data.message.id][0], {content: text, files: [attachment.url]});
+                } else {
+                    await starboardChannel.send({content: text, allowedMentions: {parse: []}});
+                    await data.message.forward(starboardChannel);
+                }
+            }
+        } else {
+            if (data.message.id in starboard) {
+                await starboardChannel.messages.edit(starboard[data.message.id][0], text);
+            } else {
+                await starboardChannel.send({content: text, allowedMentions: {parse: []}});
+                await data.message.forward(starboardChannel);
+            }
+        }
+    } else if (data.message.id in starboard) {
+        let channel = client.channels.cache.get(config.starboardChannel);
+        if (!channel) {
+            channel = await client.channels.fetch(config.starboardChannel) ?? (() => {throw new Error('Starboard channel does not exist')})();
+        }
+        await starboardChannel.messages.delete(starboard[data.message.id][0]);
+        await starboardChannel.messages.delete(starboard[data.message.id][1]);
+    }
+});
+
 
 const TYPE_NAMES: {[key: string]: string} = {
     'int': 'INT',
@@ -223,34 +279,28 @@ setInterval(async () => {
                     }
                 }
             }
-            let channel = client.channels.cache.get(config.sssssChannel);
-            if (!channel) {
-                channel = await client.channels.fetch(config.sssssChannel) ?? (() => {throw new Error('Channel does not exist')})();
+            let current = '';
+            for (let line of lines) {
+                let prev = current;
+                current += line + '\n';
+                if (current.length > 2000) {
+                    if (prev !== '') {
+                        await sssssChannel.send(prev);
+                    }
+                    current = '';
+                    while (line.length > 2000) {
+                        await sssssChannel.send(line.slice(0, 1999));
+                        line = line.slice(1999);
+                    }
+                    await sssssChannel.send(line);
+                }
             }
-            if (channel.isSendable()) {
-                let current = '';
-                for (let line of lines) {
-                    let prev = current;
-                    current += line + '\n';
-                    if (current.length > 2000) {
-                        if (prev !== '') {
-                            await channel.send(prev);
-                        }
-                        current = '';
-                        while (line.length > 2000) {
-                            await channel.send(line.slice(0, 1999));
-                            line = line.slice(1999);
-                        }
-                        await channel.send(line);
-                    }
+            if (current !== '') {
+                while (current.length > 2000) {
+                    await sssssChannel.send(current.slice(0, 1999));
+                    current = current.slice(1999);
                 }
-                if (current !== '') {
-                    while (current.length > 2000) {
-                        await channel.send(current.slice(0, 1999));
-                        current = current.slice(1999);
-                    }
-                    await channel.send(current);
-                }
+                await sssssChannel.send(current);
             }
         } else {
             console.log(`${resp.status} ${resp.statusText} while fetching new ships`);
@@ -272,5 +322,6 @@ setInterval(async () => {
         }
     }
 }, 60000);
+
 
 client.login(config.token);
