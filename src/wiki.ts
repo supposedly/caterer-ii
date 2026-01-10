@@ -71,7 +71,7 @@ export async function cmdWiki(msg: Message, argv: string[]): Promise<Response> {
             if (typeof data === 'string') {
                 image = data;
             } else {
-                throw new Error(JSON.stringify(data[Object.keys(data)[0]], undefined, 4));
+                throw new Error(JSON.stringify(startData[Object.keys(startData)[0]], undefined, 4));
             }
         } else {
             throw new Error(resp.status + ': ' + resp.statusText);
