@@ -49,8 +49,34 @@ export async function cmdWiki(msg: Message, argv: string[]): Promise<Response> {
     if (!resp.ok) {
         throw new BotError(`Server returned ${resp.status} ${resp.statusText}`);
     }
-    let data = JSON.parse(await resp.text()).query.search[0];
+    let data = JSON.parse(await resp.text()).query.search;
+    if (data.length === 0) {
+        return 'No such page exists!';
+    }
+    let title = data[0].title;
     let url = `https://conwaylife.com/wiki/${encodeURIComponent(data.title)}`;
-    let text = data.snippet.replaceAll(`<span class='searchmatch'>`, '').replaceAll('</span>', '');
-    return {embeds: [(new EmbedBuilder()).setTitle(data.title).setURL(url).setDescription(text)]};
+    let id = data[0].pageid;
+    resp = await fetch(`https://conwaylife.com/w/api.php?action=query&prop=revisions&rvprop=content&rvslots=main&pageids=${id}&format=json`);
+    if (!resp.ok) {
+        throw new BotError(`Server returned ${resp.status} ${resp.statusText}`);
+    }
+    let text: string = JSON.parse(await resp.text()).query.pages[id].revisions[0].slots.main['*'];
+    text = text.replace(/\{\{[^}]+\}\}/g, '');
+    text = text.replace(/<ref[^>]*>.*?<\/ref>/gs, '');
+    text = text.replace(/\[\[(File|Image):[^\]]+\]\]/gi, '');
+    text = text.replace(/\[(https?:\/\/[^\s]+)\s+([^\]]+)\]/g, '[$2]($1)');
+    text = text.replace(/\[\[([^\|\]]+)\|([^\]]+)\]\]/g, '[$2](https://conwaylife.com/wiki/$1)');
+    text = text.replace(/\[\[([^\]]+)\]\]/g, '[$1](https://conwaylife.com/wiki/$1)');
+    text = text.replace(/^\*\*\*\s+/gm, '    - ');
+    text = text.replace(/^\*\*\s+/gm, '  - ');
+    text = text.replace(/^\*\s+/gm, '- ');
+    text = text.replace(/^#\s+/gm, '1. ');
+    text = text.replace(/<pre>([\s\S]*?)<\/pre>/g, (_, code) => `\`\`\`\n${code.trim()}\n\`\`\``);
+    text = text.replace(/<code>(.*?)<\/code>/g, '`$1`');
+    text = text.replace(/\n{3,}/g, '\n\n');
+    text = text.trim();
+    if (text.length > 1000) {
+        text = text.slice(0, 1000) + '...';
+    }
+    return {embeds: [(new EmbedBuilder()).setTitle(title).setURL(url).setDescription(text)]};
 }
