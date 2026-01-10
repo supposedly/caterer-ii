@@ -114,6 +114,7 @@ async function findRLEFromMessage(msg: Message, special?: boolean): Promise<{msg
 }
 
 export async function findRLE(msg: Message, special?: boolean): Promise<{msg: Message, p: Pattern} | undefined> {
+    console.log(special);
     let out = await findRLEFromMessage(msg, special);
     if (out) {
         return out;
