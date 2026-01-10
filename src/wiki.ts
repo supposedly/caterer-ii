@@ -61,18 +61,24 @@ export async function cmdWiki(msg: Message, argv: string[]): Promise<Response> {
         throw new BotError(`Server returned ${resp.status} ${resp.statusText}`);
     }
     let text: string = JSON.parse(await resp.text()).query.pages[id].revisions[0].slots.main['*'];
-    text = text.replace(/\{\{[^}]+\}\}/g, '');
-    text = text.replace(/<ref[^>]*>.*?<\/ref>/gs, '');
-    text = text.replace(/\[\[(File|Image):[^\]]+\]\]/gi, '');
-    text = text.replace(/\[(https?:\/\/[^\s]+)\s+([^\]]+)\]/g, '[$2]($1)');
-    text = text.replace(/\[\[([^\|\]]+)\|([^\]]+)\]\]/g, '[$2](https://conwaylife.com/wiki/$1)');
-    text = text.replace(/\[\[([^\]]+)\]\]/g, '[$1](https://conwaylife.com/wiki/$1)');
+    text = text.replace(/^=\s+(.*?)\s+=$/gm, '# $1');
+    text = text.replace(/^==\s+(.*?)\s+==$/gm, '## $1');
+    text = text.replace(/^===\s+(.*?)\s+===$/gm, '### $1');
+    text = text.replace(/^====\s+(.*?)\s+====$/gm, '#### $1');
+    text = text.replace(/^=====\s+(.*?)\s+=====$/gm, '#### $1');
+    text = text.replace(/^====\s+(.*?)\s+======$/gm, '#### $1');
     text = text.replace(/^\*\*\*\s+/gm, '    - ');
     text = text.replace(/^\*\*\s+/gm, '  - ');
     text = text.replace(/^\*\s+/gm, '- ');
     text = text.replace(/^#\s+/gm, '1. ');
+    text = text.replace(/\[(https?:\/\/[^\s]+)\s+([^\]]+)\]/g, '[$2]($1)');
+    text = text.replace(/\[\[([^\|\]]+)\|([^\]]+)\]\]/g, (_, url, name) => `[${name}](https://conwaylife.com/wiki/${encodeURIComponent(url)})`);
+    text = text.replace(/\[\[([^\]]+)\]\]/g, (_, page) => `[${page}](https://conwaylife.com/wiki/${encodeURIComponent(page)})`);
     text = text.replace(/<pre>([\s\S]*?)<\/pre>/g, (_, code) => `\`\`\`\n${code.trim()}\n\`\`\``);
     text = text.replace(/<code>(.*?)<\/code>/g, '`$1`');
+    text = text.replace(/\{\{[^}]+\}\}/g, '');
+    text = text.replace(/<ref[^>]*>.*?<\/ref>/gs, '');
+    text = text.replace(/\[\[(File|Image):[^\]]+\]\]/gi, '');
     text = text.replace(/\n{3,}/g, '\n\n');
     text = text.trim();
     if (text.length > 1000) {
