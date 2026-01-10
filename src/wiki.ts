@@ -70,6 +70,7 @@ export async function cmdWiki(msg: Message, argv: string[]): Promise<Response> {
             if (typeof data === 'string') {
                 image = data;
             } else {
+                throw new Error(data);
             }
         } else {
             throw new Error(resp.status + ': ' + resp.statusText);
@@ -105,7 +106,7 @@ export async function cmdWiki(msg: Message, argv: string[]): Promise<Response> {
     text = text.replaceAll(/<ref[^>]*>.*?<\/ref>/gs, '');
     text = text.replaceAll(/\[\[(File|Image):[^\]]+\]\]/gi, '');
     text = text.replaceAll(/\n{3,}/g, '\n\n');
-    text = text.replaceAll(/\n+(?=# )/g, '');
+    text = text.replaceAll(/\n+(?=#+ )/g, '');
     text = text.trim();
     if (text.length > 1900) {
         text = text.slice(0, 1900);
