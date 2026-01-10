@@ -52,5 +52,6 @@ export async function cmdWiki(msg: Message, argv: string[]): Promise<Response> {
     let data = JSON.parse(await resp.text()).query.search;
     let title = `[${data.title}](https://conwaylife.com/wiki/${encodeURIComponent(data.title)})`;
     let text = data.snippet;
+    throw new Error(title + '\n\n' + text);
     return {embeds: [(new EmbedBuilder()).setTitle(title).setDescription(text)]};
 }
