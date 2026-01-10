@@ -71,9 +71,9 @@ export async function cmdWiki(msg: Message, argv: string[]): Promise<Response> {
     text = text.replaceAll('`', '\\`');
     text = text.replaceAll('|', '\\|');
     text = text.replaceAll('#', '\\#');
-    text = text.replaceAll(/''(.*?)''/g, '*$1*');
-    text = text.replaceAll(/'''(.*?)'''/g, '*$1*');
     text = text.replaceAll(/'''''(.*?)'''''/g, '***$1***');
+    text = text.replaceAll(/'''(.*?)'''/g, '*$1*');
+    text = text.replaceAll(/''(.*?)''/g, '*$1*');
     text = text.replaceAll(/^=\s+(.*?)\s+=$/gm, '# $1');
     text = text.replaceAll(/^==\s+(.*?)\s+==$/gm, '## $1');
     text = text.replaceAll(/^===\s+(.*?)\s+===$/gm, '### $1');
