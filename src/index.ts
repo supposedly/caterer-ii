@@ -215,16 +215,13 @@ async function updateStarboard(data: MessageReaction | PartialMessageReaction): 
         text += ` **${data.count}** `;
         if (msg.author?.id === data.client.user.id && msg.attachments.size === 1) {
             text += `Sim by <@${(await msg.fetchReference()).author.id}>`;
-            let attachment = msg.attachments.first();
-            if (attachment) {
-                if (entry) {
-                    await starboardChannel.messages.edit(entry[0], {content: text, files: [attachment.url], allowedMentions: {parse: []}});
-                } else {
-                    let msg0 = await starboardChannel.send({content: text, allowedMentions: {parse: []}});
-                    let msg1 = await msg.forward(starboardChannel);
-                    starboard.set(msg.id, [msg0.id, msg1.id]);
-                    await writeFile('data/starboard.json', JSON.stringify(starboard.entries()));
-                }
+            if (entry) {
+                await starboardChannel.messages.edit(entry[0], {content: text, allowedMentions: {parse: []}});
+            } else {
+                let msg0 = await starboardChannel.send({content: text, allowedMentions: {parse: []}});
+                let msg1 = await msg.forward(starboardChannel);
+                starboard.set(msg.id, [msg0.id, msg1.id]);
+                await writeFile('data/starboard.json', JSON.stringify(starboard.entries()));
             }
         } else {
             text += `<@${msg.author?.id}>`;
