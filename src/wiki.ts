@@ -63,17 +63,13 @@ export async function cmdWiki(msg: Message, argv: string[]): Promise<Response> {
     let text: string = JSON.parse(await resp.text()).query.pages[id].revisions[0].slots.main['*'];
     let image: string | null = null;
     if (!text.match(/\{\{[^{]*hideimg[^{]*\}\}/)) {
-        let resp = await fetch(`https://conwaylife.com/w/api.php?action=query&titles=File:${title.replaceAll(' ', '')}.gif&prop=imageinfo&iiprop=url&format=json`);
+        let resp = await fetch(`https://conwaylife.com/w/api.php?action=query&titles=File:${title.replaceAll(' ', '')}.png&prop=imageinfo&iiprop=url&format=json`);
         if (resp.ok) {
             let data = JSON.parse(await resp.text()).query.pages;
             data = data[Object.keys(data)[0]].imageinfo[0].url;
             if (typeof data === 'string') {
                 image = data;
-            } else {
-                throw new Error(data);
             }
-        } else {
-            throw new Error(resp.status + ': ' + resp.statusText);
         }
     }
     text = text.replaceAll(/\{\{period\|(\d+)\}\}/g, '[period-$1](https://conwaylife.com/wiki/Category:Oscillators_with_period_$1');
