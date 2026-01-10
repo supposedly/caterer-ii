@@ -79,7 +79,6 @@ export function parseSpecial(data: string): Pattern {
 }
 
 function findRLEFromText(data: string, special?: boolean): Pattern | undefined {
-    console.log(special);
     let match = RLE_HEADER.exec(data);
     if (!match) {
         return;
@@ -90,6 +89,7 @@ function findRLEFromText(data: string, special?: boolean): Pattern | undefined {
         return;
     }
     if (special) {
+        console.log('calling');
         return parseSpecial(data.slice(0, index + 1));
     } else {
         return parse(data.slice(0, index + 1), aliases, true);
@@ -97,7 +97,6 @@ function findRLEFromText(data: string, special?: boolean): Pattern | undefined {
 }
 
 async function findRLEFromMessage(msg: Message, special?: boolean): Promise<{msg: Message, p: Pattern} | undefined> {
-    console.log(special);
     let out = findRLEFromText(msg.content, special);
     if (out) {
         return {msg, p: out};
