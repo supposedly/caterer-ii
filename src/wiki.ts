@@ -79,7 +79,7 @@ export async function cmdWiki(msg: Message, argv: string[]): Promise<Response> {
     }
     text = text.replaceAll(/\{\{period\|(\d+)\}\}/g, '[period-$1](https://conwaylife.com/wiki/Category:Oscillators_with_period_$1');
     text = text.replaceAll(/\{\{year\|(\d+)\}\}/g, '[$1](https://conwaylife.com/wiki/Category:Patterns_found_in_$1)');
-    text = text.replaceAll(/<\/?references>/, '');
+    text = text.replaceAll(/<\/?references>/g, '');
     text = text.replaceAll('__NOTOC__', '');
     text = text.replaceAll(/^\*\*\*\s+/gm, '    - ');
     text = text.replaceAll(/^\*\*\s+/gm, '  - ');
@@ -111,8 +111,8 @@ export async function cmdWiki(msg: Message, argv: string[]): Promise<Response> {
     text = text.replaceAll(/\n{3,}/g, '\n\n');
     text = text.replaceAll(/(?<=\n)\n+(?=#+ )/g, '');
     text = text.trim();
-    if (text.length > 1900) {
-        text = text.slice(0, 1900);
+    if (text.length > 1000) {
+        text = text.slice(0, 1000);
         text = text.slice(0, text.lastIndexOf(' ')) + '...';
     }
     let embed = (new EmbedBuilder()).setTitle(title).setDescription(text).setURL(url);
