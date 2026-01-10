@@ -70,7 +70,7 @@ export async function cmdWiki(msg: Message, argv: string[]): Promise<Response> {
             data = data[Object.keys(data)[0]].imageinfo[0].url;
             if (typeof data === 'string') {
                 image = 'attachment://image.gif';
-                let resp = await fetch(image);
+                let resp = await fetch(data);
                 if (resp.ok) {
                     await fs.writeFile('image.gif', new Uint8Array(await resp.arrayBuffer()));
                 }
