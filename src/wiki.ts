@@ -62,17 +62,17 @@ export async function cmdWiki(msg: Message, argv: string[]): Promise<Response> {
         throw new BotError(`Server returned ${resp.status} ${resp.statusText}`);
     }
     let text: string = JSON.parse(await resp.text()).query.pages[id].revisions[0].slots.main['*'];
-    let image: string | null = null;
+    let image = false;
     if (!text.match(/\{\{[^{]*hideimg[^{]*\}\}/)) {
         let resp = await fetch(`https://conwaylife.com/w/api.php?action=query&titles=File:${title.replaceAll(' ', '')}.gif&prop=imageinfo&iiprop=url&format=json`);
         if (resp.ok) {
             let data = JSON.parse(await resp.text()).query.pages;
             data = data[Object.keys(data)[0]].imageinfo[0].url;
             if (typeof data === 'string') {
-                image = 'attachment://image.gif';
                 let resp = await fetch(data);
                 if (resp.ok) {
                     await fs.writeFile('image.gif', new Uint8Array(await resp.arrayBuffer()));
+                    image = true;
                 }
             }
         }
@@ -113,5 +113,10 @@ export async function cmdWiki(msg: Message, argv: string[]): Promise<Response> {
         text = text.slice(0, 1900);
         text = text.slice(0, text.lastIndexOf(' ')) + '...';
     }
-    return {embeds: [(new EmbedBuilder()).setTitle(title).setURL(url).setImage('image.gif')], files: ['./image.gif']};
+    let embed = (new EmbedBuilder()).setTitle(title).setDescription(text).setURL(url);
+    if (image) {
+        return {embeds: [embed.setImage('image.gif')], files: ['./image.gif']};
+    } else {
+        return {embeds: [embed]};
+    }
 }
