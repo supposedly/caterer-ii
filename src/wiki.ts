@@ -69,6 +69,7 @@ export async function cmdWiki(msg: Message, argv: string[]): Promise<Response> {
             data = data[Object.keys(data)[0]].imageinfo[0].url;
             if (typeof data === 'string') {
                 image = data;
+                throw new Error(image);
             }
         }
     }
