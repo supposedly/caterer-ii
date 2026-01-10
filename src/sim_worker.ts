@@ -184,7 +184,7 @@ async function runPattern(argv: string[], rle: string): Promise<{frames: [Patter
                             }
                         }
                     } else {
-                        for (let i = parts.length > 1 ? 0 : 1; i < Math.ceil(part[0] / step); i++) {
+                        for (let i = 0; i < Math.ceil(part[0] / step); i++) {
                             p.run(step);
                             frames.push([p.copy(), frameTime]);
                         }
