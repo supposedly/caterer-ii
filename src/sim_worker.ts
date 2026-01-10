@@ -144,7 +144,9 @@ async function runPattern(argv: string[], rle: string): Promise<{frames: [Patter
                     if (useCAViewer || p instanceof RuleLoaderBgollyPattern) {
                         await fs.writeFile(join(dir, 'in.rle'), p.toRLE());
                         execSync(`rm -f ${join(dir, 'out.rle')}`);
+                        let caviewer = false;
                         if (useCAViewer || !p.ruleStr.startsWith('__')) {
+                            caviewer = true;
                             execSync(`box64 /home/opc/caviewer/lib/runtime/bin/java -p /home/opc/caviewer/app -m CAViewer/application.Main sim -g ${part[0]} -s ${step} -i ${join(dir, 'in.rle')} -o ${join(dir, 'out.rle')}`);
                         } else {
                             execSync(`${join(dir, 'lifeweb', 'bgolly')} -a RuleLoader -s ${join(dir, 'lifeweb')}/ -o ${join(dir, 'out.rle')} -m ${part[0]} -i ${step} ${join(dir, 'in.rle')}`);
@@ -153,6 +155,7 @@ async function runPattern(argv: string[], rle: string): Promise<{frames: [Patter
                         let xOffset: number | null = null;
                         let yOffset: number | null = null;
                         let inColors = false;
+                        let firstDone = false;
                         for (let line of data.split('\n')) {
                             if (line.includes(',')) {
                                 if (xOffset === null && yOffset === null) {
@@ -169,6 +172,14 @@ async function runPattern(argv: string[], rle: string): Promise<{frames: [Patter
                                 q.yOffset = yOffset ?? 0;
                                 xOffset = null;
                                 yOffset = null;
+                                if (caviewer) {
+                                    q.xOffset--;
+                                    q.yOffset--;
+                                    if (!firstDone) {
+                                        firstDone = true;
+                                        continue;
+                                    }
+                                }
                                 frames.push([q, frameTime]);
                             }
                         }
