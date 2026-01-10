@@ -109,5 +109,5 @@ export async function cmdWiki(msg: Message, argv: string[]): Promise<Response> {
         text = text.slice(0, 1900);
         text = text.slice(0, text.lastIndexOf(' ')) + '...';
     }
-    return {embeds: [(new EmbedBuilder()).setTitle(title).setURL(url).setDescription(text).setImage(image)]};
+    return {embeds: [(new EmbedBuilder()).setTitle(title).setURL(url).setDescription(text).setThumbnail(image)]};
 }
