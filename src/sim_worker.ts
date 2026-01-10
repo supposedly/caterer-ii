@@ -167,7 +167,7 @@ async function runPattern(argv: string[], rle: string): Promise<{frames: [Patter
                             } else if (line === '@COLOR') {
                                 inColors = true;
                             } else {
-                                let q = parse(`x = 0, y = 0, rule = ${p.ruleStr}\n${line}`, aliases, true);
+                                let q = parse(`x = 0, y = 0, rule = B3/S23\n${line}`, aliases, true);
                                 q.xOffset = xOffset ?? 0;
                                 q.yOffset = yOffset ?? 0;
                                 xOffset = null;
