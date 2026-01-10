@@ -1,7 +1,7 @@
 
 import * as lifeweb from '../lifeweb/lib/index.js';
 import {inspect} from 'node:util';
-import {Client, GatewayIntentBits, MessageReplyOptions, TextChannel} from 'discord.js';
+import {Client, GatewayIntentBits, MessageReaction, PartialMessageReaction, MessageReplyOptions, TextChannel} from 'discord.js';
 import {BotError, Response, Message, readFile, writeFile, config, sentByAdmin, aliases, noReplyPings, findRLE} from './util.js';
 import {cmdHelp} from './help.js';
 import {cmdIdentify, cmdBasicIdentify, cmdMinmax, cmdSim, cmdHashsoup, cmdApgencode, cmdApgdecode, cmdPopulation} from './ca.js';
@@ -192,10 +192,14 @@ client.on('messageUpdate', async (old, msg) => {
 
 let starboard: {[key: string]: [string, string]} = JSON.parse(await readFile('data/starboard.json'));
 
-client.on('messageReactionAdd', async data => {
+async function updateStarboard(data: MessageReaction | PartialMessageReaction): Promise<void> {
+    if (data.emoji.name !== '⭐') {
+        return;
+    }
     if (data.count === null) {
         return;
     }
+    let msg = data.message;
     if (data.count >= config.starThreshold) {
         let text: string;
         if (data.count < Math.floor(config.starThreshold * 2)) {
@@ -207,16 +211,16 @@ client.on('messageReactionAdd', async data => {
         } else {
             text = '✨';
         }
-        text += ` **${data.count}** https://discord.com/channels/${data.message.guildId}/${data.message.channelId}/${data.message.id}`;
-        if (data.message.author?.id === data.client.user.id && data.message.attachments.size === 1) {
-            text += `Sim by <@${(await data.message.fetchReference()).author.id}>`;
-            let attachment = data.message.attachments.first();
+        text += ` **${data.count}** https://discord.com/channels/${msg.guildId}/${msg.channelId}/${msg.id}`;
+        if (msg.author?.id === data.client.user.id && data.message.attachments.size === 1) {
+            text += `Sim by <@${(await msg.fetchReference()).author.id}>`;
+            let attachment = msg.attachments.first();
             if (attachment) {
-                if (data.message.id in starboard) {
-                    await starboardChannel.messages.edit(starboard[data.message.id][0], {content: text, files: [attachment.url]});
+                if (msg.id in starboard) {
+                    await starboardChannel.messages.edit(starboard[msg.id][0], {content: text, files: [attachment.url]});
                 } else {
                     await starboardChannel.send({content: text, allowedMentions: {parse: []}});
-                    await data.message.forward(starboardChannel);
+                    await msg.forward(starboardChannel);
                 }
             }
         } else {
@@ -227,15 +231,21 @@ client.on('messageReactionAdd', async data => {
                 await data.message.forward(starboardChannel);
             }
         }
-    } else if (data.message.id in starboard) {
-        let channel = client.channels.cache.get(config.starboardChannel);
-        if (!channel) {
-            channel = await client.channels.fetch(config.starboardChannel) ?? (() => {throw new Error('Starboard channel does not exist')})();
-        }
-        await starboardChannel.messages.delete(starboard[data.message.id][0]);
-        await starboardChannel.messages.delete(starboard[data.message.id][1]);
+    } else if (msg.id in starboard) {
+        await starboardChannel.messages.delete(starboard[msg.id][0]);
+        await starboardChannel.messages.delete(starboard[msg.id][1]);
+    }
+}
+
+client.on('messageReactionAdd', updateStarboard);
+client.on('messageReactionRemove', updateStarboard);
+client.on('messageReactionRemoveAll', async msg => {
+    if (msg.id in starboard) {
+        await starboardChannel.messages.delete(starboard[msg.id][0]);
+        await starboardChannel.messages.delete(starboard[msg.id][1]);
     }
 });
+
 
 
 const TYPE_NAMES: {[key: string]: string} = {
