@@ -1,4 +1,5 @@
 
+import * as fs from 'node:fs/promises';
 import {EmbedBuilder} from 'discord.js';
 import {BotError, Message, Response} from './util.js';
 
@@ -63,13 +64,16 @@ export async function cmdWiki(msg: Message, argv: string[]): Promise<Response> {
     let text: string = JSON.parse(await resp.text()).query.pages[id].revisions[0].slots.main['*'];
     let image: string | null = null;
     if (!text.match(/\{\{[^{]*hideimg[^{]*\}\}/)) {
-        let resp = await fetch(`https://conwaylife.com/w/api.php?action=query&titles=File:${title.replaceAll(' ', '')}.png&prop=imageinfo&iiprop=url&format=json`);
+        let resp = await fetch(`https://conwaylife.com/w/api.php?action=query&titles=File:${title.replaceAll(' ', '')}.gif&prop=imageinfo&iiprop=url&format=json`);
         if (resp.ok) {
             let data = JSON.parse(await resp.text()).query.pages;
             data = data[Object.keys(data)[0]].imageinfo[0].url;
             if (typeof data === 'string') {
-                image = data;
-                throw new Error(image);
+                image = 'attachment://image.gif';
+                let resp = await fetch(image);
+                if (resp.ok) {
+                    await fs.writeFile('image.gif', new Uint8Array(await resp.arrayBuffer()));
+                }
             }
         }
     }
@@ -109,5 +113,5 @@ export async function cmdWiki(msg: Message, argv: string[]): Promise<Response> {
         text = text.slice(0, 1900);
         text = text.slice(0, text.lastIndexOf(' ')) + '...';
     }
-    return {embeds: [(new EmbedBuilder()).setTitle(title).setURL(url).setImage(image).setThumbnail(image)]};
+    return {embeds: [(new EmbedBuilder()).setTitle(title).setURL(url).setImage('image.gif')], files: ['./image.gif']};
 }
