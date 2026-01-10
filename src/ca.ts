@@ -299,7 +299,7 @@ function embedIdentified(type: Identified | FullIdentified, isOutput?: boolean):
     if (isOutput) {
         title = 'Output: ' + title;
     }
-    let embeds = [new EmbedBuilder().setTitle(title).setDescription(out)];
+    let embeds = [(new EmbedBuilder()).setTitle(title).setDescription(out)];
     if ('output' in type && type.output) {
         embeds.push(...embedIdentified(type.output, true));
     }
