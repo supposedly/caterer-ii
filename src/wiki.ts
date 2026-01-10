@@ -54,7 +54,7 @@ export async function cmdWiki(msg: Message, argv: string[]): Promise<Response> {
         return 'No such page exists!';
     }
     let title = data[0].title;
-    let url = `https://conwaylife.com/wiki/${encodeURIComponent(data.title)}`;
+    let url = `https://conwaylife.com/wiki/${encodeURIComponent(data.title).replaceAll('%20', '_')}`;
     let id = data[0].pageid;
     resp = await fetch(`https://conwaylife.com/w/api.php?action=query&prop=revisions&rvprop=content&rvslots=main&pageids=${id}&format=json`);
     if (!resp.ok) {
@@ -85,7 +85,9 @@ export async function cmdWiki(msg: Message, argv: string[]): Promise<Response> {
     text = text.replaceAll(/\[\[([^\]]+)\]\]/g, (_, page) => `[${page}](https://conwaylife.com/wiki/${encodeURIComponent(page)})`);
     text = text.replaceAll(/<pre>([\s\S]*?)<\/pre>/g, (_, code) => `\`\`\`\n${code.trim()}\n\`\`\``);
     text = text.replaceAll(/<code>(.*?)<\/code>/g, '`$1`');
-    text = text.replaceAll(/\{\{year\|(\d+)\}\}/g, '[$1](https://conwaylife.com/wiki/$1)')
+    text = text.replaceAll(/\{\{period\|(\d+)\}\}/g, '[period-$1](https://conwaylife.com/wiki/Category:Oscillators_with_period_$1');
+    text = text.replaceAll(/\{\{year\|(\d+)\}\}/g, '[$1](https://conwaylife.com/wiki/$1)');
+    text = text.replaceAll(/\{\{[^}]+\}\}/g, '');
     text = text.replaceAll(/<ref[^>]*>.*?<\/ref>/gs, '');
     text = text.replaceAll(/\[\[(File|Image):[^\]]+\]\]/gi, '');
     text = text.replaceAll(/\n{3,}/g, '\n\n');
