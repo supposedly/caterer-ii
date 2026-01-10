@@ -62,18 +62,19 @@ export async function cmdWiki(msg: Message, argv: string[]): Promise<Response> {
         throw new BotError(`Server returned ${resp.status} ${resp.statusText}`);
     }
     let text: string = JSON.parse(await resp.text()).query.pages[id].revisions[0].slots.main['*'];
-    let image = false;
+    let useImage = false;
     if (!text.match(/\{\{[^{]*hideimg[^{]*\}\}/)) {
         let resp = await fetch(`https://conwaylife.com/w/api.php?action=query&titles=File:${title.replaceAll(' ', '')}.gif&prop=imageinfo&iiprop=url&format=json`);
         if (resp.ok) {
-            let data = JSON.parse(await resp.text()).query.pages;
-            throw new Error(JSON.stringify(data, undefined, 4));
-            data = data[Object.keys(data)[0]].imageinfo[0].url;
-            if (typeof data === 'string') {
-                let resp = await fetch(data);
-                if (resp.ok) {
-                    await fs.writeFile('image.gif', new Uint8Array(await resp.arrayBuffer()));
-                    image = true;
+            let data = JSON.parse(await resp.text())?.query?.pages;
+            if (typeof data === 'object') {
+                data = data[Object.keys(data)[0]]?.imageinfo?.url;
+                if (typeof data === 'string') {
+                    let resp = await fetch(data);
+                    if (resp.ok) {
+                        await fs.writeFile('image.gif', new Uint8Array(await resp.arrayBuffer()));
+                        useImage = true;
+                    }
                 }
             }
         }
@@ -117,8 +118,8 @@ export async function cmdWiki(msg: Message, argv: string[]): Promise<Response> {
         text = text.slice(0, text.lastIndexOf(' ')) + '...';
     }
     let embed = (new EmbedBuilder()).setTitle(title).setDescription(text).setURL(url);
-    if (image) {
-        return {embeds: [embed.setThumbnail('attachment://image.gif')], files: ['./image.gif']};
+    if (useImage) {
+        return {embeds: [embed.setImage('attachment://image.gif')], files: ['./image.gif']};
     } else {
         return {embeds: [embed]};
     }
