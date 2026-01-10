@@ -71,7 +71,7 @@ const INVESTIGATOR_COLORS: [number, number, number][] = [
 
 let dir = join(import.meta.dirname, '..');
 
-async function runPattern(argv: string[], rle: string): Promise<{frames: [Pattern, number][], gifSize: number, minX: number, minY: number, width: number, height: number}> {
+async function runPattern(argv: string[], rle: string): Promise<{frames: [Pattern, number][], gifSize: number, minX: number, minY: number, width: number, height: number, customColors: {[key: number]: [number, number, number]}}> {
     let p = parse(rle, aliases, true);
     let parts: (string | number)[][] = [];
     let currentPart: (string | number)[] = [];
@@ -122,6 +122,7 @@ async function runPattern(argv: string[], rle: string): Promise<{frames: [Patter
     let frames: [Pattern, number | null][] = [[p.copy(), frameTime]];
     let gifSize = 200;
     let useCAViewer = false;
+    let customColors: {[key: number]: [number, number, number]} = {};
     for (let part of parts) {
         while (part.length > 0) {
             if (typeof part[0] === 'number') {
@@ -145,18 +146,24 @@ async function runPattern(argv: string[], rle: string): Promise<{frames: [Patter
                         await fs.writeFile(join(dir, 'in.rle'), p.toRLE());
                         execSync(`rm -f ${join(dir, 'out.rle')}`);
                         if (useCAViewer) {
-                            execSync(`box64 /home/opc/caviewer/lib/runtime/bin/java -p /home/opc/caviewer/app -m CAViewer/application.Main sim -g ${part[0]} -s ${step} -i in.rle -o out.rle`);
+                            execSync(`box64 /home/opc/caviewer/lib/runtime/bin/java -p /home/opc/caviewer/app -m CAViewer/application.Main sim -g ${part[0]} -s ${step} -i ${join(dir, 'in.rle')} -o ${join(dir, 'out.rle')}`);
                         } else {
                             execSync(`${join(dir, 'lifeweb', 'bgolly')} -a RuleLoader -s ${join(dir, 'lifeweb')}/ -o ${join(dir, 'out.rle')} -m ${part[0]} -i ${step} ${join(dir, 'in.rle')}`);
                         }
                         let data = (await fs.readFile(join(dir, 'out.rle'))).toString();
                         let xOffset: number | null = null;
                         let yOffset: number | null = null;
+                        let inColors = false;
                         for (let line of data.split('\n')) {
                             if (line.includes(',')) {
                                 if (xOffset === null && yOffset === null) {
                                     [xOffset, yOffset] = line.split(',').map(x => parseInt(x));
                                 }
+                            } else if (inColors) {
+                                let data = line.split(' ').map(x => parseInt(x));
+                                customColors[data[0]] = [data[1], data[2], data[3]];
+                            } else if (line === '@COLOR') {
+                                inColors = true;
                             } else {
                                 let q = parse(`x = 0, y = 0, rule = ${p.ruleStr}\n${line}`, aliases, true);
                                 q.xOffset = xOffset ?? 0;
@@ -195,7 +202,7 @@ async function runPattern(argv: string[], rle: string): Promise<{frames: [Patter
                 p.run(part[1]);
                 part = part.slice(2);
             } else if (part[0] === 'ca') {
-                useCAViewer = true;
+                useCAViewer = !useCAViewer;
                 part = part.slice(1);
             } else {
                 throw new BotError(`Invalid part: ${part.join(' ')}`);
@@ -247,12 +254,12 @@ async function runPattern(argv: string[], rle: string): Promise<{frames: [Patter
         height++;
     }
     let defaultTime = Math.min(1, Math.max(1/60, 5 / frames.length)) * 100;
-    return {frames: frames.map(([p, time]) => [p, time ?? defaultTime]), gifSize, minX, minY, width, height};
+    return {frames: frames.map(([p, time]) => [p, time ?? defaultTime]), gifSize, minX, minY, width, height, customColors};
 }
 
 async function runSim(argv: string[], rle: string): Promise<number> {
     let startTime = performance.now();
-    let {frames, gifSize, minX, minY, width, height} = await runPattern(argv, rle);
+    let {frames, gifSize, minX, minY, width, height, customColors} = await runPattern(argv, rle);
     let parseTime = performance.now() - startTime;
     let p = frames[0][0];
     let bitWidth = Math.max(2, Math.ceil(Math.log2(p.states)));
@@ -289,6 +296,11 @@ async function runSim(argv: string[], rle: string): Promise<number> {
             gct[i++] = b;
         } else if (p instanceof InvestigatorPattern) {
             let [r, g, b] = INVESTIGATOR_COLORS[value - 1];
+            gct[i++] = r;
+            gct[i++] = g;
+            gct[i++] = b;
+        } else if (customColors[value]) {
+            let [r, g, b] = customColors[value];
             gct[i++] = r;
             gct[i++] = g;
             gct[i++] = b;
