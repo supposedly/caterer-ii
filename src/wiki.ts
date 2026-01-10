@@ -52,7 +52,7 @@ export async function cmdWiki(msg: Message, argv: string[]): Promise<Response> {
     }
     let data = JSON.parse(await resp.text()).query.search;
     if (data.length === 0) {
-        return 'No such page exists!';
+        throw new BotError('No such page exists!');
     }
     let title = data[0].title;
     let url = `https://conwaylife.com/wiki/${encodeURIComponent(data.title).replaceAll('%20', '_')}`;
@@ -67,6 +67,7 @@ export async function cmdWiki(msg: Message, argv: string[]): Promise<Response> {
         let resp = await fetch(`https://conwaylife.com/w/api.php?action=query&titles=File:${title.replaceAll(' ', '')}.gif&prop=imageinfo&iiprop=url&format=json`);
         if (resp.ok) {
             let data = JSON.parse(await resp.text()).query.pages;
+            throw new Error(JSON.stringify(data, undefined, 4));
             data = data[Object.keys(data)[0]].imageinfo[0].url;
             if (typeof data === 'string') {
                 let resp = await fetch(data);
