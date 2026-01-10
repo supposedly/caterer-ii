@@ -67,6 +67,7 @@ export async function cmdWiki(msg: Message, argv: string[]): Promise<Response> {
         if (resp.ok) {
             let data = JSON.parse(await resp.text());
             let startData = data;
+            throw new Error(JSON.stringify(startData, undefined, 4));
             data = data[Object.keys(data)[0]].imageinfo.url;
             if (typeof data === 'string') {
                 image = data;
