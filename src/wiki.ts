@@ -65,9 +65,8 @@ export async function cmdWiki(msg: Message, argv: string[]): Promise<Response> {
     if (!text.match(/\{\{[^{]*hideimg[^{]*\}\}/)) {
         let resp = await fetch(`https://conwaylife.com/w/api.php?action=query&titles=File:${title.replaceAll(' ', '')}.gif&prop=imageinfo&iiprop=url&format=json`);
         if (resp.ok) {
-            let data = JSON.parse(await resp.text());
+            let data = JSON.parse(await resp.text()).query.pages;
             let startData = data;
-            throw new Error(JSON.stringify(startData, undefined, 4));
             data = data[Object.keys(data)[0]].imageinfo.url;
             if (typeof data === 'string') {
                 image = data;
