@@ -1,7 +1,7 @@
 
 import * as fs from 'node:fs/promises';
 import {join} from 'node:path';
-import {Pattern, parse} from '../lifeweb/lib/index.js';
+import {RuleError, Pattern, MAPPattern, RuleLoaderBgollyPattern, parse} from '../lifeweb/lib/index.js';
 import {Message as _Message, OmitPartialGroupDMChannel} from 'discord.js';
 
 
@@ -60,8 +60,23 @@ export function sentByAccepterer(msg: Message): boolean {
 }
 
 
+export function parseSpecial(data: string): Pattern {
+    try {
+        return parse(data, aliases, true);
+    } catch (error) {
+        if (!(error instanceof RuleError)) {
+            throw error;
+        }
+        let value = /rule\s*=\s*([.*])\n/.exec(data);
+        if (!value) {
+            throw error;
+        }
+        let p = parse(`x = 0, y = 0, rule = B3/S23\n${data.slice(value.index + value[0].length + 1)}`) as MAPPattern;
+        return new RuleLoaderBgollyPattern(p.height, p.width, p.data, value[1], undefined, true);
+    }
+}
 
-function findRLEFromText(data: string): Pattern | undefined {
+function findRLEFromText(data: string, special?: boolean): Pattern | undefined {
     let match = RLE_HEADER.exec(data);
     if (!match) {
         return;
@@ -71,11 +86,15 @@ function findRLEFromText(data: string): Pattern | undefined {
     if (index === -1) {
         return;
     }
-    return parse(data.slice(0, index + 1), aliases, true);
+    if (special) {
+        return parseSpecial(data.slice(0, index + 1));
+    } else {
+        return parse(data.slice(0, index + 1), aliases, true);
+    }
 }
 
-async function findRLEFromMessage(msg: Message): Promise<{msg: Message, p: Pattern} | undefined> {
-    let out = findRLEFromText(msg.content);
+async function findRLEFromMessage(msg: Message, special?: boolean): Promise<{msg: Message, p: Pattern} | undefined> {
+    let out = findRLEFromText(msg.content, special);
     if (out) {
         return {msg, p: out};
     }
@@ -83,7 +102,7 @@ async function findRLEFromMessage(msg: Message): Promise<{msg: Message, p: Patte
         let attachment = msg.attachments.first();
         if (attachment) {
             let data = await (await fetch(attachment.url)).text();
-            let out = findRLEFromText(data);
+            let out = findRLEFromText(data, special);
             if (out) {
                 return {msg, p: out};
             } else {
@@ -93,14 +112,14 @@ async function findRLEFromMessage(msg: Message): Promise<{msg: Message, p: Patte
     }
 }
 
-export async function findRLE(msg: Message): Promise<{msg: Message, p: Pattern} | undefined> {
-    let out = await findRLEFromMessage(msg);
+export async function findRLE(msg: Message, special?: boolean): Promise<{msg: Message, p: Pattern} | undefined> {
+    let out = await findRLEFromMessage(msg, special);
     if (out) {
         return out;
     }
     if (msg.reference) {
         let reply = await msg.fetchReference();
-        out = await findRLEFromMessage(reply);
+        out = await findRLEFromMessage(reply, special);
         if (out) {
             return out;
         }

@@ -129,7 +129,7 @@ export async function cmdSim(msg: Message, argv: string[]): Promise<Response> {
         p.setData(data, height, width);
         replyTo = msg;
     } else {
-        let data = await findRLE(msg);
+        let data = await findRLE(msg, true);
         if (!data) {
             throw new BotError('Cannot find RLE');
         }
@@ -142,7 +142,7 @@ export async function cmdSim(msg: Message, argv: string[]): Promise<Response> {
             jobs.delete(id);
             resolve(null);
             restartWorker();
-        }, 30000);
+        }, 180000);
         jobs.set(id, {resolve, reject, timeout});
         worker.postMessage({id, argv, rle: p.toRLE()});
     });
