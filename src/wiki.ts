@@ -50,7 +50,7 @@ export async function cmdWiki(msg: Message, argv: string[]): Promise<Response> {
         throw new BotError(`Server returned ${resp.status} ${resp.statusText}`);
     }
     let data = JSON.parse(await resp.text()).query.search[0];
-    let title = `[${data.title}](https://conwaylife.com/wiki/${encodeURIComponent(data.title)})`;
-    let text = data.snippet;
-    return {embeds: [(new EmbedBuilder()).setTitle(title).setDescription(text)]};
+    let url = `https://conwaylife.com/wiki/${encodeURIComponent(data.title)}`;
+    let text = data.snippet.replaceAll(`<span class='searchmatch'>`, '').replaceAll('</span>', '');
+    return {embeds: [(new EmbedBuilder()).setTitle(data.title).setURL(url).setDescription(text)]};
 }
