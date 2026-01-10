@@ -61,6 +61,17 @@ export async function cmdWiki(msg: Message, argv: string[]): Promise<Response> {
         throw new BotError(`Server returned ${resp.status} ${resp.statusText}`);
     }
     let text: string = JSON.parse(await resp.text()).query.pages[id].revisions[0].slots.main['*'];
+    let image: string | null = null;
+    if (!text.match(/\{\{[^{]*hideimg[^{]*\}\}/)) {
+        let resp = await fetch(`https://conwaylife.com/w/api.php?action=query&titles=File:${title.replaceAll(' ', '')}.gif&prop=imageinfo&iiprop=url&format=json`);
+        if (resp.ok) {
+            let data = JSON.parse(await resp.text()).query.pages;
+            data = data[Object.keys(data)[0]].imageinfo.url;
+            if (typeof data === 'string') {
+                image = data;
+            }
+        }
+    }
     text = text.replaceAll(/\{\{period\|(\d+)\}\}/g, '[period-$1](https://conwaylife.com/wiki/Category:Oscillators_with_period_$1');
     text = text.replaceAll(/\{\{year\|(\d+)\}\}/g, '[$1](https://conwaylife.com/wiki/Category:Patterns_found_in_$1)');
     text = text.replaceAll(/^\*\*\*\s+/gm, '    - ');
