@@ -157,7 +157,9 @@ async function runPattern(argv: string[], rle: string): Promise<{frames: [Patter
                         let inColors = false;
                         let firstDone = false;
                         for (let line of data.split('\n')) {
-                            if (line.includes(',')) {
+                            if (line === '') {
+                                continue;
+                            } else if (line.includes(',')) {
                                 if (xOffset === null && yOffset === null) {
                                     [xOffset, yOffset] = line.split(',').map(x => parseInt(x));
                                 }
