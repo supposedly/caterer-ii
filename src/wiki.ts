@@ -55,7 +55,7 @@ export async function cmdWiki(msg: Message, argv: string[]): Promise<Response> {
         throw new BotError('No such page exists!');
     }
     let title = data[0].title;
-    let url = `https://conwaylife.com/wiki/${encodeURIComponent(data.title).replaceAll('%20', '_')}`;
+    let url = `https://conwaylife.com/wiki/${encodeURIComponent(data[0].title).replaceAll('%20', '_')}`;
     let id = data[0].pageid;
     resp = await fetch(`https://conwaylife.com/w/api.php?action=query&prop=revisions&rvprop=content&rvslots=main&pageids=${id}&format=json`);
     if (!resp.ok) {
