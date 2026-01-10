@@ -79,6 +79,8 @@ export async function cmdWiki(msg: Message, argv: string[]): Promise<Response> {
     }
     text = text.replaceAll(/\{\{period\|(\d+)\}\}/g, '[period-$1](https://conwaylife.com/wiki/Category:Oscillators_with_period_$1');
     text = text.replaceAll(/\{\{year\|(\d+)\}\}/g, '[$1](https://conwaylife.com/wiki/Category:Patterns_found_in_$1)');
+    text = text.replaceAll(/<\/?references>/, '');
+    text = text.replaceAll('__NOTOC__', '');
     text = text.replaceAll(/^\*\*\*\s+/gm, '    - ');
     text = text.replaceAll(/^\*\*\s+/gm, '  - ');
     text = text.replaceAll(/^\*\s+/gm, '- ');
@@ -92,12 +94,12 @@ export async function cmdWiki(msg: Message, argv: string[]): Promise<Response> {
     text = text.replaceAll(/'''''(.*?)'''''/g, '***$1***');
     text = text.replaceAll(/'''(.*?)'''/g, '**$1**');
     text = text.replaceAll(/''(.*?)''/g, '*$1*');
-    text = text.replaceAll(/^=\s+(.*?)\s+=$/gm, '# $1');
-    text = text.replaceAll(/^==\s+(.*?)\s+==$/gm, '## $1');
-    text = text.replaceAll(/^===\s+(.*?)\s+===$/gm, '### $1');
-    text = text.replaceAll(/^====\s+(.*?)\s+====$/gm, '#### $1');
-    text = text.replaceAll(/^=====\s+(.*?)\s+=====$/gm, '##### $1');
-    text = text.replaceAll(/^======\s+(.*?)\s+======$/gm, '###### $1');
+    text = text.replaceAll(/^=\s*(.*?)\s*=$/gm, '# $1');
+    text = text.replaceAll(/^==\s*(.*?)\s*==$/gm, '## $1');
+    text = text.replaceAll(/^===\s*(.*?)\s*===$/gm, '### $1');
+    text = text.replaceAll(/^====\s*(.*?)\s*====$/gm, '#### $1');
+    text = text.replaceAll(/^=====\s*(.*?)\s*=====$/gm, '##### $1');
+    text = text.replaceAll(/^======\s*(.*?)\s*======$/gm, '###### $1');
     text = text.replaceAll(/\[(https?:\/\/[^\s]+)\s+([^\]]+)\](s?)/g, '[$2$3]($1)');
     text = text.replaceAll(/\[\[([^\|\]]+)\|([^\]]+)\]\](s?)/g, (_, url, name, s) => `[${name}${s}](https://conwaylife.com/wiki/${encodeURIComponent(url)})`);
     text = text.replaceAll(/\[\[([^\]]+)\]\](s?)/g, (_, page, s) => `[${page}${s}](https://conwaylife.com/wiki/${encodeURIComponent(page)})`);
