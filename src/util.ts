@@ -61,7 +61,6 @@ export function sentByAccepterer(msg: Message): boolean {
 
 
 export function parseSpecial(data: string): Pattern {
-    console.log('hi', data);
     try {
         return parse(data, aliases, true);
     } catch (error) {
@@ -115,7 +114,6 @@ async function findRLEFromMessage(msg: Message, special?: boolean): Promise<{msg
 }
 
 export async function findRLE(msg: Message, special?: boolean): Promise<{msg: Message, p: Pattern} | undefined> {
-    console.log(special);
     let out = await findRLEFromMessage(msg, special);
     if (out) {
         return out;
