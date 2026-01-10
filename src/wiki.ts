@@ -100,6 +100,7 @@ export async function cmdWiki(msg: Message, argv: string[]): Promise<Response> {
     } else {
         data = data[Object.keys(data)[0]];
     }
+    return JSON.stringify(data, undefined, 4);
     let title = data.title;
     let url = `https://conwaylife.com/wiki/${encodeURIComponent(data.title).replaceAll('%20', '_')}`;
     let id = data.pageid;
