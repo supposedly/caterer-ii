@@ -86,15 +86,15 @@ export async function cmdWiki(msg: Message, argv: string[]): Promise<Response> {
     text = text.replaceAll(/<pre>([\s\S]*?)<\/pre>/g, (_, code) => `\`\`\`\n${code.trim()}\n\`\`\``);
     text = text.replaceAll(/<code>(.*?)<\/code>/g, '`$1`');
     text = text.replaceAll(/\{\{period\|(\d+)\}\}/g, '[period-$1](https://conwaylife.com/wiki/Category:Oscillators_with_period_$1');
-    text = text.replaceAll(/\{\{year\|(\d+)\}\}/g, '[$1](https://conwaylife.com/wiki/$1)');
+    text = text.replaceAll(/\{\{year\|(\d+)\}\}/g, '[$1](https://conwaylife.com/wiki/Category:Patterns_found_in_$1)');
     text = text.replaceAll(/\{\{[^}]+\}\}/g, '');
     text = text.replaceAll(/<ref[^>]*>.*?<\/ref>/gs, '');
     text = text.replaceAll(/\[\[(File|Image):[^\]]+\]\]/gi, '');
     text = text.replaceAll(/\n{3,}/g, '\n\n');
     text = text.replaceAll(/(?<=\n)\n+(?=# )/g, '');
     text = text.trim();
-    if (text.length > 1000) {
-        text = text.slice(0, 1000) + '...';
+    if (text.length > 1900) {
+        text = text.slice(0, 1900) + '...';
     }
     return {embeds: [(new EmbedBuilder()).setTitle(title).setURL(url).setDescription(text)]};
 }
