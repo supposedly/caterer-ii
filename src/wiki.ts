@@ -88,7 +88,7 @@ export async function cmdWiki(msg: Message, argv: string[]): Promise<Response> {
     let title = data[0].title;
     let url = `https://conwaylife.com/wiki/${encodeURIComponent(data[0].title).replaceAll('%20', '_')}`;
     let id = data[0].pageid;
-    resp = await fetch(`https://conwaylife.com/w/api.php?action=query&prop=revisions&rvprop=content&rvslots=main&pageids=${id}&format=json`);
+    resp = await fetch(`https://conwaylife.com/w/api.php?action=query&redirects&prop=revisions&rvprop=content&rvslots=main&pageids=${id}&format=json`);
     if (!resp.ok) {
         throw new BotError(`Server returned ${resp.status} ${resp.statusText}`);
     }
