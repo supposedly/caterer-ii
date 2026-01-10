@@ -61,13 +61,14 @@ export function sentByAccepterer(msg: Message): boolean {
 
 
 export function parseSpecial(data: string): Pattern {
+    console.log('hi', data);
     try {
         return parse(data, aliases, true);
     } catch (error) {
         if (!(error instanceof RuleError)) {
             throw error;
         }
-        console.log('hi', data);
+        console.log('bye', data);
         let value = /rule\s*=\s*([.*])\n/.exec(data);
         if (!value) {
             throw error;
