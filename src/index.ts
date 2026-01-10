@@ -218,7 +218,7 @@ async function updateStarboard(data: MessageReaction | PartialMessageReaction): 
             let attachment = msg.attachments.first();
             if (attachment) {
                 if (entry) {
-                    await starboardChannel.messages.edit(entry[0], {content: text, files: [attachment.url]});
+                    await starboardChannel.messages.edit(entry[0], {content: text, files: [attachment.url], allowedMentions: {parse: []}});
                 } else {
                     let msg0 = await starboardChannel.send({content: text, allowedMentions: {parse: []}});
                     let msg1 = await msg.forward(starboardChannel);
@@ -229,7 +229,7 @@ async function updateStarboard(data: MessageReaction | PartialMessageReaction): 
         } else {
             text += `<@${msg.author?.id}>`;
             if (entry) {
-                await starboardChannel.messages.edit(entry[0], text);
+                await starboardChannel.messages.edit(entry[0], {content: text, allowedMentions: {parse: []}});
             } else {
                 let msg0 = await starboardChannel.send({content: text, allowedMentions: {parse: []}});
                 let msg1 = await msg.forward(starboardChannel);
