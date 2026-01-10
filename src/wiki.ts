@@ -102,9 +102,9 @@ export async function cmdWiki(msg: Message, argv: string[]): Promise<Response> {
     text = text.replaceAll(/^===\s*(.*?)\s*===$/gm, '### $1');
     text = text.replaceAll(/^==\s*(.*?)\s*==$/gm, '## $1');
     text = text.replaceAll(/^=\s*(.*?)\s*=$/gm, '# $1');
-    text = text.replaceAll(/\[(https?:\/\/[^\s]+)\s+([^\]]+)\](s?)/g, '[$2$3]($1)');
-    text = text.replaceAll(/\[\[([^\|\]]+)\|([^\]]+)\]\](s?)/g, (_, url, name, s) => `[${name}${s}](https://conwaylife.com/wiki/${encodeURIComponent(url)})`);
-    text = text.replaceAll(/\[\[([^\]]+)\]\](s?)/g, (_, page, s) => `[${page}${s}](https://conwaylife.com/wiki/${encodeURIComponent(page)})`);
+    text = text.replaceAll(/\[(https?:\/\/[^\s]+)\s+([^\]]+)\]((e?s)?)/g, '[$2$3]($1)');
+    text = text.replaceAll(/\[\[([^\|\]]+)\|([^\]]+)\]\]((e?s)?)/g, (_, url, name, s) => `[${name}${s}](https://conwaylife.com/wiki/${encodeURIComponent(url)})`);
+    text = text.replaceAll(/\[\[([^\]]+)\]\]((e?s)?)/g, (_, page, s) => `[${page}${s}](https://conwaylife.com/wiki/${encodeURIComponent(page)})`);
     text = text.replaceAll(/<pre>([\s\S]*?)<\/pre>/g, (_, code) => `\`\`\`\n${code.trim()}\n\`\`\``);
     text = text.replaceAll(/<code>(.*?)<\/code>/g, '`$1`');
     text = text.replaceAll(/ ?\{\{[^}]+\}\}/g, '');
