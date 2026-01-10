@@ -67,6 +67,7 @@ export function parseSpecial(data: string): Pattern {
         if (!(error instanceof RuleError)) {
             throw error;
         }
+        console.log('hi', data);
         let value = /rule\s*=\s*([.*])\n/.exec(data);
         if (!value) {
             throw error;
