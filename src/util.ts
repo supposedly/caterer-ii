@@ -79,7 +79,6 @@ export function parseSpecial(data: string): Pattern {
 }
 
 function findRLEFromText(data: string, special?: boolean): Pattern | undefined {
-    console.log(special);
     let match = RLE_HEADER.exec(data);
     if (!match) {
         return;
@@ -90,7 +89,6 @@ function findRLEFromText(data: string, special?: boolean): Pattern | undefined {
         return;
     }
     if (special) {
-        console.log('calling');
         return parseSpecial(data.slice(0, index + 1));
     } else {
         return parse(data.slice(0, index + 1), aliases, true);
@@ -131,7 +129,7 @@ export async function findRLE(msg: Message, special?: boolean): Promise<{msg: Me
     }
     let msgs = await msg.channel.messages.fetch({limit: 50});
     for (let msg of msgs) {
-        if (out = await findRLEFromMessage(msg[1] as Message)) {
+        if (out = await findRLEFromMessage(msg[1] as Message, special)) {
             return out;
         }
     }
