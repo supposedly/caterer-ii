@@ -83,9 +83,9 @@ export async function cmdWiki(msg: Message, argv: string[]): Promise<Response> {
     text = text.replaceAll(/\{\{year\|(\d+)\}\}/g, '[$1](https://conwaylife.com/wiki/Category:Patterns_found_in_$1)');
     text = text.replaceAll(/<\/?references( \/)?>/g, '');
     text = text.replaceAll('__NOTOC__', '');
-    text = text.replaceAll(/^\*\*\*\s+/gm, '    - ');
-    text = text.replaceAll(/^\*\*\s+/gm, '  - ');
-    text = text.replaceAll(/^\*\s+/gm, '- ');
+    text = text.replaceAll(/^\*\*\*/gm, '    - ');
+    text = text.replaceAll(/^\*\*/gm, '  - ');
+    text = text.replaceAll(/^\*/gm, '- ');
     text = text.replaceAll(/^#\s+/gm, '1. ');
     text = text.replaceAll('*', '\\*');
     text = text.replaceAll('_', '\\_');
