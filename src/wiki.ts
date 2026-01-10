@@ -77,33 +77,17 @@ export async function cmdWiki(msg: Message, argv: string[]): Promise<Response> {
         namespace = NAMESPACES[parts[0]];
         query = parts[1];
     }
-    let resp = await fetch(`https://conwaylife.com/w/api.php?action=query&titles=${namespace === 0 ? '' : REVERSE_NAMESPACES[namespace] + ':'}${query}&redirects&format=json`);
+    let resp = await fetch(`https://conwaylife.com/w/api.php?action=query&list=search&srnamespace=${namespace}&srsearch=${encodeURIComponent(query)}&srlimit=1&format=json`);
     if (!resp.ok) {
         throw new BotError(`Server returned ${resp.status} ${resp.statusText}`);
     }
-    let data = JSON.parse(await resp.text())?.query?.pages;
-    if (!data || typeof data !== 'object') {
-        throw new Error('Invalid API response!');
+    let data = JSON.parse(await resp.text()).query.search;
+    if (data.length === 0) {
+        throw new BotError('No such page exists!');
     }
-    if (Object.keys(data).length === 0) {
-        let resp = await fetch(`https://conwaylife.com/w/api.php?action=query&list=search&srnamespace=${namespace}&srsearch=${encodeURIComponent(query)}&srlimit=1&format=json`);
-        if (!resp.ok) {
-            throw new BotError(`Server returned ${resp.status} ${resp.statusText}`);
-        }
-        let data = JSON.parse(await resp.text())?.query?.search;
-        if (!Array.isArray(data)) {
-            throw new Error('Invalid API response!');
-        }
-        if (data.length === 0) {
-            throw new BotError('No such page exists!');
-        }
-    } else {
-        data = data[Object.keys(data)[0]];
-    }
-    return JSON.stringify(data, undefined, 4);
-    let title = data.title;
-    let url = `https://conwaylife.com/wiki/${encodeURIComponent(data.title).replaceAll('%20', '_')}`;
-    let id = data.pageid;
+    let title = data[0].title;
+    let url = `https://conwaylife.com/wiki/${encodeURIComponent(data[0].title).replaceAll('%20', '_')}`;
+    let id = data[0].pageid;
     resp = await fetch(`https://conwaylife.com/w/api.php?action=query&prop=revisions&rvprop=content&rvslots=main&pageids=${id}&format=json`);
     if (!resp.ok) {
         throw new BotError(`Server returned ${resp.status} ${resp.statusText}`);
