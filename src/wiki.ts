@@ -115,7 +115,7 @@ export async function cmdWiki(msg: Message, argv: string[]): Promise<Response> {
     }
     let embed = (new EmbedBuilder()).setTitle(title).setDescription(text).setURL(url);
     if (image) {
-        return {embeds: [embed.setImage('attachment://image.gif')], files: ['./image.gif']};
+        return {embeds: [embed.setThumbnail('attachment://image.gif')], files: ['./image.gif']};
     } else {
         return {embeds: [embed]};
     }
