@@ -211,7 +211,7 @@ async function updateStarboard(data: MessageReaction | PartialMessageReaction): 
         } else {
             text = '✨';
         }
-        text += ` **${data.count}** https://discord.com/channels/${msg.guildId}/${msg.channelId}/${msg.id}`;
+        text += ` **${data.count}** `;
         if (msg.author?.id === data.client.user.id && data.message.attachments.size === 1) {
             text += `Sim by <@${(await msg.fetchReference()).author.id}>`;
             let attachment = msg.attachments.first();
@@ -226,6 +226,7 @@ async function updateStarboard(data: MessageReaction | PartialMessageReaction): 
                 }
             }
         } else {
+            text += `<@${msg.author?.id}>`;
             if (msg.id in starboard) {
                 await starboardChannel.messages.edit(starboard[data.message.id][0], text);
             } else {
