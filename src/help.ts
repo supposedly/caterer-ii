@@ -166,7 +166,7 @@ const HELP: {[key: string]: Help} = {
             {
                 name: 'type',
                 optional: true,
-                desc: 'The rulespace to use: [int|ot](gen)?(b0)?, default int.',
+                desc: 'The rulespace to use: int/intb0/ot/otb0/intgen/otgen, default int.',
             },
             {
                 name: 'speed',
@@ -174,6 +174,18 @@ const HELP: {[key: string]: Help} = {
             },
         ],
         aliases: ['5s'],
+    },
+
+    sssss_info: {
+        desc: 'Query the status of a specific rulespace in 5S',
+        args: [
+            {
+                name: 'type',
+                optional: true,
+                desc: 'The rulespace to use: int/intb0/ot/otb0/intgen/otgen, default int.',
+            },
+        ],
+        aliases: ['sssssinfo', '5s_info', '5sinfo'],
     },
 
     name: {

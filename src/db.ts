@@ -23,6 +23,17 @@ export async function cmdSssss(msg: Message, argv: string[]): Promise<Response> 
     }
 }
 
+export async function cmdSssssInfo(msg: Message, argv: string[]): Promise<Response> {
+    await msg.channel.sendTyping();
+    let type = argv[1] ? argv[1].toLowerCase() : 'int';
+    let resp = await fetch(`https://speedydelete.com/5s/api/getcounts?type=${type}`);
+    if (resp.ok) {
+        return await resp.text();
+    } else {
+        throw new BotError(`Server returned ${resp.status} ${resp.statusText}`);
+    }
+}
+
 
 export let dyks = (await readFile('data/dyk.txt')).split('\n').slice(1);
 

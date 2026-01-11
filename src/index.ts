@@ -5,7 +5,7 @@ import {Client, GatewayIntentBits, MessageReaction, PartialMessageReaction, Mess
 import {BotError, Response, Message, readFile, writeFile, config, sentByAdmin, aliases, noReplyPings, findRLE} from './util.js';
 import {cmdHelp} from './help.js';
 import {cmdIdentify, cmdBasicIdentify, cmdMinmax, cmdSim, cmdHashsoup, cmdApgencode, cmdApgdecode, cmdPopulation} from './ca.js';
-import {cmdSssss, cmdDyk, cmdName, cmdRename, cmdDeleteName, cmdSimStats, cmdSaveSimStats, cmdAlias, cmdUnalias, cmdLookupAlias} from './db.js';
+import {cmdSssss, cmdSssssInfo, cmdDyk, cmdName, cmdRename, cmdDeleteName, cmdSimStats, cmdSaveSimStats, cmdAlias, cmdUnalias, cmdLookupAlias} from './db.js';
 import {cmdWiki} from './wiki.js';
 
 
@@ -81,6 +81,9 @@ const COMMANDS: {[key: string]: (msg: Message, argv: string[]) => Promise<Respon
 
     sssss: cmdSssss,
     '5s': cmdSssss,
+    sssssinfo: cmdSssssInfo,
+    '5s_info': cmdSssssInfo,
+    '5sinfo': cmdSssssInfo,
     dyk: cmdDyk,
     name: cmdName,
     rename: cmdRename,
