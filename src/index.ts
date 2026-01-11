@@ -117,7 +117,17 @@ async function runCommand(msg: Message): Promise<void> {
     } else {
         return;
     }
-    let argv = data.split(/ \n/);
+    let argv: string[];
+    if (data.includes('\n')) {
+        let parts = data.split('\n');
+        if (!parts[0].includes(' ')) {
+            argv = [parts[0], ...parts.slice(1).join('\n').split(' ')];
+        } else {
+            argv = data.split(' ');
+        }
+    } else {
+        argv = data.split(' ');
+    }
     let cmd = argv[0].toLowerCase();
     if (cmd in COMMANDS) {
         try {
