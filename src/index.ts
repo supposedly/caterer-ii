@@ -354,20 +354,13 @@ setInterval(async () => {
             console.log(`${resp.status} ${resp.statusText} while fetching new ships`);
         }
     } catch (error) {
-        console.log(error);
-        let channel = client.channels.cache.get(config.sssssChannel);
-        if (!channel) {
-            channel = await client.channels.fetch(config.sssssChannel) ?? (() => {throw new Error('Channel does not exist')})();
+        let str: string;
+        if (error && typeof error === 'object' && 'stack' in error) {
+            str = String(error.stack);
+        } else {
+            str = String(error);
         }
-        if (channel.isSendable()) {
-            let str: string;
-            if (error && typeof error === 'object' && 'stack' in error) {
-                str = String(error.stack);
-            } else {
-                str = String(error);
-            }
-            await channel.send('```' + str + '```');
-        }
+        await sssssChannel.send('```' + str + '```');
     }
 }, 60000);
 
