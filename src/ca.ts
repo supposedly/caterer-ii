@@ -298,7 +298,7 @@ function embedIdentified(original: Pattern, type: Identified | FullIdentified, i
     if (type.apgcode.startsWith('x') || type.apgcode.startsWith('y')) {
         name = names.get(type.apgcode);
     } else {
-        name = names.get(original.toCanonicalApgcode(1, 'x_'));
+        name = names.get(original.toCanonicalApgcode(1, 'x'));
     }
     if (name !== undefined) {
         if (type.stabilizedAt > 0) {

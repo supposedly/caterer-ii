@@ -72,7 +72,7 @@ export async function cmdName(msg: Message, argv: string[]): Promise<Response> {
     }
     let apgcode = identify(data.p, 1024, false).apgcode;
     if (!apgcode.startsWith('x') && !apgcode.startsWith('y')) {
-        apgcode = data.p.toCanonicalApgcode(1, 'x_');
+        apgcode = data.p.toCanonicalApgcode(1, 'x');
     }
     let newName = argv.slice(1).join(' ');
     if (newName === '') {
