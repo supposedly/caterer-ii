@@ -33,8 +33,8 @@ const COMMANDS: {[key: string]: (msg: Message, argv: string[]) => Promise<Respon
     },
 
     async ping(msg: Message): Promise<Response> {
-        let msg2 = await msg.reply({content: 'Pong!', allowedMentions: {repliedUser: !noReplyPings.includes(msg.author.id)}});
-        msg2.edit({content: `Pong! Latency: ${Math.round(msg2.createdTimestamp - msg.createdTimestamp)} ms (Discord WebSocket: ${Math.round(client.ws.ping)} ms)`, allowedMentions: {repliedUser: !noReplyPings.includes(msg.author.id)}})
+        let msg2 = await msg.reply({content: 'Pong!', allowedMentions: {repliedUser: !noReplyPings.includes(msg.author.id), parse: []}});
+        msg2.edit({content: `Pong! Latency: ${Math.round(msg2.createdTimestamp - msg.createdTimestamp)} ms (Discord WebSocket: ${Math.round(client.ws.ping)} ms)`, allowedMentions: {repliedUser: !noReplyPings.includes(msg.author.id), parse: []}})
     },
 
     async pig(msg: Message): Promise<Response> {
@@ -134,15 +134,15 @@ async function runCommand(msg: Message): Promise<void> {
             let out = await COMMANDS[cmd](msg, argv);
             if (out) {
                 if (typeof out === 'string') {
-                    previousMsgs.push([msg.id, await msg.reply({content: out, allowedMentions: {repliedUser: !noReplyPings.includes(msg.author.id)}})]);
+                    previousMsgs.push([msg.id, await msg.reply({content: out, allowedMentions: {repliedUser: !noReplyPings.includes(msg.author.id), parse: []}})]);
                 } else {
-                    (out as MessageReplyOptions).allowedMentions = {repliedUser: !noReplyPings.includes(msg.author.id)};
+                    (out as MessageReplyOptions).allowedMentions = {repliedUser: !noReplyPings.includes(msg.author.id), parse: []};
                     previousMsgs.push([msg.id, await msg.reply(out)]);
                 }
             }
         } catch (error) {
             if (error instanceof BotError || error instanceof lifeweb.RuleError) {
-                previousMsgs.push([msg.id, await msg.reply({content: 'Error: ' + error.message, allowedMentions: {repliedUser: !noReplyPings.includes(msg.author.id)}})]);
+                previousMsgs.push([msg.id, await msg.reply({content: 'Error: ' + error.message, allowedMentions: {repliedUser: !noReplyPings.includes(msg.author.id), parse: []}})]);
             } else {
                 let str: string;
                 if (error && typeof error === 'object' && 'stack' in error) {
@@ -151,7 +151,7 @@ async function runCommand(msg: Message): Promise<void> {
                     str = String(error);
                 }
                 console.log(str);
-                previousMsgs.push([msg.id, await msg.reply({content: '```' + str + '```', allowedMentions: {repliedUser: !noReplyPings.includes(msg.author.id)}})]);
+                previousMsgs.push([msg.id, await msg.reply({content: '```' + str + '```', allowedMentions: {repliedUser: !noReplyPings.includes(msg.author.id), parse: []}})]);
             }
         }
         if (previousMsgs.length > 2000) {
@@ -176,7 +176,6 @@ let client = new Client({
         Partials.User,
         Partials.ThreadMember,
     ],
-    allowedMentions: {parse: []},
 });
 
 let starboardChannel: TextChannel;
@@ -205,7 +204,7 @@ client.on('messageUpdate', async (old, msg) => {
         } else {
             str = String(error);
         }
-        await msg.reply({content: '```' + str + '```', allowedMentions: {repliedUser: !noReplyPings.includes(msg.author.id)}});
+        await msg.reply({content: '```' + str + '```', allowedMentions: {repliedUser: !noReplyPings.includes(msg.author.id), parse: []}});
     }
     runCommand(msg);
 });

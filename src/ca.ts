@@ -3,7 +3,7 @@ import {join} from 'node:path';
 import {Worker} from 'node:worker_threads';
 import {EmbedBuilder} from 'discord.js';
 import {Pattern, Identified, FullIdentified, identify, findMinmax, getDescription, fullIdentify, createPattern, toCatagolueRule, getHashsoup, RuleError} from '../lifeweb/lib/index.js';
-import {BotError, Message, Response, writeFile, names, aliases, simStats, findRLE} from './util.js';
+import {BotError, Message, Response, writeFile, names, aliases, simStats, noReplyPings, findRLE} from './util.js';
 
 
 type WorkerResult = {id: number, ok: true, parseTime: number} | {id: number, ok: false, error: string, intentional: boolean, type: string};
@@ -209,7 +209,7 @@ export async function cmdPopulation(msg: Message, argv: string[]): Promise<Respo
     if (p.states === 2) {
         await msg.reply({
             content: String(p.population),
-            allowedMentions: {repliedUser: false},
+            allowedMentions: {repliedUser: !noReplyPings.includes(msg.author.id), parse: []},
         });
     } else {
         let counts = [];
@@ -225,7 +225,7 @@ export async function cmdPopulation(msg: Message, argv: string[]): Promise<Respo
         }
         await msg.reply({
             content: `${total} total live cells\n${counts.map((x, i) => `${x} state cells`).join('\n')}`,
-            allowedMentions: {repliedUser: false},
+            allowedMentions: {repliedUser: !noReplyPings.includes(msg.author.id), parse: []},
         });
     }
 }
