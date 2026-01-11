@@ -29,7 +29,7 @@ export let dyks = (await readFile('data/dyk.txt')).split('\n').slice(1);
 export async function cmdDyk(msg: Message, argv: string[]): Promise<Response> {
     let num: number;
     if (argv.length > 1) {
-        num = parseInt(argv[1]);
+        num = parseInt(argv[1]) - 1;
         if (Number.isNaN(num)) {
             throw new BotError('Invalid number!');
         }
