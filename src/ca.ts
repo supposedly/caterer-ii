@@ -294,7 +294,12 @@ function embedIdentified(type: Identified | FullIdentified, isOutput?: boolean):
         out += '](https://catagolue.hatsya.com/object/' + apgcode + '/' + toCatagolueRule(type.phases[0].ruleStr) + ')';
     }
     let title = 'desc' in type ? type.desc : getDescription(type);
-    let name = names.get(type.apgcode);
+    let name: string | undefined = undefined;
+    if (type.apgcode.startsWith('x') || type.apgcode.startsWith('y')) {
+        name = names.get(type.apgcode);
+    } else {
+        name = names.get(type.phases[0].toCanonicalApgcode(1, 'x_'));
+    }
     if (name !== undefined) {
         if (type.stabilizedAt > 0) {
             title = 'Stabilizes into ' + name + ' (' + title + ')';
