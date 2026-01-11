@@ -238,7 +238,7 @@ export async function cmdPopulation(msg: Message, argv: string[]): Promise<Respo
 }
 
 
-function embedIdentified(type: Identified | FullIdentified, isOutput?: boolean): EmbedBuilder[] {
+function embedIdentified(original: Pattern, type: Identified | FullIdentified, isOutput?: boolean): EmbedBuilder[] {
     let out = '';
     if (type.period > 0) {
         out += '**Period:** ' + type.period + '\n';
@@ -298,14 +298,7 @@ function embedIdentified(type: Identified | FullIdentified, isOutput?: boolean):
     if (type.apgcode.startsWith('x') || type.apgcode.startsWith('y')) {
         name = names.get(type.apgcode);
     } else {
-        let p: Pattern | undefined = createPattern(type.phases[0].ruleStr);
-        if ('data' in type.phases[0]) {
-            p.setData((type.phases[0] as DataPattern).data, type.phases[0].height, type.phases[0].width);
-            name = names.get(p.toCanonicalApgcode(1, 'x_'));
-        } else if ('coords' in type.phases[0]) {
-            p.setCoords((type.phases[0] as CoordPattern).coords);
-            name = names.get(p.toCanonicalApgcode(1, 'x_'));
-        }
+        name = names.get(original.toCanonicalApgcode(1, 'x_'));
     }
     if (name !== undefined) {
         if (type.stabilizedAt > 0) {
@@ -321,7 +314,7 @@ function embedIdentified(type: Identified | FullIdentified, isOutput?: boolean):
     }
     let embeds = [(new EmbedBuilder()).setTitle(title).setDescription(out)];
     if ('output' in type && type.output) {
-        embeds.push(...embedIdentified(type.output, true));
+        embeds.push(...embedIdentified(Object.assign(original.clearedCopy(), type.output.phases[0]), type.output, true));
     }
     return embeds;
 }
@@ -343,7 +336,7 @@ export async function cmdIdentify(msg: Message, argv: string[]): Promise<Respons
     if (!out) {
         throw new BotError('Timed out!');
     }
-    return {embeds: embedIdentified(out)};
+    return {embeds: embedIdentified(data.p, out)};
 }
 
 export async function cmdBasicIdentify(msg: Message, argv: string[]): Promise<Response> {
@@ -363,7 +356,7 @@ export async function cmdBasicIdentify(msg: Message, argv: string[]): Promise<Re
     if (!out) {
         throw new BotError('Timed out!');
     }
-    return {embeds: embedIdentified(out)};
+    return {embeds: embedIdentified(data.p, out)};
 }
 
 export async function cmdMinmax(msg: Message, argv: string[]): Promise<Response> {
