@@ -151,12 +151,14 @@ async function runCommand(msg: Message): Promise<void> {
 }
 
 
-let client = new Client({intents: [
-    GatewayIntentBits.MessageContent,
-    GatewayIntentBits.Guilds,
-    GatewayIntentBits.GuildMessages,
-    GatewayIntentBits.GuildMessageReactions,
-]});
+let client = new Client({
+    intents: [
+        GatewayIntentBits.MessageContent,
+        GatewayIntentBits.Guilds,
+        GatewayIntentBits.GuildMessages,
+        GatewayIntentBits.GuildMessageReactions,
+    ],
+});
 
 let starboardChannel: TextChannel;
 let sssssChannel: TextChannel;
@@ -193,7 +195,6 @@ client.on('messageUpdate', async (old, msg) => {
 let starboard: Map<string, [string, string]> = new Map(JSON.parse(await readFile('data/starboard.json')));
 
 async function updateStarboard(data: MessageReaction | PartialMessageReaction): Promise<void> {
-    console.log('UPDATING', data.message.content);
     if (data.emoji.name !== '⭐') {
         return;
     }

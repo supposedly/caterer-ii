@@ -272,7 +272,6 @@ async function runPattern(argv: string[], rle: string): Promise<{frames: [Patter
 async function runSim(argv: string[], rle: string): Promise<number> {
     let startTime = performance.now();
     let {frames, gifSize, minX, minY, width, height, customColors} = await runPattern(argv, rle);
-    console.log(frames);
     let parseTime = performance.now() - startTime;
     let p = frames[0][0];
     let bitWidth = Math.max(2, Math.ceil(Math.log2(p.states)));
