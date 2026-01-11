@@ -326,16 +326,18 @@ setInterval(async () => {
                     }
                     current = '';
                     while (line.length > 2000) {
-                        await sssssChannel.send(line.slice(0, 1999));
-                        line = line.slice(1999);
+                        let index = line.slice(0, 1999).lastIndexOf(',');
+                        await sssssChannel.send(line.slice(0, index));
+                        line = line.slice(index);
                     }
                     await sssssChannel.send(line);
                 }
             }
             if (current !== '') {
                 while (current.length > 2000) {
-                    await sssssChannel.send(current.slice(0, 1999));
-                    current = current.slice(1999);
+                    let index = current.slice(0, 1999).lastIndexOf(',');
+                    await sssssChannel.send(current.slice(0, index));
+                    current = current.slice(index);
                 }
                 await sssssChannel.send(current);
             }
