@@ -17,6 +17,7 @@ const COMMANDS: {[key: string]: (msg: Message, argv: string[]) => Promise<Respon
     help: cmdHelp,
 
     async eval(msg: Message, argv: string[]): Promise<Response> {
+        throw new Error(JSON.stringify(argv, undefined, 4));
         if (sentByAdmin(msg)) {
             await msg.channel.sendTyping();
             let code = argv.slice(1).join(' ');
