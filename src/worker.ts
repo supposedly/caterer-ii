@@ -283,6 +283,7 @@ async function runSim(argv: string[], rle: string): Promise<number> {
     let gct = new Uint8Array((colors - 1) * 3);
     let i = 0;
     for (let value = 1; value < colors; value++) {
+        console.log(value);
         if (value > p.states) {
             gct[i++] = 0x00;
             gct[i++] = 0x00;
