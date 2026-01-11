@@ -211,6 +211,7 @@ async function updateStarboard(data: MessageReaction | PartialMessageReaction): 
                 msg.delete();
             }
         }
+        return;
     }
     if (data.emoji.name !== '⭐') {
         return;
