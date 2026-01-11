@@ -162,6 +162,7 @@ let client = new Client({
         Partials.Channel,
         Partials.Message,
         Partials.Reaction,
+        Partials.GuildMember,
     ],
 });
 
