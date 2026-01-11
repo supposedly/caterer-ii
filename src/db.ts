@@ -8,11 +8,11 @@ export async function cmdSssss(msg: Message, argv: string[]): Promise<Response> 
     await msg.channel.sendTyping();
     let type = 'int';
     let speed: string;
-    if (argv[1].includes('/')) {
-        speed = argv[1];
+    if (argv[1].includes('/') || argv[1].includes(',')) {
+        speed = argv.slice(1).join(' ');
     } else {
         type = argv[1].toLowerCase();
-        speed = argv[2];
+        speed = argv.slice(2).join(' ');
     }
     let {dx, dy, period} = parseSpeed(speed);
     let resp = await fetch(`https://speedydelete.com/5s/api/get?type=${type}&dx=${dx}&dy=${dy}&period=${period}`);
