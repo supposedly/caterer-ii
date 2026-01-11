@@ -2,7 +2,7 @@
 import {join} from 'node:path';
 import {Worker} from 'node:worker_threads';
 import {EmbedBuilder} from 'discord.js';
-import {Pattern, Identified, FullIdentified, identify, findMinmax, getDescription, fullIdentify, createPattern, toCatagolueRule, getHashsoup, RuleError} from '../lifeweb/lib/index.js';
+import {Pattern, DataPattern, CoordPattern, Identified, FullIdentified, findMinmax, getDescription, createPattern, toCatagolueRule, getHashsoup, RuleError} from '../lifeweb/lib/index.js';
 import {BotError, Message, Response, writeFile, names, aliases, simStats, noReplyPings, findRLE} from './util.js';
 
 
@@ -298,7 +298,14 @@ function embedIdentified(type: Identified | FullIdentified, isOutput?: boolean):
     if (type.apgcode.startsWith('x') || type.apgcode.startsWith('y')) {
         name = names.get(type.apgcode);
     } else {
-        name = names.get(type.phases[0].toCanonicalApgcode(1, 'x_'));
+        let p: Pattern | undefined = createPattern(type.phases[0].ruleStr);
+        if ('data' in type.phases[0]) {
+            p.setData((type.phases[0] as DataPattern).data, type.phases[0].height, type.phases[0].width);
+            name = names.get(p.toCanonicalApgcode(1, 'x_'));
+        } else if ('coords' in type.phases[0]) {
+            p.setCoords((type.phases[0] as CoordPattern).coords);
+            name = names.get(p.toCanonicalApgcode(1, 'x_'));
+        }
     }
     if (name !== undefined) {
         if (type.stabilizedAt > 0) {
