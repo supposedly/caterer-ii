@@ -17,7 +17,6 @@ const COMMANDS: {[key: string]: (msg: Message, argv: string[]) => Promise<Respon
     help: cmdHelp,
 
     async eval(msg: Message, argv: string[]): Promise<Response> {
-        throw new Error(JSON.stringify(argv, undefined, 4));
         if (sentByAdmin(msg)) {
             await msg.channel.sendTyping();
             let code = argv.slice(1).join(' ');
@@ -111,6 +110,8 @@ async function runCommand(msg: Message): Promise<void> {
         return;
     }
     let data = msg.content;
+    await msg.reply(data);
+    /*
     if (data.startsWith('!')) {
         data = data.slice(1);
     } else if (data.startsWith('ca.')) {
@@ -148,7 +149,7 @@ async function runCommand(msg: Message): Promise<void> {
         if (previousMsgs.length > 2000) {
             previousMsgs = previousMsgs.slice(1000);
         }
-    }
+    } */
 }
 
 
