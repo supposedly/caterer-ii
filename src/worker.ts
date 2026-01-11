@@ -3,7 +3,7 @@ import {join} from 'node:path';
 import * as fs from 'node:fs/promises';
 import {execSync} from 'node:child_process';
 import {parentPort} from 'node:worker_threads';
-import {RuleError, Pattern, CoordPattern, TreePattern, DataHistoryPattern, CoordHistoryPattern, DataSuperPattern, CoordSuperPattern, InvestigatorPattern, RuleLoaderBgollyPattern, parse} from '../lifeweb/lib/index.js';
+import {RuleError, Pattern, CoordPattern, TreePattern, DataHistoryPattern, CoordHistoryPattern, DataSuperPattern, CoordSuperPattern, InvestigatorPattern, RuleLoaderBgollyPattern, identify, fullIdentify, parse} from '../lifeweb/lib/index.js';
 import {BotError, parseSpecial, aliases} from './util.js';
 
 
@@ -412,12 +412,19 @@ if (!parentPort) {
     throw new Error('No parent port');
 }
 
-parentPort.on('message', async ({id, argv, rle}: {id: number, argv: string[], rle: string}) => {
+parentPort.on('message', async (data: {id: number, type: 'sim', argv: string[], rle: string} | {id: number, type: 'identify' | 'basic_identify', rle: string, limit: number}) => {
     if (!parentPort) {
         throw new Error('No parent port');
     }
+    let id = data.id;
     try {
-        parentPort.postMessage({id, ok: true, parseTime: await runSim(argv, rle)});
+        if (data.type === 'sim') {
+            parentPort.postMessage({id, ok: true, data: await runSim(data.argv, data.rle)});
+        } else if (data.type === 'identify') {
+            parentPort.postMessage({id, ok: true, data: fullIdentify(parse(data.rle), data.limit)});
+        } else if (data.type === 'basic_identify') {
+            parentPort.postMessage({id, ok: true, data: identify(parse(data.rle), data.limit)});
+        }
     } catch (error) {
         if (error instanceof BotError || error instanceof RuleError) {
             parentPort.postMessage({id, ok: false, error: error.message, intentional: true, type: error.constructor.name});

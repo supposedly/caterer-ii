@@ -6,10 +6,10 @@ import {Pattern, Identified, FullIdentified, identify, findMinmax, getDescriptio
 import {BotError, Message, Response, writeFile, names, aliases, simStats, noReplyPings, findRLE} from './util.js';
 
 
-type WorkerResult = {id: number, ok: true, parseTime: number} | {id: number, ok: false, error: string, intentional: boolean, type: string};
+type WorkerResult = {id: number, ok: true} & ({type: 'sim', data: number} | {type: 'identify', data: FullIdentified} | {type: 'basic_identify', data: Identified}) | {id: number, ok: false, error: string, intentional: boolean, type: string};
 
 interface Job {
-    resolve: (data: number) => void;
+    resolve: (data: any) => void;
     reject: (reason?: any) => void;
     timeout: NodeJS.Timeout;
 }
@@ -26,7 +26,9 @@ function workerOnMessage(msg: WorkerResult): void {
     if (!job) {
         return;
     }
-    if (!msg.ok) {
+    if (msg.ok) {
+        job.resolve(msg.data);
+    } else {
         if (msg.intentional) {
             if (msg.type === 'BotError') {
                 job.reject(new BotError(msg.error));
@@ -36,8 +38,6 @@ function workerOnMessage(msg: WorkerResult): void {
         } else {
             job.reject(msg.error);
         }
-    } else {
-        job.resolve(msg.parseTime);
     }
     clearTimeout(job.timeout);
     jobs.delete(msg.id);
@@ -90,6 +90,22 @@ function workerOnExit(code: number): void {
     workerHandleFatal(new Error(msg));
 }
 
+function createWorkerJob(type: 'sim', data: {argv: string[], rle: string}): Promise<number | null>;
+function createWorkerJob(type: 'identify', data: {rle: string, limit: number}): Promise<FullIdentified | null>;
+function createWorkerJob(type: 'basic_identify', data: {rle: string, limit: number}): Promise<Identified | null>;
+function createWorkerJob(type: 'sim' | 'identify' | 'basic_identify', data: any): Promise<any> {
+    return new Promise((resolve, reject) => {
+        let id = nextID++;
+        let timeout = setTimeout(() => {
+            jobs.delete(id);
+            resolve(null);
+            restartWorker();
+        }, 180000);
+        jobs.set(id, {resolve, reject, timeout});
+        worker.postMessage({id, ...data});
+    });
+}
+
 
 let simCounter = 0;
 
@@ -137,16 +153,7 @@ export async function cmdSim(msg: Message, argv: string[]): Promise<Response> {
         p = data.p;
         replyTo = data.msg;
     }
-    let parseTime = await new Promise<number | null>((resolve, reject) => {
-        let id = nextID++;
-        let timeout = setTimeout(() => {
-            jobs.delete(id);
-            resolve(null);
-            restartWorker();
-        }, 180000);
-        jobs.set(id, {resolve, reject, timeout});
-        worker.postMessage({id, argv, rle: p.toRLE()});
-    });
+    let parseTime = await createWorkerJob('sim', {argv, rle: p.toRLE()});
     if (!parseTime) {
         return 'Error: Timed out!';
     }
@@ -320,7 +327,11 @@ export async function cmdIdentify(msg: Message, argv: string[]): Promise<Respons
     if (!data) {
         throw new BotError('Cannot find RLE');
     }
-    return {embeds: embedIdentified(fullIdentify(data.p, limit))};
+    let out = await createWorkerJob('identify', {rle: data.p.toRLE(), limit});
+    if (!out) {
+        throw new BotError('Timed out!');
+    }
+    return {embeds: embedIdentified(out)};
 }
 
 export async function cmdBasicIdentify(msg: Message, argv: string[]): Promise<Response> {
@@ -336,7 +347,11 @@ export async function cmdBasicIdentify(msg: Message, argv: string[]): Promise<Re
     if (!data) {
         throw new BotError('Cannot find RLE');
     }
-    return {embeds: embedIdentified(identify(data.p, limit))};
+    let out = await createWorkerJob('basic_identify', {rle: data.p.toRLE(), limit});
+    if (!out) {
+        throw new BotError('Timed out!');
+    }
+    return {embeds: embedIdentified(out)};
 }
 
 export async function cmdMinmax(msg: Message, argv: string[]): Promise<Response> {
