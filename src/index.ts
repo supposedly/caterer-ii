@@ -193,13 +193,13 @@ client.on('messageUpdate', async (old, msg) => {
 let starboard: Map<string, [string, string]> = new Map(JSON.parse(await readFile('data/starboard.json')));
 
 async function updateStarboard(data: MessageReaction | PartialMessageReaction): Promise<void> {
+    console.log('UPDATING', data.message.content);
     if (data.emoji.name !== '⭐') {
         return;
     }
     if (data.count === null) {
         return;
     }
-    console.log('UPDATING', data.message.content);
     let msg = data.message;
     let entry = starboard.get(msg.id);
     if (data.count >= config.starThreshold) {
