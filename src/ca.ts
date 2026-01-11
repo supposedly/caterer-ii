@@ -6,8 +6,6 @@ import {Pattern, Identified, FullIdentified, identify, findMinmax, getDescriptio
 import {BotError, Message, Response, writeFile, names, aliases, simStats, findRLE} from './util.js';
 
 
-let simCounter = 0;
-
 type WorkerResult = {id: number, ok: true, parseTime: number} | {id: number, ok: false, error: string, intentional: boolean, type: string};
 
 interface Job {
@@ -57,7 +55,7 @@ function restartWorker() {
             worker.terminate();
         } catch {}
     }
-    worker = new Worker(join(import.meta.dirname, 'sim_worker.js'));
+    worker = new Worker(join(import.meta.dirname, 'worker.js'));
     worker.on('message', workerOnMessage);
     worker.on('error', workerOnError);
     worker.on('exit', workerOnExit);
@@ -91,6 +89,9 @@ function workerOnExit(code: number): void {
     console.log(msg + ', restarting worker');
     workerHandleFatal(new Error(msg));
 }
+
+
+let simCounter = 0;
 
 export async function cmdSim(msg: Message, argv: string[]): Promise<Response> {
     let startTime = performance.now();

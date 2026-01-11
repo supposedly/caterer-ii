@@ -9,5 +9,5 @@
         "strict": true,
         "sourceMap": true
     },
-    "files": ["./src/index.ts", "./src/wrapper.ts", "./src/sim_worker.ts"]
+    "files": ["./src/index.ts", "./src/wrapper.ts", "src/worker.ts"]
 }
