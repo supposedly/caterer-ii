@@ -163,6 +163,8 @@ let client = new Client({
         Partials.Message,
         Partials.Reaction,
         Partials.GuildMember,
+        Partials.User,
+        Partials.ThreadMember,
     ],
 });
 
