@@ -127,6 +127,7 @@ async function runPattern(argv: string[], rle: string): Promise<{frames: [Patter
             if (typeof part[0] === 'number') {
                 if (part[1] === 'fps') {
                     frameTime = Math.ceil(100 / part[0]);
+                    console.log(frameTime);
                     part = part.slice(2);
                 } else {
                     let step = 1;
