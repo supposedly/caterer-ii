@@ -221,7 +221,7 @@ async function updateStarboard(data: MessageReaction | PartialMessageReaction): 
                 let msg0 = await starboardChannel.send({content: text, allowedMentions: {parse: []}});
                 let msg1 = await msg.forward(starboardChannel);
                 starboard.set(msg.id, [msg0.id, msg1.id]);
-                await writeFile('data/starboard.json', JSON.stringify(starboard.entries()));
+                await writeFile('data/starboard.json', JSON.stringify(Array.from(starboard.entries())));
             }
         } else {
             text += `<@${msg.author?.id}>`;
@@ -231,7 +231,7 @@ async function updateStarboard(data: MessageReaction | PartialMessageReaction): 
                 let msg0 = await starboardChannel.send({content: text, allowedMentions: {parse: []}});
                 let msg1 = await msg.forward(starboardChannel);
                 starboard.set(msg.id, [msg0.id, msg1.id]);
-                await writeFile('data/starboard.json', JSON.stringify(starboard.entries()));
+                await writeFile('data/starboard.json', JSON.stringify(Array.from(starboard.entries())));
             }
         }
     } else if (entry) {
