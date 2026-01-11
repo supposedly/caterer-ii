@@ -117,10 +117,8 @@ async function runCommand(msg: Message): Promise<void> {
     } else {
         return;
     }
-    let argv = data.split(' ');
+    let argv = data.split(/'\n/);
     let cmd = argv[0].toLowerCase();
-    await msg.reply('```js\n' + JSON.stringify({argv, cmd}, undefined, 4) + '```');
-    /*
     if (cmd in COMMANDS) {
         try {
             let out = await COMMANDS[cmd](msg, argv);
@@ -149,7 +147,7 @@ async function runCommand(msg: Message): Promise<void> {
         if (previousMsgs.length > 2000) {
             previousMsgs = previousMsgs.slice(1000);
         }
-    } */
+    }
 }
 
 
