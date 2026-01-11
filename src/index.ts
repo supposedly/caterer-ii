@@ -213,19 +213,22 @@ async function updateStarboard(data: MessageReaction | PartialMessageReaction): 
         return;
     }
     let msg = data.message;
+    let count = data.count;
+    // let count = (await data.users.fetch()).
     let entry = starboard.get(msg.id);
-    if (data.count >= config.starThreshold) {
+    console.log(entry);
+    if (count >= config.starThreshold) {
         let text: string;
-        if (data.count < Math.floor(config.starThreshold * 2)) {
+        if (count < Math.floor(config.starThreshold * 2)) {
             text = '⭐';
-        } else if (data.count < Math.floor(config.starThreshold * 3)) {
+        } else if (count < Math.floor(config.starThreshold * 3)) {
             text = '🌟';
-        } else if (data.count < Math.floor(config.starThreshold * 4)) {
+        } else if (count < Math.floor(config.starThreshold * 4)) {
             text = '💫';
         } else {
             text = '✨';
         }
-        text += ` **${data.count}** `;
+        text += ` **${count}** `;
         if (msg.author?.id === data.client.user.id && msg.attachments.size === 1) {
             text += `Sim by <@${(await msg.fetchReference()).author.id}>`;
             if (entry) {
