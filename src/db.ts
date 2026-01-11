@@ -71,7 +71,7 @@ export async function cmdName(msg: Message, argv: string[]): Promise<Response> {
         throw new BotError('Cannot find RLE');
     }
     let apgcode = identify(data.p, 1024, false).apgcode;
-    if (!apgcode.startsWith('x') || apgcode.startsWith('y')) {
+    if (!apgcode.startsWith('x') && !apgcode.startsWith('y')) {
         apgcode = data.p.toCanonicalApgcode(1, 'x_');
     }
     let newName = argv.slice(1).join(' ');
