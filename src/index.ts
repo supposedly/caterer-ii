@@ -212,7 +212,6 @@ async function updateStarboard(data: MessageReaction | PartialMessageReaction): 
         }
         let msg = data.message;
         if (msg.author?.id === client.user?.id && msg.reference) {
-            console.log('hii');
             let id = (await data.message.fetchReference()).author.id;
             if ((await data.users.fetch()).find(x => x.id === id)) {
                 msg.delete();
