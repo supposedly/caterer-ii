@@ -176,6 +176,7 @@ let client = new Client({
         Partials.User,
         Partials.ThreadMember,
     ],
+    allowedMentions: {parse: []},
 });
 
 let starboardChannel: TextChannel;
