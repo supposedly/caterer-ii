@@ -203,6 +203,15 @@ client.on('messageUpdate', async (old, msg) => {
 let starboard: Map<string, [string, string]> = new Map(JSON.parse(await readFile('data/starboard.json')));
 
 async function updateStarboard(data: MessageReaction | PartialMessageReaction): Promise<void> {
+    if (data.emoji.name === '❌' || data.emoji.name === '🗑️') {
+        let msg = data.message;
+        if (msg.author?.id === client.user?.id && msg.reference) {
+            let id = (await data.message.fetchReference()).author.id;
+            if ((await data.users.fetch()).find(x => x.id === id)) {
+                msg.delete();
+            }
+        }
+    }
     if (data.emoji.name !== '⭐') {
         return;
     }
