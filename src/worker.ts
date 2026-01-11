@@ -424,6 +424,8 @@ parentPort.on('message', async (data: {id: number, type: 'sim', argv: string[], 
             parentPort.postMessage({id, ok: true, data: fullIdentify(parse(data.rle), data.limit)});
         } else if (data.type === 'basic_identify') {
             parentPort.postMessage({id, ok: true, data: identify(parse(data.rle), data.limit)});
+        } else {
+            throw new Error('Invalid type!');
         }
     } catch (error) {
         if (error instanceof BotError || error instanceof RuleError) {
