@@ -127,7 +127,6 @@ async function runPattern(argv: string[], rle: string): Promise<{frames: [Patter
             if (typeof part[0] === 'number') {
                 if (part[1] === 'fps') {
                     frameTime = Math.ceil(100 / part[0]);
-                    console.log(frameTime);
                     part = part.slice(2);
                 } else {
                     let step = 1;
@@ -266,7 +265,7 @@ async function runPattern(argv: string[], rle: string): Promise<{frames: [Patter
         width++;
         height++;
     }
-    let defaultTime = Math.min(1, Math.max(1/60, 5 / frames.length)) * 100;
+    let defaultTime = Math.ceil(Math.min(1, Math.max(1/50, 5 / frames.length)) * 100);
     return {frames: frames.map(([p, time]) => [p, time ?? defaultTime]), gifSize, minX, minY, width, height, customColors};
 }
 
