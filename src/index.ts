@@ -110,8 +110,6 @@ async function runCommand(msg: Message): Promise<void> {
         return;
     }
     let data = msg.content;
-    await msg.reply(data);
-    /*
     if (data.startsWith('!')) {
         data = data.slice(1);
     } else if (data.startsWith('ca.')) {
@@ -121,6 +119,8 @@ async function runCommand(msg: Message): Promise<void> {
     }
     let argv = data.split(' ');
     let cmd = argv[0].toLowerCase();
+    await msg.reply('```js\n' + JSON.stringify({argv, cmd}, undefined, 4) + '```');
+    /*
     if (cmd in COMMANDS) {
         try {
             let out = await COMMANDS[cmd](msg, argv);
