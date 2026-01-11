@@ -1,7 +1,7 @@
 
 import {RuleError, identify, createPattern, parseSpeed} from '../lifeweb/lib/index.js';
 import {EmbedBuilder} from 'discord.js';
-import {BotError, Message, Response, NAME_CHARS, readFile, writeFile, aliases, names, simStats, sentByAccepterer, findRLE} from './util.js';
+import {BotError, Message, Response, readFile, writeFile, aliases, names, simStats, sentByAccepterer, findRLE} from './util.js';
 
 
 export async function cmdSssss(msg: Message, argv: string[]): Promise<Response> {
@@ -31,6 +31,8 @@ export async function cmdDyk(): Promise<Response> {
     return `Did you know... (#${num + 1}): ${dyks[num]}\n-# Licensed under the [GNU Free Documentation License 1.2](https://www.gnu.org/licenses/fdl-1.3.html)`;
 }
 
+
+export const NAME_CHARS = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789~!@#$%^&*()-=_+[]\\{}|;\':",./<>? 🏳️‍⚧️';
 
 export async function cmdName(msg: Message, argv: string[]): Promise<Response> {
     await msg.channel.sendTyping();

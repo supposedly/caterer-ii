@@ -34,8 +34,6 @@ export async function writeFile(path: string, data: Parameters<typeof fs.writeFi
 }
 
 
-export const NAME_CHARS = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789~!@#$%^&*()-=_+[]\\{}|;\':",./<>? ';
-
 export const RLE_HEADER = /\s*x\s*=\s*\d+\s*,?\s*y\s*=\s*\d+/;
 
 
