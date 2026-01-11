@@ -199,6 +199,7 @@ async function updateStarboard(data: MessageReaction | PartialMessageReaction): 
     if (data.count === null) {
         return;
     }
+    console.log('UPDATING', data.message.content);
     let msg = data.message;
     let entry = starboard.get(msg.id);
     if (data.count >= config.starThreshold) {
