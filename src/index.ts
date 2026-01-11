@@ -204,6 +204,9 @@ let starboard: Map<string, [string, string]> = new Map(JSON.parse(await readFile
 
 async function updateStarboard(data: MessageReaction | PartialMessageReaction): Promise<void> {
     if (data.emoji.name === '❌' || data.emoji.name === '🗑️') {
+        if (data.partial) {
+            data = await data.fetch();
+        }
         let msg = data.message;
         if (msg.author?.id === client.user?.id && msg.reference) {
             console.log('hii');
