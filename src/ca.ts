@@ -100,7 +100,7 @@ function createWorkerJob(type: 'sim' | 'identify' | 'basic_identify', data: any)
             jobs.delete(id);
             resolve(null);
             restartWorker();
-        }, 180000);
+        }, type === 'sim' && data.argv.includes('ca') ? 180000 : 60000);
         jobs.set(id, {resolve, reject, timeout});
         worker.postMessage({id, type, ...data});
     });
