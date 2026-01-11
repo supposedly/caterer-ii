@@ -4,6 +4,17 @@ import {EmbedBuilder} from 'discord.js';
 import {BotError, Message, Response, readFile, writeFile, aliases, names, simStats, sentByAccepterer, findRLE} from './util.js';
 
 
+export const TYPE_NAMES: {[key: string]: string} = {
+    'int': 'INT',
+    'intb0': 'INT B0',
+    'ot': 'OT',
+    'otb0': 'OT B0',
+    'intgen': 'INT Generations',
+    'intgenb0': 'INT Generations B0',
+    'otgen': 'OT Generations',
+    'otgenb0': 'OT Generations B0',
+};
+
 export async function cmdSssss(msg: Message, argv: string[]): Promise<Response> {
     await msg.channel.sendTyping();
     let type = 'int';
@@ -28,7 +39,7 @@ export async function cmdSssssInfo(msg: Message, argv: string[]): Promise<Respon
     let type = argv[1] ? argv[1].toLowerCase() : 'int';
     let resp = await fetch(`https://speedydelete.com/5s/api/getcounts?type=${type}`);
     if (resp.ok) {
-        return await resp.text();
+        return (await resp.text()).replaceAll('This rulespace', `The ${TYPE_NAMES[type]} rulespace`);
     } else {
         throw new BotError(`Server returned ${resp.status} ${resp.statusText}`);
     }

@@ -5,7 +5,7 @@ import {Client, GatewayIntentBits, MessageReaction, PartialMessageReaction, Mess
 import {BotError, Response, Message, readFile, writeFile, config, sentByAdmin, aliases, noReplyPings, findRLE} from './util.js';
 import {cmdHelp} from './help.js';
 import {cmdIdentify, cmdBasicIdentify, cmdMinmax, cmdSim, cmdHashsoup, cmdApgencode, cmdApgdecode, cmdPopulation} from './ca.js';
-import {cmdSssss, cmdSssssInfo, cmdDyk, cmdName, cmdRename, cmdDeleteName, cmdSimStats, cmdSaveSimStats, cmdAlias, cmdUnalias, cmdLookupAlias} from './db.js';
+import {TYPE_NAMES, cmdSssss, cmdSssssInfo, cmdDyk, cmdName, cmdRename, cmdDeleteName, cmdSimStats, cmdSaveSimStats, cmdAlias, cmdUnalias, cmdLookupAlias} from './db.js';
 import {cmdWiki} from './wiki.js';
 
 
@@ -294,17 +294,6 @@ client.on('messageReactionRemoveAll', async msg => {
     }
 });
 
-
-const TYPE_NAMES: {[key: string]: string} = {
-    'int': 'INT',
-    'intb0': 'INT B0',
-    'ot': 'OT',
-    'otb0': 'OT B0',
-    'intgen': 'INT Generations',
-    'intgenb0': 'INT Generations B0',
-    'otgen': 'OT Generations',
-    'otgenb0': 'OT Generations B0',
-};
 
 setInterval(async () => {
     try {
