@@ -64,13 +64,15 @@ export async function cmdDyk(msg: Message, argv: string[]): Promise<Response> {
 
 export const NAME_CHARS = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789~!@#$%^&*()-=_+[]\\{}|;\':",./<>? 🏳️‍⚧️';
 
+const NAME_GENERATIONS = 1024;
+
 export async function cmdName(msg: Message, argv: string[]): Promise<Response> {
     await msg.channel.sendTyping();
     let data = await findRLE(msg);
     if (!data) {
         throw new BotError('Cannot find RLE');
     }
-    let apgcode = identify(data.p, 1024, false).apgcode;
+    let apgcode = identify(data.p, NAME_GENERATIONS, false).apgcode;
     if (!apgcode.startsWith('x') && !apgcode.startsWith('y')) {
         apgcode = data.p.toCanonicalApgcode(1, 'x');
     }
@@ -110,9 +112,9 @@ export async function cmdRename(msg: Message, argv: string[]): Promise<Response>
     if (!data) {
         throw new BotError('Cannot find RLE');
     }
-    let apgcode = identify(data.p, 4096).apgcode;
-    if (!apgcode.startsWith('x') || apgcode.startsWith('y')) {
-        throw new BotError(`Apgcode is ${apgcode}`);
+    let apgcode = identify(data.p, NAME_GENERATIONS, false).apgcode;
+    if (!apgcode.startsWith('x') && !apgcode.startsWith('y')) {
+        apgcode = data.p.toCanonicalApgcode(1, 'x');
     }
     let newName = argv.slice(1).join(' ');
     if (!Array.from(newName).every(x => NAME_CHARS.includes(x))) {
@@ -139,9 +141,9 @@ export async function cmdDeleteName(msg: Message, argv: string[]): Promise<Respo
     if (!data) {
         throw new BotError('Cannot find RLE');
     }
-    let apgcode = identify(data.p, 4096).apgcode;
-    if (!apgcode.startsWith('x') || apgcode.startsWith('y')) {
-        throw new BotError(`Apgcode is ${apgcode}`);
+    let apgcode = identify(data.p, NAME_GENERATIONS, false).apgcode;
+    if (!apgcode.startsWith('x') && !apgcode.startsWith('y')) {
+        apgcode = data.p.toCanonicalApgcode(1, 'x');
     }
     let name = names.get(apgcode);
     if (typeof name === 'string') {
