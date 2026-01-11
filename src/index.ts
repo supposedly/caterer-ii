@@ -207,6 +207,9 @@ async function updateStarboard(data: MessageReaction | PartialMessageReaction): 
         if (data.partial) {
             data = await data.fetch();
         }
+        if (!data.count) {
+            return;
+        }
         let msg = data.message;
         if (msg.author?.id === client.user?.id && msg.reference) {
             console.log('hii');
