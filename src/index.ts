@@ -264,7 +264,7 @@ async function updateStarboard(data: MessageReaction | PartialMessageReaction): 
         }
         text += ` **${count}** `;
         if (msg.author?.id === data.client.user.id && msg.attachments.size === 1) {
-            text += `Sim by <@${(await msg.fetchReference()).author.id}>`;
+            text += `Pattern by <@${(await msg.fetchReference()).author.id}>`;
         } else {
             text += `<@${msg.author?.id}>`;
         }
