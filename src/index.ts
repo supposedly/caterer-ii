@@ -216,7 +216,6 @@ async function updateStarboard(data: MessageReaction | PartialMessageReaction): 
     let count = data.count;
     // let count = (await data.users.fetch()).
     let entry = starboard.get(msg.id);
-    console.log(entry);
     if (count >= config.starThreshold) {
         let text: string;
         if (count < Math.floor(config.starThreshold * 2)) {
@@ -231,24 +230,16 @@ async function updateStarboard(data: MessageReaction | PartialMessageReaction): 
         text += ` **${count}** `;
         if (msg.author?.id === data.client.user.id && msg.attachments.size === 1) {
             text += `Sim by <@${(await msg.fetchReference()).author.id}>`;
-            if (entry) {
-                await starboardChannel.messages.edit(entry[0], {content: text, allowedMentions: {parse: []}});
-            } else {
-                let msg0 = await starboardChannel.send({content: text, allowedMentions: {parse: []}});
-                let msg1 = await msg.forward(starboardChannel);
-                starboard.set(msg.id, [msg0.id, msg1.id]);
-                await writeFile('data/starboard.json', JSON.stringify(Array.from(starboard.entries())));
-            }
         } else {
             text += `<@${msg.author?.id}>`;
-            if (entry) {
-                await starboardChannel.messages.edit(entry[0], {content: text, allowedMentions: {parse: []}});
-            } else {
-                let msg0 = await starboardChannel.send({content: text, allowedMentions: {parse: []}});
-                let msg1 = await msg.forward(starboardChannel);
-                starboard.set(msg.id, [msg0.id, msg1.id]);
-                await writeFile('data/starboard.json', JSON.stringify(Array.from(starboard.entries())));
-            }
+        }
+        if (entry) {
+            (await starboardChannel.messages.fetch(entry[0])).edit({content: text, allowedMentions: {parse: []}});
+        } else {
+            let msg0 = await starboardChannel.send({content: text, allowedMentions: {parse: []}});
+            let msg1 = await msg.forward(starboardChannel);
+            starboard.set(msg.id, [msg0.id, msg1.id]);
+            await writeFile('data/starboard.json', JSON.stringify(Array.from(starboard.entries())));
         }
     } else if (entry) {
         starboard.delete(msg.id);
@@ -262,9 +253,9 @@ client.on('messageReactionRemove', updateStarboard);
 client.on('messageReactionRemoveAll', async msg => {
     let entry = starboard.get(msg.id);
     if (entry) {
+        starboard.delete(msg.id);
         await starboardChannel.messages.delete(entry[0]);
         await starboardChannel.messages.delete(entry[1]);
-        starboard.delete(msg.id);
     }
 });
 
