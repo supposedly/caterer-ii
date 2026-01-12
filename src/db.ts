@@ -148,6 +148,7 @@ export async function cmdDeleteName(msg: Message, argv: string[]): Promise<Respo
     let name = names.get(apgcode);
     if (typeof name === 'string') {
         names.delete(apgcode);
+        await writeFile('data/names.txt', Array.from(names.entries()).map(x => x[0] + ' ' + x[1]).join('\n'));
         return `Name deleted! Pattern was named \`${name}\``;
     } else {
         throw new BotError('Pattern is not named');
