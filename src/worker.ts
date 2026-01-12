@@ -82,7 +82,7 @@ async function runPattern(argv: string[], rle: string): Promise<{frames: [Patter
             let isNumber = false;
             let current = '';
             for (let char of arg) {
-                if ('0123456789.'.includes(char)) {
+                if ('0123456789.-'.includes(char)) {
                     if (isNumber) {
                         current += char;
                     } else {
