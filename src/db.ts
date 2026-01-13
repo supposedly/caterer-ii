@@ -131,7 +131,7 @@ export async function cmdRename(msg: Message, argv: string[]): Promise<Response>
         return 'Set name to `' + newName + '`';
     }
 }
-//
+
 export async function cmdDeleteName(msg: Message, argv: string[]): Promise<Response> {
     await msg.channel.sendTyping();
     if (!sentByAccepterer(msg)) {
