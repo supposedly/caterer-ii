@@ -3,7 +3,7 @@ import {join} from 'node:path';
 import * as fs from 'node:fs/promises';
 import {execSync} from 'node:child_process';
 import {parentPort} from 'node:worker_threads';
-import {RuleError, Pattern, CoordPattern, TreePattern, DataHistoryPattern, CoordHistoryPattern, DataSuperPattern, CoordSuperPattern, InvestigatorPattern, RuleLoaderBgollyPattern, identify, fullIdentify, parse} from '../lifeweb/lib/index.js';
+import {RuleError, Pattern, CoordPattern, TreePattern, DataHistoryPattern, CoordHistoryPattern, DataSuperPattern, CoordSuperPattern, InvestigatorPattern, RuleLoaderBgollyPattern, findType, identify, parse} from '../lifeweb/lib/index.js';
 import {BotError, parseSpecial, aliases} from './util.js';
 
 
@@ -421,9 +421,9 @@ parentPort.on('message', async (data: {id: number, type: 'sim', argv: string[], 
         if (data.type === 'sim') {
             parentPort.postMessage({id, ok: true, data: await runSim(data.argv, data.rle)});
         } else if (data.type === 'identify') {
-            parentPort.postMessage({id, ok: true, data: fullIdentify(parse(data.rle), data.limit)});
-        } else if (data.type === 'basic_identify') {
             parentPort.postMessage({id, ok: true, data: identify(parse(data.rle), data.limit)});
+        } else if (data.type === 'basic_identify') {
+            parentPort.postMessage({id, ok: true, data: findType(parse(data.rle), data.limit)});
         } else {
             throw new Error('Invalid type!');
         }

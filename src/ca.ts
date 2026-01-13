@@ -2,11 +2,11 @@
 import {join} from 'node:path';
 import {Worker} from 'node:worker_threads';
 import {EmbedBuilder} from 'discord.js';
-import {Pattern, DataPattern, CoordPattern, Identified, FullIdentified, findMinmax, getDescription, createPattern, toCatagolueRule, getHashsoup, RuleError} from '../lifeweb/lib/index.js';
+import {Pattern, PatternType, Identified, findMinmax, getApgcode, getDescription, createPattern, toCatagolueRule, getHashsoup, RuleError} from '../lifeweb/lib/index.js';
 import {BotError, Message, Response, writeFile, names, aliases, simStats, noReplyPings, findRLE} from './util.js';
 
 
-type WorkerResult = {id: number, ok: true} & ({type: 'sim', data: number} | {type: 'identify', data: FullIdentified} | {type: 'basic_identify', data: Identified}) | {id: number, ok: false, error: string, intentional: boolean, type: string};
+type WorkerResult = {id: number, ok: true} & ({type: 'sim', data: number} | {type: 'identify', data: Identified} | {type: 'basic_identify', data: PatternType}) | {id: number, ok: false, error: string, intentional: boolean, type: string};
 
 interface Job {
     resolve: (data: any) => void;
@@ -91,8 +91,8 @@ function workerOnExit(code: number): void {
 }
 
 function createWorkerJob(type: 'sim', data: {argv: string[], rle: string}): Promise<number | null>;
-function createWorkerJob(type: 'identify', data: {rle: string, limit: number}): Promise<FullIdentified | null>;
-function createWorkerJob(type: 'basic_identify', data: {rle: string, limit: number}): Promise<Identified | null>;
+function createWorkerJob(type: 'identify', data: {rle: string, limit: number}): Promise<Identified | null>;
+function createWorkerJob(type: 'basic_identify', data: {rle: string, limit: number}): Promise<PatternType | null>;
 function createWorkerJob(type: 'sim' | 'identify' | 'basic_identify', data: any): Promise<any> {
     return new Promise((resolve, reject) => {
         let id = nextID++;
@@ -238,7 +238,7 @@ export async function cmdPopulation(msg: Message, argv: string[]): Promise<Respo
 }
 
 
-function embedIdentified(original: Pattern, type: Identified | FullIdentified, isOutput?: boolean): EmbedBuilder[] {
+function embedIdentified(original: Pattern, type: PatternType | Identified, isOutput?: boolean): EmbedBuilder[] {
     let out = '';
     if (type.period > 0) {
         out += '**Period:** ' + type.period + '\n';
@@ -280,9 +280,9 @@ function embedIdentified(original: Pattern, type: Identified | FullIdentified, i
             out += '**Strict volatility:** ' + (Math.round(type.strictVolatility * 1000) / 1000) + '\n';
         }
     }
-    if (type.apgcode !== 'PATHOLOGICAL') {
+    let apgcode = getApgcode(type);
+    if (apgcode !== 'PATHOLOGICAL') {
         out += '[';
-        let apgcode = type.apgcode;
         if (apgcode.length > 1280) {
             apgcode = 'ov_' + apgcode.slice(1, apgcode.indexOf('_'));
         }
@@ -295,8 +295,8 @@ function embedIdentified(original: Pattern, type: Identified | FullIdentified, i
     }
     let title = 'desc' in type ? type.desc : getDescription(type);
     let name: string | undefined = undefined;
-    if (type.apgcode.startsWith('x') || type.apgcode.startsWith('y')) {
-        name = names.get(type.apgcode);
+    if (apgcode.startsWith('x') || apgcode.startsWith('y')) {
+        name = names.get(apgcode);
     } else {
         name = names.get(original.toCanonicalApgcode(1, 'x'));
     }
