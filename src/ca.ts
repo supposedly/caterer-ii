@@ -2,7 +2,7 @@
 import {join} from 'node:path';
 import {Worker} from 'node:worker_threads';
 import {EmbedBuilder} from 'discord.js';
-import {Pattern, PatternType, Identified, findMinmax, getApgcode, getDescription, createPattern, toCatagolueRule, getHashsoup, RuleError} from '../lifeweb/lib/index.js';
+import {Pattern, PatternType, Identified, findMinmax, getApgcode, getDescription, ALTERNATE_SYMMETRIES, createPattern, toCatagolueRule, getHashsoup, RuleError} from '../lifeweb/lib/index.js';
 import {BotError, Message, Response, writeFile, names, aliases, simStats, noReplyPings, findRLE} from './util.js';
 
 
@@ -241,16 +241,16 @@ export async function cmdPopulation(msg: Message, argv: string[]): Promise<Respo
 function embedIdentified(original: Pattern, type: PatternType | Identified, isOutput?: boolean): EmbedBuilder[] {
     let out = '';
     if (type.period > 0) {
-        out += '**Period:** ' + type.period + '\n';
+        out += `**Period:** ${type.period}\n`;
     }
     if (type.disp && (type.disp[0] !== 0 || type.disp[1] !== 0)) {
-        out += '**Displacement:** (' + type.disp[0] + ', ' + type.disp[1] + ')\n';
+        out += `**Displacement:** (${type.disp[0]}, ${type.disp[1]})\n`;
     }
     if (type.stabilizedAt > 0) {
-        out += '**Stabilizes at:** ' + type.stabilizedAt + '\n';
+        out += `**Stabilizes at:** ${type.stabilizedAt}\n`;
     }
     if (type.power !== undefined) {
-        out += '**Power:** ' + type.power + '\n';
+        out += `**Power:** ${type.power}\n`;
     }
     let pops: number[];
     if (type.period > 0) {
@@ -261,23 +261,26 @@ function embedIdentified(original: Pattern, type: PatternType | Identified, isOu
     let minPop = Math.min(...pops);
     let avgPop = pops.reduce((x, y) => x + y, 0) / pops.length;
     let maxPop = Math.max(...pops);
-    out += '**Populations:** ' + minPop + ' | ' + (Math.round(avgPop * 100) / 100) + ' | ' + maxPop + '\n';
+    out += `**Populations:** ${minPop} | ${Math.round(avgPop * 100) / 100} | ${maxPop}\n`;
     if ('minmax' in type && type.minmax) {
-        out += '**Min:** ' + type.minmax[0] + '\n';
-        out += '**Max:** ' + type.minmax[1] + '\n';
+        out += `**Min:** ${type.minmax[0]}\n`;
+        out += `**Max:** ${type.minmax[1]}\n`;
+    }
+    if ('symmetry' in type) {
+        out += `**Symmetry:** ${type.symmetry} (${ALTERNATE_SYMMETRIES[type.symmetry]})\n`;
     }
     if (type.period > 1) {
         if ('heat' in type && type.heat !== undefined) {
-            out += '**Heat:** ' + (Math.round(type.heat * 1000) / 1000) + '\n';
+            out += `**Heat:** ${Math.round(type.heat * 1000) / 1000}\n`;
         }
         if ('temperature' in type && type.temperature !== undefined) {
-            out += '**Temperature:** ' + (Math.round(type.temperature * 1000) / 1000) + '\n';
+            out += `**Temperature:** ${Math.round(type.temperature * 1000) / 1000}\n`;
         }
         if ('volatility' in type && type.volatility !== undefined) {
-            out += '**Volatility:** ' + (Math.round(type.volatility * 1000) / 1000) + '\n';
+            out += `**Volatility:** ${Math.round(type.volatility * 1000) / 1000}\n`;
         }
         if ('strictVolatility' in type && type.strictVolatility !== undefined) {
-            out += '**Strict volatility:** ' + (Math.round(type.strictVolatility * 1000) / 1000) + '\n';
+            out += `**Strict volatility:** ${Math.round(type.strictVolatility * 1000) / 1000}\n`;
         }
     }
     let apgcode = getApgcode(type);
