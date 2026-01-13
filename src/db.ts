@@ -1,5 +1,5 @@
 
-import {RuleError, identify, createPattern, parseSpeed} from '../lifeweb/lib/index.js';
+import {RuleError, findType, getApgcode, createPattern, parseSpeed} from '../lifeweb/lib/index.js';
 import {EmbedBuilder} from 'discord.js';
 import {BotError, Message, Response, readFile, writeFile, aliases, names, simStats, sentByAccepterer, findRLE} from './util.js';
 
@@ -72,7 +72,7 @@ export async function cmdName(msg: Message, argv: string[]): Promise<Response> {
     if (!data) {
         throw new BotError('Cannot find RLE');
     }
-    let apgcode = identify(data.p, NAME_GENERATIONS, false).apgcode;
+    let apgcode = getApgcode(findType(data.p, NAME_GENERATIONS, false));
     if (!apgcode.startsWith('x') && !apgcode.startsWith('y')) {
         apgcode = data.p.toCanonicalApgcode(1, 'x');
     }
@@ -112,7 +112,7 @@ export async function cmdRename(msg: Message, argv: string[]): Promise<Response>
     if (!data) {
         throw new BotError('Cannot find RLE');
     }
-    let apgcode = identify(data.p, NAME_GENERATIONS, false).apgcode;
+    let apgcode = getApgcode(findType(data.p, NAME_GENERATIONS, false));
     if (!apgcode.startsWith('x') && !apgcode.startsWith('y')) {
         apgcode = data.p.toCanonicalApgcode(1, 'x');
     }
@@ -141,7 +141,7 @@ export async function cmdDeleteName(msg: Message, argv: string[]): Promise<Respo
     if (!data) {
         throw new BotError('Cannot find RLE');
     }
-    let apgcode = identify(data.p, NAME_GENERATIONS, false).apgcode;
+    let apgcode = getApgcode(findType(data.p, NAME_GENERATIONS, false));
     if (!apgcode.startsWith('x') && !apgcode.startsWith('y')) {
         apgcode = data.p.toCanonicalApgcode(1, 'x');
     }
