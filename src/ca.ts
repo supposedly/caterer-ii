@@ -283,6 +283,7 @@ function embedIdentified(original: Pattern, type: PatternType | Identified, isOu
             out += `**Strict volatility:** ${Math.round(type.strictVolatility * 1000) / 1000}\n`;
         }
     }
+    type.phases[0] = original;
     let apgcode = getApgcode(type);
     if (apgcode !== 'PATHOLOGICAL') {
         out += '[';
@@ -301,7 +302,7 @@ function embedIdentified(original: Pattern, type: PatternType | Identified, isOu
     if (apgcode.startsWith('x') || apgcode.startsWith('y')) {
         name = names.get(apgcode);
     } else {
-        name = names.get(original.toCanonicalApgcode(1, 'x'));
+        name = names.get(type.phases[0].toCanonicalApgcode(1, 'x'));
     }
     if (name !== undefined) {
         if (type.stabilizedAt > 0) {
