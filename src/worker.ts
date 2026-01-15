@@ -269,12 +269,11 @@ async function runPattern(argv: string[], rle: string): Promise<{frames: [Patter
                     p.runGeneration();
                     frames.push([p.copy(), frameTime]);
                 }
-                if (typeof part[1] === 'number') {
+                if (typeof part[0] === 'number') {
                     if (type.period > 0) {
-                        for (let i = 0; i < (part[1] - 1) * type.period; i++) {
+                        for (let i = 0; i < (part[0] - 1) * type.period; i++) {
                             p.runGeneration();
                             frames.push([p.copy(), frameTime]);
-                            console.log(i);
                         }
                     }
                     part = part.slice(1);
