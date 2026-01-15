@@ -226,8 +226,9 @@ async function runPattern(argv: string[], rle: string): Promise<{frames: [Patter
                     if (pop === 0) {
                         break;
                     }
+                    let found = false;
                     for (let period = 1; period < Math.floor(i / 16); period++) {
-                        let found = true;
+                        found = true;
                         for (let j = 1; j < 16; j++) {
                             if (pop !== pops[pops.length - period * j]) {
                                 found = false;
@@ -238,9 +239,12 @@ async function runPattern(argv: string[], rle: string): Promise<{frames: [Patter
                             break;
                         }
                     }
+                    if (found) {
+                        break;
+                    }
                     for (let period = 1; period < Math.floor(i / 16); period++) {
                         let diff = pop - pops[pops.length - period];
-                        let found = true;
+                        found = true;
                         for (let j = 1; j < 16; j++) {
                             if (diff !== pops[pops.length - period * j] - pops[pops.length - period * (j + 1)]) {
                                 found = false;
@@ -250,6 +254,9 @@ async function runPattern(argv: string[], rle: string): Promise<{frames: [Patter
                         if (found) {
                             break;
                         }
+                    }
+                    if (found) {
+                        break;
                     }
                     pops.push(pop);
                 }
