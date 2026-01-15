@@ -298,6 +298,7 @@ async function updateStarboard(data: MessageReaction | PartialMessageReaction): 
         } else {
             msg = Array.from((await msg.channel.messages.fetch({limit: 1, after: msg.id})).values())[0];
             if (msg.reference) {
+                msg = await msg.fetchReference();
                 users.push(...(await getStarReactions(msg)));
             } else {
                 return;
