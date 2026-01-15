@@ -261,6 +261,21 @@ client.on('messageReactionAdd', async data => {
 
 let starboard: Map<string, [string, string]> = new Map(JSON.parse(await readFile('data/starboard.json')));
 
+async function getStarReactions(msg: _Message): Promise<string[]> {
+    let react = msg.reactions.cache.get('⭐');
+    if (!react) {
+        let react2 = msg.reactions.resolve('⭐');
+        if (react2) {
+            react = react2;
+        }
+    }
+    if (react) {
+        return (await react.users.fetch()).map(x => x.id);
+    } else {
+        return [];
+    }
+}
+
 async function updateStarboard(data: MessageReaction | PartialMessageReaction): Promise<void> {
     if (data.emoji.name !== '⭐') {
         return;
@@ -279,18 +294,14 @@ async function updateStarboard(data: MessageReaction | PartialMessageReaction): 
     if (msg.channel.id === config.starboardChannel) {
         if (msg.reference) {
             msg = await msg.fetchReference();
-            let react = msg.reactions.cache.get('⭐');
-            if (!react) {
-                let react2 = msg.reactions.resolve('⭐');
-                if (react2) {
-                    react = react2;
-                }
-            }
-            if (react) {
-                users.push(...(await react.users.fetch()).map(x => x.id));
-            }
+            users.push(...(await getStarReactions(msg)));
         } else {
-            return;
+            msg = Array.from((await msg.channel.messages.fetch({limit: 1, after: msg.id})).values())[0];
+            if (msg.reference) {
+                users.push(...(await getStarReactions(msg)));
+            } else {
+                return;
+            }
         }
     }
     let senderId: string;
@@ -299,8 +310,12 @@ async function updateStarboard(data: MessageReaction | PartialMessageReaction): 
     } else {
         return;
     }
-    let count = Array.from(new Set(users)).filter(x => x !== senderId).length;
     let entry = starboard.get(msg.id);
+    if (entry) {
+        users.push(...(await getStarReactions(await starboardChannel.messages.fetch(entry[0]))));
+        users.push(...(await getStarReactions(await starboardChannel.messages.fetch(entry[1]))));
+    }
+    let count = Array.from(new Set(users)).filter(x => x !== senderId).length;
     if (count >= config.starThreshold) {
         let text: string;
         if (count < Math.floor(config.starThreshold * 2)) {
