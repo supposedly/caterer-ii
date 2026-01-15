@@ -274,6 +274,7 @@ async function runPattern(argv: string[], rle: string): Promise<{frames: [Patter
                         for (let i = 0; i < (part[1] - 1) * type.period; i++) {
                             p.runGeneration();
                             frames.push([p.copy(), frameTime]);
+                            console.log(i);
                         }
                     }
                     part = part.slice(1);
