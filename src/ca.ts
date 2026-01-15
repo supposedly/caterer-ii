@@ -143,7 +143,7 @@ export async function cmdSim(msg: Message, argv: string[]): Promise<Response> {
                 data[i] = Math.ceil(Math.random() * p.states);
             }
         }
-        p.setData(data, height, width);
+        p.setData(height, width, data);
         replyTo = msg;
     } else {
         let data = await findRLE(msg, argv.join(' ').includes('ca'));
