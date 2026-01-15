@@ -3,7 +3,7 @@ import {join} from 'node:path';
 import * as fs from 'node:fs/promises';
 import {execSync} from 'node:child_process';
 import {parentPort} from 'node:worker_threads';
-import {RuleError, Pattern, CoordPattern, TreePattern, DataHistoryPattern, CoordHistoryPattern, DataSuperPattern, CoordSuperPattern, InvestigatorPattern, RuleLoaderBgollyPattern, findType, identify, parse} from '../lifeweb/lib/index.js';
+import {RuleError, Pattern, CoordPattern, TreePattern, DataHistoryPattern, CoordHistoryPattern, DataSuperPattern, CoordSuperPattern, InvestigatorPattern, RuleLoaderBgollyPattern, findType, getDescription, identify, createPattern, parse} from '../lifeweb/lib/index.js';
 import {BotError, parseSpecial, aliases} from './util.js';
 
 
@@ -70,7 +70,7 @@ const INVESTIGATOR_COLORS: [number, number, number][] = [
 
 let dir = join(import.meta.dirname, '..');
 
-async function runPattern(argv: string[], rle: string): Promise<{frames: [Pattern, number][], gifSize: number, minX: number, minY: number, width: number, height: number, customColors: {[key: number]: [number, number, number]}}> {
+async function runPattern(argv: string[], rle: string): Promise<{frames: [Pattern, number][], gifSize: number, minX: number, minY: number, width: number, height: number, customColors: {[key: number]: [number, number, number]}, desc?: string}> {
     let p = parseSpecial(rle).shrinkToFit();
     let parts: (string | number)[][] = [];
     let currentPart: (string | number)[] = [];
@@ -122,6 +122,7 @@ async function runPattern(argv: string[], rle: string): Promise<{frames: [Patter
     let gifSize = 200;
     let useCAViewer = false;
     let customColors: {[key: number]: [number, number, number]} = {};
+    let desc: string | undefined;
     for (let part of parts) {
         while (part.length > 0) {
             if (typeof part[0] === 'number') {
@@ -260,7 +261,16 @@ async function runPattern(argv: string[], rle: string): Promise<{frames: [Patter
                     }
                     pops.push(pop);
                 }
-                
+            } else if (part[0] === 'identify') {
+                let type = findType(p, 120000, true);
+                frames.push(...type.phases.map<[Pattern, number | null]>(x => [x, frameTime]));
+                desc = getDescription(type);
+            } else if (part[0] === 'setrule') {
+                if (typeof part[1] === 'number') {
+                    throw new BotError(`Invalid part: ${part.join(' ')}`);
+                }
+                p = createPattern(part[1], {height: p.height, width: p.width, data: p.getData()});
+                part = part.slice(2);
             } else {
                 throw new BotError(`Invalid part: ${part.join(' ')}`);
             }
@@ -311,12 +321,12 @@ async function runPattern(argv: string[], rle: string): Promise<{frames: [Patter
         height++;
     }
     let defaultTime = Math.ceil(Math.min(1, Math.max(1/50, 5 / frames.length)) * 100);
-    return {frames: frames.map(([p, time]) => [p, time ?? defaultTime]), gifSize, minX, minY, width, height, customColors};
+    return {frames: frames.map(([p, time]) => [p, time ?? defaultTime]), gifSize, minX, minY, width, height, customColors, desc};
 }
 
-async function runSim(argv: string[], rle: string): Promise<number> {
+async function runSim(argv: string[], rle: string): Promise<[number, string | undefined]> {
     let startTime = performance.now();
-    let {frames, gifSize, minX, minY, width, height, customColors} = await runPattern(argv, rle);
+    let {frames, gifSize, minX, minY, width, height, customColors, desc} = await runPattern(argv, rle);
     let parseTime = performance.now() - startTime;
     let p = frames[0][0];
     let bitWidth = Math.max(2, Math.ceil(Math.log2(p.states)));
@@ -449,7 +459,7 @@ async function runSim(argv: string[], rle: string): Promise<number> {
     let scale = Math.ceil(gifSize / Math.min(width, height));
     gifSize = Math.min(width, height) * scale;
     execSync(`gifsicle --resize-${width < height ? 'width' : 'height'} ${gifSize} -O3 sim_base.gif > sim.gif`);
-    return parseTime;
+    return [parseTime, desc];
 }
 
 
