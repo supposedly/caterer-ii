@@ -2,7 +2,7 @@
 import * as lifeweb from '../lifeweb/lib/index.js';
 import {inspect} from 'node:util';
 import {Client, GatewayIntentBits, Message as _Message, MessageReaction, PartialMessageReaction, MessageReplyOptions, TextChannel, Partials} from 'discord.js';
-import {BotError, Response, Message, readFile, writeFile, config, sentByAdmin, aliases, noReplyPings, findRLE} from './util.js';
+import {BotError, Response, Message, readFile, writeFile, config, sentByAdmin, aliases, noReplyPings, findRLEFromText, findRLE} from './util.js';
 import {cmdHelp} from './help.js';
 import {cmdIdentify, cmdBasicIdentify, cmdMinmax, cmdSim, cmdHashsoup, cmdApgencode, cmdApgdecode, cmdPopulation} from './ca.js';
 import {TYPE_NAMES, cmdSssss, cmdSssssInfo, cmdDyk, cmdName, cmdRename, cmdDeleteName, cmdSimStats, cmdSaveSimStats, cmdAlias, cmdUnalias, cmdLookupAlias} from './db.js';
@@ -290,7 +290,13 @@ async function updateStarboard(data: MessageReaction | PartialMessageReaction): 
         }
         text += ` **${count}** `;
         if (msg.author?.id === data.client.user.id && msg.attachments.size === 1) {
-            text += `Pattern by <@${(await msg.fetchReference()).author.id}>`;
+            let msg2 = await msg.fetchReference();
+            let data = findRLEFromText(msg2.content);
+            if (data) {
+                text += `Pattern by <@${msg2.author.id}> in \`${data.ruleStr}\``;
+            } else {
+                text += `Pattern by <@${msg2.author.id}>`;
+            }
         } else {
             text += `<@${msg.author?.id}>`;
         }
