@@ -216,6 +216,46 @@ async function runPattern(argv: string[], rle: string): Promise<{frames: [Patter
             } else if (part[0] === 'ca') {
                 useCAViewer = !useCAViewer;
                 part = part.slice(1);
+            } else if (part[0] === 'stable') {
+                part = part.slice(2);
+                let pops: number[] = [];
+                for (let i = 0; i < 120000; i++) {
+                    p.runGeneration();
+                    frames.push([p.copy(), frameTime]);
+                    let pop = p.population;
+                    if (pop === 0) {
+                        break;
+                    }
+                    for (let period = 1; period < Math.floor(pops.length / 15); period++) {
+                        let found = true;
+                        for (let j = 1; j < 16; j++) {
+                            if (pop !== pops[pops.length - period * j]) {
+                                found = false;
+                                break;
+                            }
+                        }
+                        if (found) {
+                            break;
+                        }
+                    }
+                    if (i > 500 && i % 50 === 0) {
+                        for (let period = 1; period < Math.floor(i / 20); period++) {
+                            let diff = pop - pops[pops.length - period];
+                            let found = true;
+                            for (let j = 1; j < 16; j++) {
+                                if (diff !== pops[pops.length - period * j] - pops[pops.length - period * (j + 1)]) {
+                                    found = false;
+                                    break;
+                                }
+                            }
+                            if (found) {
+                                break;
+                            }
+                        }
+                    }
+                    pops.push(pop);
+                }
+                
             } else {
                 throw new BotError(`Invalid part: ${part.join(' ')}`);
             }
