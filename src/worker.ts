@@ -268,6 +268,7 @@ async function runPattern(argv: string[], rle: string): Promise<{frames: [Patter
                 desc = getDescription(type);
                 if (typeof part[1] === 'number') {
                     if (type.period > 0) {
+                        p.run(type.phases.length);
                         for (let i = 0; i < (part[1] - 1) * type.period; i++) {
                             p.runGeneration();
                             frames.push([p.copy(), frameTime]);
