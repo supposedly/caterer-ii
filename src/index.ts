@@ -226,10 +226,7 @@ client.on('messageUpdate', async (old, msg) => {
     runCommand(msg);
 });
 
-
-let starboard: Map<string, [string, string]> = new Map(JSON.parse(await readFile('data/starboard.json')));
-
-async function updateStarboard(data: MessageReaction | PartialMessageReaction): Promise<void> {
+client.on('messageReactionAdd', async data => {
     if (data.emoji.name === '❌' || data.emoji.name === '🗑️') {
         if (data.partial) {
             data = await data.fetch();
@@ -254,6 +251,12 @@ async function updateStarboard(data: MessageReaction | PartialMessageReaction): 
         }
         return;
     }
+})
+
+
+let starboard: Map<string, [string, string]> = new Map(JSON.parse(await readFile('data/starboard.json')));
+
+async function updateStarboard(data: MessageReaction | PartialMessageReaction): Promise<void> {
     if (data.emoji.name !== '⭐') {
         return;
     }
