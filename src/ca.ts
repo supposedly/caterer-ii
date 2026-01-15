@@ -6,7 +6,7 @@ import {Pattern, PatternType, Identified, findMinmax, getApgcode, getDescription
 import {BotError, Message, Response, writeFile, names, aliases, simStats, noReplyPings, findRLE} from './util.js';
 
 
-type WorkerResult = {id: number, ok: true} & ({type: 'sim', data: number} | {type: 'identify', data: Identified} | {type: 'basic_identify', data: PatternType}) | {id: number, ok: false, error: string, intentional: boolean, type: string};
+type WorkerResult = {id: number, ok: true} & ({type: 'sim', data: [number, string | undefined]} | {type: 'identify', data: Identified} | {type: 'basic_identify', data: PatternType}) | {id: number, ok: false, error: string, intentional: boolean, type: string};
 
 interface Job {
     resolve: (data: any) => void;
@@ -90,7 +90,7 @@ function workerOnExit(code: number): void {
     workerHandleFatal(new Error(msg));
 }
 
-function createWorkerJob(type: 'sim', data: {argv: string[], rle: string}): Promise<number | null>;
+function createWorkerJob(type: 'sim', data: {argv: string[], rle: string}): Promise<[number, string | undefined] | null>;
 function createWorkerJob(type: 'identify', data: {rle: string, limit: number}): Promise<Identified | null>;
 function createWorkerJob(type: 'basic_identify', data: {rle: string, limit: number}): Promise<PatternType | null>;
 function createWorkerJob(type: 'sim' | 'identify' | 'basic_identify', data: any): Promise<any> {
@@ -153,10 +153,11 @@ export async function cmdSim(msg: Message, argv: string[]): Promise<Response> {
         p = data.p;
         replyTo = data.msg;
     }
-    let parseTime = await createWorkerJob('sim', {argv, rle: p.toRLE()});
-    if (!parseTime) {
+    let data = await createWorkerJob('sim', {argv, rle: p.toRLE()});
+    if (!data) {
         return 'Error: Timed out!';
     }
+    let [parseTime, desc] = data;
     if (p.ruleStr in simStats) {
         simStats[p.ruleStr]++;
     } else {
@@ -167,20 +168,22 @@ export async function cmdSim(msg: Message, argv: string[]): Promise<Response> {
         simCounter = 0;
         await writeFile('data/sim_stats.json', JSON.stringify(simStats, undefined, 4));
     }
+    let content: string | undefined = undefined;
     if (outputTime) {
         let total = Math.round(performance.now() - startTime) / 1000;
         let parse = Math.round(parseTime) / 1000;
-        return await replyTo.reply({
-            content: `Took ${total} seconds (${parse} to parse)`,
-            files: ['sim.gif'],
-            allowedMentions: {repliedUser: false},
-        });
-    } else {
-        return await replyTo.reply({
-            files: ['sim.gif'],
-            allowedMentions: {repliedUser: false},
-        });
+        content = `Took ${total} seconds (${parse} to parse)`;
+        if (desc) {
+            content += '\n' + desc;
+        }
+    } else if (desc) {
+        content = desc;
     }
+    return await replyTo.reply({
+        content,
+        files: ['sim.gif'],
+        allowedMentions: {repliedUser: false},
+    });
 }
 
 
