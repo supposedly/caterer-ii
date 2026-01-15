@@ -264,11 +264,13 @@ async function runPattern(argv: string[], rle: string): Promise<{frames: [Patter
             } else if (part[0] === 'identify') {
                 part = part.slice(1);
                 let type = findType(p, 120000, true);
-                frames.push(...type.phases.slice(1).map<[Pattern, number | null]>(x => [x, frameTime]));
                 desc = getDescription(type);
+                for (let i = 0; i < type.stabilizedAt + type.period; i++) {
+                    p.runGeneration();
+                    frames.push([p.copy(), frameTime]);
+                }
                 if (typeof part[1] === 'number') {
                     if (type.period > 0) {
-                        p.run(type.phases.length);
                         for (let i = 0; i < (part[1] - 1) * type.period; i++) {
                             p.runGeneration();
                             frames.push([p.copy(), frameTime]);
