@@ -398,7 +398,7 @@ setInterval(async () => {
                     if (improvedShips.length === 1) {
                         lines.push(`Improved speed in ${TYPE_NAMES[type]}: ${improvedShips[0][2] === 3 ? `**${improvedShips[0][1]} (${improvedShips[0][3]} cells to ${improvedShips[0][2]} cells)**` : `${improvedShips[0][1]} (${improvedShips[0][3]} cells to ${improvedShips[0][2]} cells)`}`);
                     } else {
-                        lines.push(`${improvedShips.length} improved speeds in ${TYPE_NAMES[type]}: ${improvedShips.map(x => x[3] === 3 ? `**${x[1]} (${x[3]} cells to ${x[2]} cells)**` : `${x[1]} (${x[3]} cells to ${x[2]} cells)`).join(', ')}`);
+                        lines.push(`${improvedShips.length} improved speeds in ${TYPE_NAMES[type]}: ${improvedShips.map(x => x[2] === 3 ? `**${x[1]} (${x[3]} cells to ${x[2]} cells)**` : `${x[1]} (${x[3]} cells to ${x[2]} cells)`).join(', ')}`);
                     }
                 }
             }
