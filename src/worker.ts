@@ -226,7 +226,7 @@ async function runPattern(argv: string[], rle: string): Promise<{frames: [Patter
                     if (pop === 0) {
                         break;
                     }
-                    for (let period = 1; period < Math.floor(pops.length / 15); period++) {
+                    for (let period = 1; period < Math.floor(i / 16); period++) {
                         let found = true;
                         for (let j = 1; j < 16; j++) {
                             if (pop !== pops[pops.length - period * j]) {
@@ -238,19 +238,17 @@ async function runPattern(argv: string[], rle: string): Promise<{frames: [Patter
                             break;
                         }
                     }
-                    if (i > 500 && i % 50 === 0) {
-                        for (let period = 1; period < Math.floor(i / 20); period++) {
-                            let diff = pop - pops[pops.length - period];
-                            let found = true;
-                            for (let j = 1; j < 16; j++) {
-                                if (diff !== pops[pops.length - period * j] - pops[pops.length - period * (j + 1)]) {
-                                    found = false;
-                                    break;
-                                }
-                            }
-                            if (found) {
+                    for (let period = 1; period < Math.floor(i / 16); period++) {
+                        let diff = pop - pops[pops.length - period];
+                        let found = true;
+                        for (let j = 1; j < 16; j++) {
+                            if (diff !== pops[pops.length - period * j] - pops[pops.length - period * (j + 1)]) {
+                                found = false;
                                 break;
                             }
+                        }
+                        if (found) {
+                            break;
                         }
                     }
                     pops.push(pop);
