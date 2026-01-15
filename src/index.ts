@@ -211,7 +211,9 @@ client.on('messageUpdate', async (old, msg) => {
         let index = previousMsgs.findLastIndex(x => x[0] === old.id);
         if (index > -1) {
             let msg = previousMsgs[index][1];
-            msg.delete();
+            try {
+                msg.delete();
+            } catch {}
             previousMsgs = previousMsgs.splice(index, 1);
         }
     } catch (error) {
