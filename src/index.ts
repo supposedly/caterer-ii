@@ -275,6 +275,13 @@ async function updateStarboard(data: MessageReaction | PartialMessageReaction): 
     if (msg.createdTimestamp < 1768086000000) {
         return;
     }
+    if (msg.channel.id === config.starboardChannel) {
+        if (msg.reference) {
+            msg = await msg.fetchReference();
+        } else {
+            return;
+        }
+    }
     let count = (await data.users.fetch()).filter(x => x.id !== msg.author?.id).size;
     let entry = starboard.get(msg.id);
     if (count >= config.starThreshold) {
