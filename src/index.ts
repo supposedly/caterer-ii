@@ -1,7 +1,7 @@
 
 import * as lifeweb from '../lifeweb/lib/index.js';
 import {inspect} from 'node:util';
-import {Client, GatewayIntentBits, Message as _Message, MessageReaction, PartialMessageReaction, MessageReplyOptions, TextChannel, Partials} from 'discord.js';
+import {Client, GatewayIntentBits, DiscordAPIError, Message as _Message, MessageReaction, PartialMessageReaction, MessageReplyOptions, TextChannel, Partials} from 'discord.js';
 import {BotError, Response, Message, readFile, writeFile, config, sentByAdmin, aliases, noReplyPings, findRLEFromText, findRLE} from './util.js';
 import {cmdHelp} from './help.js';
 import {cmdIdentify, cmdBasicIdentify, cmdMinmax, cmdSim, cmdHashsoup, cmdApgencode, cmdApgdecode, cmdPopulation} from './ca.js';
@@ -226,7 +226,13 @@ client.on('messageUpdate', async (old, msg) => {
         } else {
             str = String(error);
         }
-        await msg.reply({content: '```' + str + '```', allowedMentions: {repliedUser: !noReplyPings.includes(msg.author.id), parse: []}});
+        console.log(str);
+        if (error instanceof DiscordAPIError && String(error).includes('fewer in length')) {
+            await msg.reply('Error: Response too long!');
+        } else {
+            await msg.reply({content: '```' + str + '```', allowedMentions: {repliedUser: !noReplyPings.includes(msg.author.id), parse: []}});
+
+        }
     }
     runCommand(msg);
 });
