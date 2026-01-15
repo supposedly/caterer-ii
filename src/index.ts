@@ -212,7 +212,10 @@ client.on('messageUpdate', async (old, msg) => {
         if (index > -1) {
             let msg = previousMsgs[index][1];
             try {
-                msg.delete();
+                let msg2 = await msg.channel.messages.fetch(msg.id);
+                if (msg2) {
+                    msg2.delete();
+                }
             } catch {}
             previousMsgs = previousMsgs.splice(index, 1);
         }
