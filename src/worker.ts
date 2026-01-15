@@ -217,7 +217,7 @@ async function runPattern(argv: string[], rle: string): Promise<{frames: [Patter
                 useCAViewer = !useCAViewer;
                 part = part.slice(1);
             } else if (part[0] === 'stable') {
-                part = part.slice(2);
+                part = part.slice(1);
                 let pops: number[] = [];
                 for (let i = 0; i < 120000; i++) {
                     p.runGeneration();
