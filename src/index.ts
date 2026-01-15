@@ -275,14 +275,24 @@ async function updateStarboard(data: MessageReaction | PartialMessageReaction): 
     if (msg.createdTimestamp < 1768086000000) {
         return;
     }
+    let count = (await data.users.fetch()).filter(x => x.id !== msg.author?.id).size;
     if (msg.channel.id === config.starboardChannel) {
         if (msg.reference) {
             msg = await msg.fetchReference();
+            let react = msg.reactions.cache.get('⭐');
+            if (!react) {
+                let react2 = msg.reactions.resolve('⭐');
+                if (react2) {
+                    react = react2;
+                }
+            }
+            if (react) {
+                count += react.count;
+            }
         } else {
             return;
         }
     }
-    let count = (await data.users.fetch()).filter(x => x.id !== msg.author?.id).size;
     let entry = starboard.get(msg.id);
     if (count >= config.starThreshold) {
         let text: string;
