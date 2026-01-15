@@ -262,6 +262,7 @@ async function runPattern(argv: string[], rle: string): Promise<{frames: [Patter
                     pops.push(pop);
                 }
             } else if (part[0] === 'identify') {
+                part = part.slice(1);
                 let type = findType(p, 120000, true);
                 frames.push(...type.phases.map<[Pattern, number | null]>(x => [x, frameTime]));
                 desc = getDescription(type);
