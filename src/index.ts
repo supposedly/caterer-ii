@@ -231,7 +231,6 @@ client.on('messageUpdate', async (old, msg) => {
             await msg.reply('Error: Response too long!');
         } else {
             await msg.reply({content: '```' + str + '```', allowedMentions: {repliedUser: !noReplyPings.includes(msg.author.id), parse: []}});
-
         }
     }
     runCommand(msg);
