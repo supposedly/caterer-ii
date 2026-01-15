@@ -333,7 +333,7 @@ async function runPattern(argv: string[], rle: string): Promise<{frames: [Patter
         width++;
         height++;
     }
-    let defaultTime = Math.ceil(Math.min(1, Math.max(1/50, 5 / frames.length)) * 100);
+    let defaultTime = Math.ceil(Math.min(1, Math.max(1/100, 4 / frames.length)) * 100);
     return {frames: frames.map(([p, time]) => [p, time ?? defaultTime]), gifSize, minX, minY, width, height, customColors, desc};
 }
 
