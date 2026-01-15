@@ -170,13 +170,13 @@ export async function cmdSim(msg: Message, argv: string[]): Promise<Response> {
     if (outputTime) {
         let total = Math.round(performance.now() - startTime) / 1000;
         let parse = Math.round(parseTime) / 1000;
-        await replyTo.reply({
+        return await replyTo.reply({
             content: `Took ${total} seconds (${parse} to parse)`,
             files: ['sim.gif'],
             allowedMentions: {repliedUser: false},
         });
     } else {
-        await replyTo.reply({
+        return await replyTo.reply({
             files: ['sim.gif'],
             allowedMentions: {repliedUser: false},
         });

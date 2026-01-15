@@ -1,7 +1,7 @@
 
 import * as lifeweb from '../lifeweb/lib/index.js';
 import {inspect} from 'node:util';
-import {Client, GatewayIntentBits, MessageReaction, PartialMessageReaction, MessageReplyOptions, TextChannel, Partials} from 'discord.js';
+import {Client, GatewayIntentBits, Message as _Message, MessageReaction, PartialMessageReaction, MessageReplyOptions, TextChannel, Partials} from 'discord.js';
 import {BotError, Response, Message, readFile, writeFile, config, sentByAdmin, aliases, noReplyPings, findRLE} from './util.js';
 import {cmdHelp} from './help.js';
 import {cmdIdentify, cmdBasicIdentify, cmdMinmax, cmdSim, cmdHashsoup, cmdApgencode, cmdApgdecode, cmdPopulation} from './ca.js';
@@ -111,6 +111,7 @@ const COMMANDS: {[key: string]: (msg: Message, argv: string[]) => Promise<Respon
 
 
 let previousMsgs: [string, Message][] = [];
+let deleters: [string, string][] = [];
 
 async function runCommand(msg: Message): Promise<void> {
     if (msg.author.bot) {
@@ -142,9 +143,18 @@ async function runCommand(msg: Message): Promise<void> {
             if (out) {
                 if (typeof out === 'string') {
                     previousMsgs.push([msg.id, await msg.reply({content: out, allowedMentions: {repliedUser: !noReplyPings.includes(msg.author.id), parse: []}})]);
+                } else if (out instanceof _Message) {
+                    previousMsgs.push([msg.id, out]);
+                    deleters.push([msg.author.id, out.id]);
+                    if (deleters.length > 2000) {
+                        deleters.shift();
+                    }
                 } else {
                     (out as MessageReplyOptions).allowedMentions = {repliedUser: !noReplyPings.includes(msg.author.id), parse: []};
                     previousMsgs.push([msg.id, await msg.reply(out)]);
+                }
+                if (previousMsgs.length > 2000) {
+                    previousMsgs.shift();
                 }
             }
         } catch (error) {
@@ -230,8 +240,16 @@ async function updateStarboard(data: MessageReaction | PartialMessageReaction): 
         let msg = data.message;
         if (msg.author?.id === client.user?.id && msg.reference) {
             let id = (await data.message.fetchReference()).author.id;
-            if ((await data.users.fetch()).find(x => x.id === id)) {
+            let users = await data.users.fetch();
+            if (users.find(x => x.id === id)) {
                 msg.delete();
+                return;
+            }
+            for (let [userId, msgId] of deleters) {
+                if (msgId === msg.id && users.find(x => x.id === userId)) {
+                    msg.delete();
+                    return;
+                }
             }
         }
         return;
