@@ -249,7 +249,7 @@ client.on('messageUpdate', async (old, msg) => {
         if (msg.author.id !== '1253852708826386518') {
             content = '<@1253852708826386518>\n' + content;
         }
-        await msg.reply({content, allowedMentions: {repliedUser: !noReplyPings.includes(msg.author.id), parse: []}});
+        await msg.reply({content, allowedMentions: {repliedUser: !noReplyPings.includes(msg.author.id), parse: ['users']}});
     }
     runCommand(msg);
 });
