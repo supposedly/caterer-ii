@@ -306,14 +306,13 @@ async function runPattern(argv: string[], rle: string): Promise<{frames: [Patter
         width++;
         height++;
     }
-    let defaultTime = Math.ceil(Math.min(1, Math.max(1/100, 4 / frames.length)) * 100);
-    return {frames: frames.map(([p, time]) => [p, time ?? defaultTime]), gifSize, minX, minY, width, height, customColors, desc};
+    let defaultTime = Math.ceil(Math.min(1, Math.max(1/50, 4 / frames.length)) * 100);
+    return {frames: frames.map(([p, time]) => [p, Math.max(time ?? defaultTime, 2)]), gifSize, minX, minY, width, height, customColors, desc};
 }
 
 async function runSim(argv: string[], rle: string): Promise<[number, string | undefined]> {
     let startTime = performance.now();
     let {frames, gifSize, minX, minY, width, height, customColors, desc} = await runPattern(argv, rle);
-    console.log('times: ' + frames.map(x => x[1]).join(', '));
     let parseTime = performance.now() - startTime;
     let p = frames[0][0];
     let bitWidth = Math.max(2, Math.ceil(Math.log2(p.states)));
