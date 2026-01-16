@@ -2,7 +2,7 @@
 import {join} from 'node:path';
 import {Worker} from 'node:worker_threads';
 import {EmbedBuilder} from 'discord.js';
-import {Pattern, PatternType, Identified, findMinmax, getApgcode, getDescription, ALTERNATE_SYMMETRIES, createPattern, toCatagolueRule, getHashsoup, RuleError} from '../lifeweb/lib/index.js';
+import {Pattern, TRANSITIONS, VALID_TRANSITIONS, unparseTransitions, arrayToTransitions, parseMAP, unparseMAP, PatternType, Identified, findMinmax, getApgcode, getDescription, ALTERNATE_SYMMETRIES, createPattern, toCatagolueRule, getHashsoup, RuleError, MAPPattern} from '../lifeweb/lib/index.js';
 import {BotError, Message, Response, writeFile, names, aliases, simStats, noReplyPings, findRLE} from './util.js';
 
 
@@ -238,6 +238,25 @@ export async function cmdPopulation(msg: Message, argv: string[]): Promise<Respo
             allowedMentions: {repliedUser: !noReplyPings.includes(msg.author.id), parse: []},
         });
     }
+}
+
+
+export async function cmdMAPToINT(msg: Message, argv: string[]): Promise<Response> {
+    let [b, s] = arrayToTransitions(parseMAP(argv[1].slice(3)), TRANSITIONS);
+    return `B${unparseTransitions(b, VALID_TRANSITIONS)}/S${unparseTransitions(s, VALID_TRANSITIONS)}`;
+}
+
+export async function cmdMAPToHexINT(msg: Message, argv: string[]): Promise<Response> {
+    let [b, s] = arrayToTransitions(parseMAP(argv[1].slice(3)), TRANSITIONS);
+    return `B${unparseTransitions(b, VALID_TRANSITIONS)}/S${unparseTransitions(s, VALID_TRANSITIONS)}`;
+}
+
+export async function cmdINTToMAP(msg: Message, argv: string[]): Promise<Response> {
+    let p = createPattern(argv[1]);
+    if (!(p instanceof MAPPattern)) {
+        throw new Error('Rule must be in B/S notation!');
+    }
+    return 'MAP' + unparseMAP(p.trs);
 }
 
 

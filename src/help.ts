@@ -43,39 +43,6 @@ const HELP: {[key: string]: Help} = {
         args: [],
     },
 
-    identify: {
-        desc: 'Identify a pattern',
-        args: [
-            {
-                name: 'generations',
-                optional: true,
-                desc: 'Number of generations to run the identifier for (default 256).'
-            },
-        ],
-    },
-
-    basic_identify: {
-        desc: 'Identify a pattern, but provide less information',
-        args: [
-            {
-                name: 'generations',
-                optional: true,
-                desc: 'Number of generations to run the identifier for (default 256).'
-            },
-        ],
-        aliases: ['basicidentify'],
-    },
-
-    minmax: {
-        desc: 'Find the minimum and maximum rule of a pattern',
-        args: [
-            {
-                name: 'generations',
-                desc: 'Number of generations to run the pattern for.',
-            },
-        ],
-    },
-
     sim: {
         desc: 'Simulate a RLE and output a gif',
         args: [
@@ -158,6 +125,72 @@ const HELP: {[key: string]: Help} = {
         desc: 'Get the population of a pattern',
         args: [],
         aliases: ['pop'],
+    },
+
+    map_to_int: {
+        desc: 'Converts a MAP rule to an INT rule',
+        args: [
+            {
+                name: 'rule',
+                desc: 'The MAP rule to convert',
+            },
+        ],
+        aliases: ['maptoint'],
+    },
+
+    map_to_hex_int: {
+        desc: 'Converts a MAP rule to a Hexagonal INT rule',
+        args: [
+            {
+                name: 'rule',
+                desc: 'The MAP rule to convert',
+            },
+        ],
+        aliases: ['maptohexint'],
+    },
+
+    int_to_map: {
+        desc: 'Converts an INT rule to a MAP rule',
+        args: [
+            {
+                name: 'rule',
+                desc: 'The INT rule to convert',
+            },
+        ],
+        aliases: ['inttomap'],
+    },
+
+    identify: {
+        desc: 'Identify a pattern',
+        args: [
+            {
+                name: 'generations',
+                optional: true,
+                desc: 'Number of generations to run the identifier for (default 256).'
+            },
+        ],
+    },
+
+    basic_identify: {
+        desc: 'Identify a pattern, but provide less information',
+        args: [
+            {
+                name: 'generations',
+                optional: true,
+                desc: 'Number of generations to run the identifier for (default 256).'
+            },
+        ],
+        aliases: ['basicidentify'],
+    },
+
+    minmax: {
+        desc: 'Find the minimum and maximum rule of a pattern',
+        args: [
+            {
+                name: 'generations',
+                desc: 'Number of generations to run the pattern for.',
+            },
+        ],
     },
 
     sssss: {
