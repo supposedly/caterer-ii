@@ -258,7 +258,7 @@ export async function cmdMAPToHexINT(msg: Message, argv: string[]): Promise<Resp
 }
 
 export async function cmdINTToMAP(msg: Message, argv: string[]): Promise<Response> {
-    let p = createPattern(argv[1]);
+    let p = createPattern(argv[1], undefined, aliases);
     if (!(p instanceof MAPPattern)) {
         throw new Error('Rule must be in B/S notation!');
     }
@@ -266,8 +266,12 @@ export async function cmdINTToMAP(msg: Message, argv: string[]): Promise<Respons
 }
 
 
+export async function cmdNormalizeRule(msg: Message, argv: string[]): Promise<Response> {
+    return createPattern(argv.slice(1).join(' '), undefined, aliases).ruleStr;
+}
+
 export async function cmdRuleSymmetry(msg: Message, argv: string[]): Promise<Response> {
-    return createPattern(argv[1]).ruleSymmetry;
+    return createPattern(argv.slice(1).join(' '), undefined, aliases).ruleSymmetry;
 }
 
 

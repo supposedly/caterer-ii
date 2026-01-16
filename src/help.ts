@@ -160,6 +160,18 @@ const HELP: {[key: string]: Help} = {
         aliases: ['inttomap'],
     },
 
+    normalize_rule: {
+        desc: 'Normalizes a rule',
+        args: [
+            {
+                name: 'rule',
+                desc: 'The rule to normalize',
+            },
+        ],
+        aliases: ['normalizerule'],
+    },
+
+
     rule_symmetry: {
         desc: 'Gets the symmetry of a rule',
         args: [
