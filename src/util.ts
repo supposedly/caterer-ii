@@ -98,6 +98,13 @@ export async function findRLEFromMessage(msg: Message, special?: boolean): Promi
         return {msg, p: out};
     }
     if (!msg.author.bot && msg.attachments.size > 0) {
+        if (msg.reference && msg.reference.type === 1) {
+            let msg2 = await msg.fetchReference();
+            let out = findRLEFromText(msg2.content);
+            if (out) {
+                return {msg, p: out};
+            }
+        }
         let attachment = msg.attachments.first();
         if (attachment) {
             let data = await (await fetch(attachment.url)).text();
