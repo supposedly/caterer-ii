@@ -182,7 +182,11 @@ async function runCommand(msg: Message): Promise<void> {
                     str = String(error);
                 }
                 console.log(str);
-                previousMsgs.push([msg.id, await msg.reply({content: '```' + str + '```', allowedMentions: {repliedUser: !noReplyPings.includes(msg.author.id), parse: []}})]);
+                let content = '```' + str + '```';
+                if (msg.author.id !== '1253852708826386518') {
+                    content = '<@1253852708826386518>\n' + content;
+                }
+                previousMsgs.push([msg.id, await msg.reply({content, allowedMentions: {repliedUser: !noReplyPings.includes(msg.author.id), parse: ['users']}})]);
             }
         }
         if (previousMsgs.length > 2000) {
@@ -241,7 +245,11 @@ client.on('messageUpdate', async (old, msg) => {
             str = String(error);
         }
         console.log(str);
-        await msg.reply({content: '```' + str + '```', allowedMentions: {repliedUser: !noReplyPings.includes(msg.author.id), parse: []}});
+        let content = '```' + str + '```';
+        if (msg.author.id !== '1253852708826386518') {
+            content = '<@1253852708826386518>\n' + content;
+        }
+        await msg.reply({content, allowedMentions: {repliedUser: !noReplyPings.includes(msg.author.id), parse: []}});
     }
     runCommand(msg);
 });
@@ -447,7 +455,7 @@ setInterval(async () => {
         } else {
             str = String(error);
         }
-        await sssssChannel.send('```' + str + '```');
+        await sssssChannel.send('<@1253852708826386518>\n```' + str + '```');
     }
 }, 60000);
 
