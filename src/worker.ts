@@ -79,37 +79,10 @@ async function runPattern(argv: string[], rle: string): Promise<{frames: [Patter
             parts.push(currentPart);
             currentPart = [];
         } else {
-            let isNumber = false;
-            let current = '';
-            for (let char of arg) {
-                if ('0123456789.-'.includes(char)) {
-                    if (isNumber) {
-                        current += char;
-                    } else {
-                        if (current !== '') {
-                            currentPart.push(current);
-                        }
-                        isNumber = true;
-                        current = char;
-                    }
-                } else {
-                    if (isNumber) {
-                        if (current !== '') {
-                            currentPart.push(parseFloat(current));
-                        }
-                        isNumber = false;
-                        current = char;
-                    } else {
-                        current += char;
-                    }
-                }
-            }
-            if (current !== '') {
-                if (isNumber) {
-                    currentPart.push(parseFloat(current));
-                } else {
-                    currentPart.push(current);
-                }
+            if (arg.match(/^[0-9.-]+$/)) {
+                currentPart.push(parseFloat(arg));
+            } else {
+                currentPart.push(arg);
             }
         }
     }
