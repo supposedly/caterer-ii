@@ -70,7 +70,7 @@ const INVESTIGATOR_COLORS: [number, number, number][] = [
 
 let dir = join(import.meta.dirname, '..');
 
-async function runPattern(argv: string[], rle: string): Promise<{frames: [Pattern, number][], gifSize: number, minX: number, minY: number, width: number, height: number, customColors: {[key: number]: [number, number, number]}, desc?: string}> {
+async function parseSim(argv: string[], rle: string): Promise<{frames: [Pattern, number][], gifSize: number, minX: number, minY: number, width: number, height: number, customColors: {[key: number]: [number, number, number]}, desc?: string}> {
     let p = parseSpecial(rle).shrinkToFit();
     let parts: (string | number)[][] = [];
     let currentPart: (string | number)[] = [];
@@ -255,7 +255,11 @@ async function runPattern(argv: string[], rle: string): Promise<{frames: [Patter
                 if (typeof part[1] === 'number') {
                     throw new BotError(`Invalid part: ${part.join(' ')}`);
                 }
-                p = createPattern(part[1], {height: p.height, width: p.width, data: p.getData()});
+                let q = createPattern(part[1], {height: p.height, width: p.width, data: p.getData()});
+                q.xOffset = p.xOffset;
+                q.yOffset = p.yOffset;
+                q.generation = p.generation;
+                p = q;
                 part = part.slice(2);
             } else {
                 throw new BotError(`Invalid part: ${part.join(' ')}`);
@@ -312,7 +316,7 @@ async function runPattern(argv: string[], rle: string): Promise<{frames: [Patter
 
 async function runSim(argv: string[], rle: string): Promise<[number, string | undefined]> {
     let startTime = performance.now();
-    let {frames, gifSize, minX, minY, width, height, customColors, desc} = await runPattern(argv, rle);
+    let {frames, gifSize, minX, minY, width, height, customColors, desc} = await parseSim(argv, rle);
     let parseTime = performance.now() - startTime;
     let p = frames[0][0];
     let bitWidth = Math.max(2, Math.ceil(Math.log2(p.states)));
