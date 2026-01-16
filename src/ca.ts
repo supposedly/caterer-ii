@@ -242,11 +242,17 @@ export async function cmdPopulation(msg: Message, argv: string[]): Promise<Respo
 
 
 export async function cmdMAPToINT(msg: Message, argv: string[]): Promise<Response> {
+    if (!argv[1].startsWith('MAP')) {
+        throw new BotError('Invalid MAP rule!');
+    }
     let [b, s] = arrayToTransitions(parseMAP(argv[1].slice(3)), TRANSITIONS);
     return `B${unparseTransitions(b, VALID_TRANSITIONS)}/S${unparseTransitions(s, VALID_TRANSITIONS)}`;
 }
 
 export async function cmdMAPToHexINT(msg: Message, argv: string[]): Promise<Response> {
+    if (!argv[1].startsWith('MAP')) {
+        throw new BotError('Invalid MAP rule!');
+    }
     let [b, s] = arrayToTransitions(parseMAP(argv[1].slice(3)), HEX_TRANSITIONS);
     return `B${unparseTransitions(b, VALID_HEX_TRANSITIONS, true)}/S${unparseTransitions(s, VALID_HEX_TRANSITIONS, true)}H`;
 }
