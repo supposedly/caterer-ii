@@ -488,7 +488,7 @@ parentPort.on('message', async (data: {id: number, type: 'sim', argv: string[], 
     }
 });
 
-process.setUncaughtExceptionCaptureCallback(error => {
-    console.log(error.stack);
+process.setUncaughtExceptionCaptureCallback(async error => {
+    await fs.appendFile('/home/opc/worker_logs.txt', error.stack + '\n\n');
     process.exit(1);
 })
