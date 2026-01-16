@@ -260,6 +260,11 @@ export async function cmdINTToMAP(msg: Message, argv: string[]): Promise<Respons
 }
 
 
+export async function cmdRuleSymmetry(msg: Message, argv: string[]): Promise<Response> {
+    return createPattern(argv[1]).ruleSymmetry;
+}
+
+
 function embedIdentified(original: Pattern, type: PatternType | Identified, isOutput?: boolean): EmbedBuilder[] {
     let out = '';
     if (type.period > 0) {

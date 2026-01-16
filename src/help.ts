@@ -160,6 +160,17 @@ const HELP: {[key: string]: Help} = {
         aliases: ['inttomap'],
     },
 
+    rule_symmetry: {
+        desc: 'Gets the symmetry of a rule',
+        args: [
+            {
+                name: 'rule',
+                desc: 'The rule to use',
+            },
+        ],
+        aliases: ['rulesymmetry'],
+    },
+
     identify: {
         desc: 'Identify a pattern',
         args: [

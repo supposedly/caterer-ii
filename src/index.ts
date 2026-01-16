@@ -4,7 +4,7 @@ import {inspect} from 'node:util';
 import {Client, GatewayIntentBits, DiscordAPIError, Message as _Message, MessageReaction, PartialMessageReaction, MessageReplyOptions, TextChannel, Partials} from 'discord.js';
 import {BotError, Response, Message, readFile, writeFile, config, sentByAdmin, aliases, noReplyPings, findRLEFromText, findRLE} from './util.js';
 import {cmdHelp} from './help.js';
-import {cmdSim, cmdHashsoup, cmdApgencode, cmdApgdecode, cmdPopulation, cmdMAPToINT, cmdMAPToHexINT, cmdINTToMAP, cmdIdentify, cmdBasicIdentify, cmdMinmax, } from './ca.js';
+import {cmdSim, cmdHashsoup, cmdApgencode, cmdApgdecode, cmdPopulation, cmdMAPToINT, cmdMAPToHexINT, cmdINTToMAP, cmdRuleSymmetry, cmdIdentify, cmdBasicIdentify, cmdMinmax, } from './ca.js';
 import {TYPE_NAMES, cmdSssss, cmdSssssInfo, cmdDyk, cmdName, cmdRename, cmdDeleteName, cmdSimStats, cmdSaveSimStats, cmdAlias, cmdUnalias, cmdLookupAlias} from './db.js';
 import {cmdWiki} from './wiki.js';
 
@@ -85,6 +85,9 @@ const COMMANDS: {[key: string]: (msg: Message, argv: string[]) => Promise<Respon
     'maptohexint': cmdMAPToHexINT,
     'int_to_map': cmdINTToMAP,
     'inttomap': cmdINTToMAP,
+
+    'rule_symmetry': cmdRuleSymmetry,
+    'rulsymmetry': cmdRuleSymmetry,
 
     'sssss': cmdSssss,
     '5s': cmdSssss,
