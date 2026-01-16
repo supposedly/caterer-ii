@@ -4,7 +4,7 @@ import {inspect} from 'node:util';
 import {Client, GatewayIntentBits, DiscordAPIError, Message as _Message, MessageReaction, PartialMessageReaction, MessageReplyOptions, TextChannel, Partials} from 'discord.js';
 import {BotError, Response, Message, readFile, writeFile, config, sentByAdmin, aliases, noReplyPings, findRLEFromText, findRLE} from './util.js';
 import {cmdHelp} from './help.js';
-import {cmdSim, cmdHashsoup, cmdApgencode, cmdApgdecode, cmdPopulation, cmdMAPToINT, cmdMAPToHexINT, cmdINTToMAP, cmdNormalizeRule, cmdRuleSymmetry, cmdIdentify, cmdBasicIdentify, cmdMinmax, } from './ca.js';
+import {cmdSim, cmdHashsoup, cmdApgencode, cmdApgdecode, cmdPopulation, cmdMAPToINT, cmdMAPToHexINT, cmdINTToMAP, cmdNormalizeRule, cmdRuleSymmetry, cmdIdentify, cmdBasicIdentify, cmdFullIdentify, cmdMinmax} from './ca.js';
 import {TYPE_NAMES, cmdSssss, cmdSssssInfo, cmdDyk, cmdName, cmdRename, cmdDeleteName, cmdSimStats, cmdSaveSimStats, cmdAlias, cmdUnalias, cmdLookupAlias} from './db.js';
 import {cmdWiki} from './wiki.js';
 
@@ -71,6 +71,8 @@ const COMMANDS: {[key: string]: (msg: Message, argv: string[]) => Promise<Respon
     'identify': cmdIdentify,
     'basic_identify': cmdBasicIdentify,
     'basicidentify': cmdBasicIdentify,
+    'full_identify': cmdFullIdentify,
+    'fullidentify': cmdFullIdentify,
     'minmax': cmdMinmax,
 
     'hashsoup': cmdHashsoup,

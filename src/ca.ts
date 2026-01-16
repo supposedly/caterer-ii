@@ -275,7 +275,7 @@ export async function cmdRuleSymmetry(msg: Message, argv: string[]): Promise<Res
 }
 
 
-function embedIdentified(original: Pattern, type: PatternType | Identified, isOutput?: boolean): EmbedBuilder[] {
+function embedIdentified(original: Pattern, type: PatternType | Identified, full: boolean = false, isOutput?: boolean): EmbedBuilder[] {
     let out = '';
     if (type.period > 0) {
         out += `**Period:** ${type.period}\n`;
@@ -306,7 +306,7 @@ function embedIdentified(original: Pattern, type: PatternType | Identified, isOu
     if ('symmetry' in type) {
         out += `**Symmetry:** ${type.symmetry} (${ALTERNATE_SYMMETRIES[type.symmetry]})\n`;
     }
-    if (type.period > 1) {
+    if (type.period > 1 && full) {
         if ('heat' in type && type.heat !== undefined) {
             out += `**Heat:** ${Math.round(type.heat * 1000) / 1000}\n`;
         }
@@ -335,6 +335,9 @@ function embedIdentified(original: Pattern, type: PatternType | Identified, isOu
         out += '](https://catagolue.hatsya.com/object/' + apgcode + '/' + toCatagolueRule(type.phases[0].ruleStr) + ')';
     }
     let title = 'desc' in type ? type.desc : getDescription(type);
+    if ('strictVolatility' in type && type.strictVolatility === 0) {
+        title += ' (trivial)';
+    }
     let name: string | undefined = undefined;
     if (apgcode.startsWith('x') || apgcode.startsWith('y')) {
         name = names.get(apgcode);
@@ -355,7 +358,7 @@ function embedIdentified(original: Pattern, type: PatternType | Identified, isOu
     }
     let embeds = [(new EmbedBuilder()).setTitle(title).setDescription(out)];
     if ('output' in type && type.output) {
-        embeds.push(...embedIdentified(Object.assign(original.clearedCopy(), type.output.phases[0]), type.output, true));
+        embeds.push(...embedIdentified(Object.assign(original.clearedCopy(), type.output.phases[0]), type.output, full, true));
     }
     return embeds;
 }
@@ -399,6 +402,27 @@ export async function cmdBasicIdentify(msg: Message, argv: string[]): Promise<Re
     }
     return {embeds: embedIdentified(data.p, out)};
 }
+
+export async function cmdFullIdentify(msg: Message, argv: string[]): Promise<Response> {
+    await msg.channel.sendTyping();
+    let limit = 256;
+    if (argv[1]) {
+        let parsed = parseFloat(argv[1]);
+        if (!Number.isNaN(parsed)) {
+            limit = parsed;
+        }
+    }
+    let data = await findRLE(msg);
+    if (!data) {
+        throw new BotError('Cannot find RLE');
+    }
+    let out = await createWorkerJob('basic_identify', {rle: data.p.toRLE(), limit});
+    if (!out) {
+        throw new BotError('Timed out!');
+    }
+    return {embeds: embedIdentified(data.p, out, true)};
+}
+
 
 export async function cmdMinmax(msg: Message, argv: string[]): Promise<Response> {
     await msg.channel.sendTyping();

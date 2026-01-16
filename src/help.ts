@@ -171,7 +171,6 @@ const HELP: {[key: string]: Help} = {
         aliases: ['normalizerule'],
     },
 
-
     rule_symmetry: {
         desc: 'Gets the symmetry of a rule',
         args: [
@@ -204,6 +203,18 @@ const HELP: {[key: string]: Help} = {
             },
         ],
         aliases: ['basicidentify'],
+    },
+
+    full_identify: {
+        desc: 'Identify a pattern, but provide even more information',
+        args: [
+            {
+                name: 'generations',
+                optional: true,
+                desc: 'Number of generations to run the identifier for (default 256).'
+            },
+        ],
+        aliases: ['fullidentify'],
     },
 
     minmax: {
