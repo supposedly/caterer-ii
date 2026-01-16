@@ -242,9 +242,10 @@ async function parseSim(argv: string[], rle: string): Promise<{frames: [Pattern,
                     p.runGeneration();
                     frames.push([p.copy(), frameTime]);
                 }
-                if (typeof part[0] === 'number') {
+                if (typeof part[0] === 'string' && part[0].match(/^x[0-9]+$/)) {
+                    let amount = parseInt(part[0].slice(1));
                     if (type.period > 0) {
-                        for (let i = 0; i < (part[0] - 1) * type.period; i++) {
+                        for (let i = 0; i < (amount - 1) * type.period; i++) {
                             p.runGeneration();
                             frames.push([p.copy(), frameTime]);
                         }
