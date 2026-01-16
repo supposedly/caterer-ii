@@ -4,7 +4,7 @@ import {inspect} from 'node:util';
 import {Client, GatewayIntentBits, DiscordAPIError, Message as _Message, MessageReaction, PartialMessageReaction, MessageReplyOptions, TextChannel, Partials} from 'discord.js';
 import {BotError, Response, Message, readFile, writeFile, config, sentByAdmin, aliases, noReplyPings, findRLEFromText, findRLE} from './util.js';
 import {cmdHelp} from './help.js';
-import {cmdSim, cmdHashsoup, cmdApgencode, cmdApgdecode, cmdPopulation, cmdMAPToINT, cmdMAPToHexINT, cmdINTToMAP, cmdRuleSymmetry, cmdNormalizeRule, cmdIdentify, cmdBasicIdentify, cmdMinmax, } from './ca.js';
+import {cmdSim, cmdHashsoup, cmdApgencode, cmdApgdecode, cmdPopulation, cmdMAPToINT, cmdMAPToHexINT, cmdINTToMAP, cmdNormalizeRule, cmdRuleSymmetry, cmdIdentify, cmdBasicIdentify, cmdMinmax, } from './ca.js';
 import {TYPE_NAMES, cmdSssss, cmdSssssInfo, cmdDyk, cmdName, cmdRename, cmdDeleteName, cmdSimStats, cmdSaveSimStats, cmdAlias, cmdUnalias, cmdLookupAlias} from './db.js';
 import {cmdWiki} from './wiki.js';
 
