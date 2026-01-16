@@ -248,7 +248,7 @@ export async function cmdMAPToINT(msg: Message, argv: string[]): Promise<Respons
 
 export async function cmdMAPToHexINT(msg: Message, argv: string[]): Promise<Response> {
     let [b, s] = arrayToTransitions(parseMAP(argv[1].slice(3)), HEX_TRANSITIONS);
-    return `B${unparseTransitions(b, VALID_HEX_TRANSITIONS)}/S${unparseTransitions(s, VALID_HEX_TRANSITIONS)}`;
+    return `B${unparseTransitions(b, VALID_HEX_TRANSITIONS, true)}/S${unparseTransitions(s, VALID_HEX_TRANSITIONS, true)}`;
 }
 
 export async function cmdINTToMAP(msg: Message, argv: string[]): Promise<Response> {
