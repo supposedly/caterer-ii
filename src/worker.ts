@@ -241,6 +241,9 @@ async function parseSim(argv: string[], rle: string): Promise<{frames: [Pattern,
                 if ('strictVolatility' in type && type.strictVolatility === 0) {
                     desc += ' (trivial)';
                 }
+                if (type.stabilizedAt > 0) {
+                    desc = 'Stabilizes into ' + desc;
+                }
                 for (let i = 0; i < type.stabilizedAt + type.period; i++) {
                     p.runGeneration();
                     frames.push([p.copy(), frameTime]);
