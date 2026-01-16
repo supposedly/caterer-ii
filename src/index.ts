@@ -87,7 +87,7 @@ const COMMANDS: {[key: string]: (msg: Message, argv: string[]) => Promise<Respon
     'inttomap': cmdINTToMAP,
 
     'rule_symmetry': cmdRuleSymmetry,
-    'rulsymmetry': cmdRuleSymmetry,
+    'rulesymmetry': cmdRuleSymmetry,
 
     'sssss': cmdSssss,
     '5s': cmdSssss,
