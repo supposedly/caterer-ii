@@ -239,11 +239,7 @@ client.on('messageUpdate', async (old, msg) => {
             str = String(error);
         }
         console.log(str);
-        if (error instanceof DiscordAPIError && String(error).includes('fewer in length')) {
-            await msg.reply('Error: Response too long!');
-        } else {
-            await msg.reply({content: '```' + str + '```', allowedMentions: {repliedUser: !noReplyPings.includes(msg.author.id), parse: []}});
-        }
+        await msg.reply({content: '```' + str + '```', allowedMentions: {repliedUser: !noReplyPings.includes(msg.author.id), parse: []}});
     }
     runCommand(msg);
 });
