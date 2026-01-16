@@ -416,7 +416,7 @@ export async function cmdFullIdentify(msg: Message, argv: string[]): Promise<Res
     if (!data) {
         throw new BotError('Cannot find RLE');
     }
-    let out = await createWorkerJob('basic_identify', {rle: data.p.toRLE(), limit});
+    let out = await createWorkerJob('identify', {rle: data.p.toRLE(), limit});
     if (!out) {
         throw new BotError('Timed out!');
     }
