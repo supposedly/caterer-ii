@@ -321,6 +321,7 @@ function embedIdentified(original: Pattern, type: PatternType | Identified, full
         }
     }
     type.phases[0] = original;
+    type.phases[type.stabilizedAt] = original.copy().run(type.stabilizedAt);
     let apgcode = getApgcode(type);
     if (apgcode !== 'PATHOLOGICAL') {
         out += '[';
