@@ -2,7 +2,7 @@
 import {join} from 'node:path';
 import {Worker} from 'node:worker_threads';
 import {EmbedBuilder} from 'discord.js';
-import {Pattern, TRANSITIONS, VALID_TRANSITIONS, unparseTransitions, arrayToTransitions, parseMAP, unparseMAP, PatternType, Identified, findMinmax, getApgcode, getDescription, ALTERNATE_SYMMETRIES, createPattern, toCatagolueRule, getHashsoup, RuleError, MAPPattern} from '../lifeweb/lib/index.js';
+import {Pattern, TRANSITIONS, VALID_TRANSITIONS, HEX_TRANSITIONS, VALID_HEX_TRANSITIONS, unparseTransitions, arrayToTransitions, parseMAP, unparseMAP, PatternType, Identified, findMinmax, getApgcode, getDescription, ALTERNATE_SYMMETRIES, createPattern, toCatagolueRule, getHashsoup, RuleError, MAPPattern} from '../lifeweb/lib/index.js';
 import {BotError, Message, Response, writeFile, names, aliases, simStats, noReplyPings, findRLE} from './util.js';
 
 
@@ -247,8 +247,8 @@ export async function cmdMAPToINT(msg: Message, argv: string[]): Promise<Respons
 }
 
 export async function cmdMAPToHexINT(msg: Message, argv: string[]): Promise<Response> {
-    let [b, s] = arrayToTransitions(parseMAP(argv[1].slice(3)), TRANSITIONS);
-    return `B${unparseTransitions(b, VALID_TRANSITIONS)}/S${unparseTransitions(s, VALID_TRANSITIONS)}`;
+    let [b, s] = arrayToTransitions(parseMAP(argv[1].slice(3)), HEX_TRANSITIONS);
+    return `B${unparseTransitions(b, VALID_HEX_TRANSITIONS)}/S${unparseTransitions(s, VALID_HEX_TRANSITIONS)}`;
 }
 
 export async function cmdINTToMAP(msg: Message, argv: string[]): Promise<Response> {
