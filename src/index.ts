@@ -263,6 +263,9 @@ client.on('messageReactionAdd', async data => {
             return;
         }
         let msg = data.message;
+        if (msg.channel.id === config.starboardChannel) {
+            return;
+        }
         if (msg.author?.id === client.user?.id && msg.reference) {
             let id = (await data.message.fetchReference()).author.id;
             let users = await data.users.fetch();
