@@ -183,7 +183,7 @@ async function runCommand(msg: Message): Promise<void> {
                 }
                 console.log(str);
                 let content = '```' + str + '```';
-                if (msg.author.id !== '1253852708826386518') {
+                if (msg.author.id !== '1253852708826386518' && !str.includes('Worker exited')) {
                     content = '<@1253852708826386518>\n' + content;
                 }
                 previousMsgs.push([msg.id, await msg.reply({content, allowedMentions: {repliedUser: !noReplyPings.includes(msg.author.id), parse: ['users']}})]);
@@ -246,7 +246,7 @@ client.on('messageUpdate', async (old, msg) => {
         }
         console.log(str);
         let content = '```' + str + '```';
-        if (msg.author.id !== '1253852708826386518') {
+        if (msg.author.id !== '1253852708826386518' && !str.includes('Worker exited')) {
             content = '<@1253852708826386518>\n' + content;
         }
         await msg.reply({content, allowedMentions: {repliedUser: !noReplyPings.includes(msg.author.id), parse: ['users']}});
