@@ -84,6 +84,12 @@ for (let line of rulespaceData.split('\n')) {
             addTrs.push('B' + tr);
         }
     }
+    for (let tr of maxS) {
+        if (!minS.includes(tr)) {
+            addTrs.push('S' + tr);
+        }
+    }
+    rulespaces.push([min, addTrs]);
 }
 
 async function getRandomRule(): Promise<string> {
