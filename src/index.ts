@@ -255,34 +255,29 @@ client.on('messageUpdate', async (old, msg) => {
 });
 
 client.on('messageReactionAdd', async data => {
-    if (data.emoji.name === '❌' || data.emoji.name === '🗑️') {
-        if (data.partial) {
-            data = await data.fetch();
-        }
-        if (!data.count) {
+    if (!data.message.author || data.message.author?.id !== client.user?.id || !(data.emoji.name === '❌' || data.emoji.name === '🗑️')) {
+        return;
+    }
+    let msg = data.message;
+    if (msg.channel.id === config.starboardChannel) {
+        return;
+    }
+    if (msg.author?.id === client.user?.id && msg.reference) {
+        let id = (await data.message.fetchReference()).author.id;
+        let users = await data.users.fetch();
+        if (users.find(x => x.id === id)) {
+            msg.delete();
             return;
         }
-        let msg = data.message;
-        if (msg.channel.id === config.starboardChannel) {
-            return;
-        }
-        if (msg.author?.id === client.user?.id && msg.reference) {
-            let id = (await data.message.fetchReference()).author.id;
-            let users = await data.users.fetch();
-            if (users.find(x => x.id === id)) {
+        for (let [userId, msgId] of deleters) {
+            if (msgId === msg.id && users.find(x => x.id === userId)) {
                 msg.delete();
                 return;
             }
-            for (let [userId, msgId] of deleters) {
-                if (msgId === msg.id && users.find(x => x.id === userId)) {
-                    msg.delete();
-                    return;
-                }
-            }
         }
-        return;
     }
-})
+    return;
+});
 
 
 let starboard: Map<string, [string, string]> = new Map(JSON.parse(await readFile('data/starboard.json')));
