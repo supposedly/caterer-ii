@@ -177,9 +177,7 @@ async function parseSim(argv: string[], rle: string): Promise<{frames: [Pattern,
                 if (typeof part[1] !== 'number') {
                     throw new BotError(`Invalid part: ${part.join(' ')}`);
                 }
-                for (let i = 0; i < part[1]; i++) {
-                    frames.push([p.copy(), frameTime]);
-                }
+                frames.push([p.copy(), part[1] * 100]);
                 part = part.slice(2);
             } else if (part[0] === 'jump') {
                 if (typeof part[1] !== 'number') {
