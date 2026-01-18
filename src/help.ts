@@ -361,15 +361,15 @@ const HELP: {[key: string]: Help} = {
         ],
     },
 
-    noreplypings: {
-        desc: 'Disables reply pings when using commands',
-        args: [],
-    },
+    // noreplypings: {
+    //     desc: 'Disables reply pings when using commands',
+    //     args: [],
+    // },
 
-    yesreplypings: {
-        desc: 'Enables reply pings when using commands (This command removes you from the list of no-reply-ping users, and therefore deletes your data)',
-        args: [],
-    },
+    // yesreplypings: {
+    //     desc: 'Enables reply pings when using commands (This command removes you from the list of no-reply-ping users, and therefore deletes your data)',
+    //     args: [],
+    // },
 
 };
 
