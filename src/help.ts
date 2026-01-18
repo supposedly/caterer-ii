@@ -361,28 +361,26 @@ const HELP: {[key: string]: Help} = {
         ],
     },
 
-    // noreplypings: {
-    //     desc: 'Disables reply pings when using commands',
-    //     args: [],
-    // },
+    noreplypings: {
+        desc: 'Disables reply pings when using commands',
+        args: [],
+    },
 
-    // yesreplypings: {
-    //     desc: 'Enables reply pings when using commands (This command removes you from the list of no-reply-ping users, and therefore deletes your data)',
-    //     args: [],
-    // },
+    yesreplypings: {
+        desc: 'Enables reply pings when using commands (This command removes you from the list of no-reply-ping users, and therefore deletes your data)',
+        args: [],
+    },
 
 };
 
 
-let helpMsg = '```ansi\n\x1b[1m\x1b[34mA cellular automata bot for the ConwayLife Lounge Discord server\n\nCommands:\x1b[0m';
+let helpMsg = 'A cellular automata bot for the ConwayLife Lounge Discord server\n\nCommands:';
 let helpMsgs: {[key: string]: string} = {};
-
-let padding = Math.max(...Object.keys(HELP).map(x => x.length));
 
 for (let cmd in HELP) {
     let data = HELP[cmd];
-    helpMsg += '\n' + cmd.padEnd(padding) + ' | ' + data.desc;
-    let msg = '```ansi\n' + '\x1b[1m\x1b[34m!' + cmd + '\x1b[0m';
+    helpMsg += `* ${cmd} - ${data.desc}\n`;
+    let msg = '`' + cmd;
     for (let arg of data.args) {
         msg += arg.newline ? '\n' : ' ';
         if (arg.optional) {
@@ -391,9 +389,9 @@ for (let cmd in HELP) {
             msg += '<' + arg.name + '>';
         }
     }
-    msg += '\n' + data.desc + '.``````ansi\n\x1b[1m\x1b[34mArguments:\x1b[0m';
+    msg += '`\n' + data.desc + '\nArguments:';
     for (let arg of data.args) {
-        msg += '\n';
+        msg += '\n*';
         if (arg.optional) {
             msg += '[' + arg.name + ']';
         } else {
@@ -402,12 +400,11 @@ for (let cmd in HELP) {
         msg += ' - ' + arg.desc;
     }
     if (data.extra) {
-        msg += '``````ansi\n' + data.extra;
+        msg += '\n\n' + data.extra;
     }
     if (data.aliases) {
-        msg += '``````ansi\n\x1b[1m\x1b[34mAliases: \x1b[0m' + data.aliases.join(', ');
+        msg += '\n\nAliases: ' + data.aliases.map(x => '`' + x + '`').join(', ');
     }
-    msg += '```';
     helpMsgs[cmd] = msg;
     if (data.aliases) {
         for (let alias in data.aliases) {
@@ -417,7 +414,7 @@ for (let cmd in HELP) {
     }
 }
 
-helpMsg += '```';
+helpMsg = helpMsg.slice(0, -1);
 
 export async function cmdHelp(msg: Message, argv: string[]): Promise<Response> {
     if (argv.length > 1) {
