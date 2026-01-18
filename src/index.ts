@@ -175,7 +175,7 @@ async function runCommand(msg: Message): Promise<void> {
                 }
             }
         } catch (error) {
-            if (error instanceof BotError || error instanceof lifeweb.RuleError) {
+            if (error instanceof BotError || error instanceof lifeweb.RuleError || (error instanceof Error && error.message === 'Worker exited with code 1')) {
                 previousMsgs.push([msg.id, await msg.reply({content: 'Error: ' + error.message, allowedMentions: {repliedUser: !noReplyPings.includes(msg.author.id), parse: []}})]);
             } else {
                 let str: string;
@@ -186,7 +186,7 @@ async function runCommand(msg: Message): Promise<void> {
                 }
                 console.log(str);
                 let content = '```' + str + '```';
-                if (msg.author.id !== '1253852708826386518' && !str.includes('Worker exited')) {
+                if (msg.author.id !== '1253852708826386518') {
                     content = '<@1253852708826386518>\n' + content;
                 }
                 previousMsgs.push([msg.id, await msg.reply({content, allowedMentions: {repliedUser: !noReplyPings.includes(msg.author.id), parse: ['users']}})]);
@@ -249,7 +249,7 @@ client.on('messageUpdate', async (old, msg) => {
         }
         console.log(str);
         let content = '```' + str + '```';
-        if (msg.author.id !== '1253852708826386518' && !str.includes('Worker exited')) {
+        if (msg.author.id !== '1253852708826386518') {
             content = '<@1253852708826386518>\n' + content;
         }
         await msg.reply({content, allowedMentions: {repliedUser: !noReplyPings.includes(msg.author.id), parse: ['users']}});
