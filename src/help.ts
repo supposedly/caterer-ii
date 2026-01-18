@@ -389,7 +389,7 @@ for (let cmd in HELP) {
             msg += '<' + arg.name + '>';
         }
     }
-    msg += '`\n' + data.desc + '\nArguments:';
+    msg += '`\n\n' + data.desc + '\n\nArguments:';
     for (let arg of data.args) {
         msg += '\n* ';
         if (arg.optional) {
