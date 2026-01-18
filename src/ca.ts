@@ -234,7 +234,7 @@ export async function cmdPopulation(msg: Message, argv: string[]): Promise<Respo
             }
         }
         await msg.reply({
-            content: `${total} total live cells\n${counts.map((x, i) => `${x} state cells`).join('\n')}`,
+            content: `${total} total live cells\n${counts.map((x, i) => `${x} state ${i} cells`).join('\n')}`,
             allowedMentions: {repliedUser: !noReplyPings.includes(msg.author.id), parse: []},
         });
     }
