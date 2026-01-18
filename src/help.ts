@@ -122,64 +122,75 @@ const HELP: {[key: string]: Help} = {
     },
 
     population: {
-        desc: 'Get the population of a pattern',
+        desc: 'Get the population of a pattern.',
         args: [],
         aliases: ['pop'],
     },
 
     map_to_int: {
-        desc: 'Converts a MAP rule to an INT rule',
+        desc: 'Converts a MAP rule to an INT rule.',
         args: [
             {
                 name: 'rule',
-                desc: 'The MAP rule to convert',
+                desc: 'The MAP rule to convert.',
             },
         ],
         aliases: ['maptoint'],
     },
 
     map_to_hex_int: {
-        desc: 'Converts a MAP rule to a Hexagonal INT rule',
+        desc: 'Converts a MAP rule to a Hexagonal INT rule.',
         args: [
             {
                 name: 'rule',
-                desc: 'The MAP rule to convert',
+                desc: 'The MAP rule to convert.',
             },
         ],
         aliases: ['maptohexint'],
     },
 
     int_to_map: {
-        desc: 'Converts an INT rule to a MAP rule',
+        desc: 'Converts an INT rule to a MAP rule.',
         args: [
             {
                 name: 'rule',
-                desc: 'The INT rule to convert',
+                desc: 'The INT rule to convert.',
             },
         ],
         aliases: ['inttomap'],
     },
 
     normalize_rule: {
-        desc: 'Normalizes a rule',
+        desc: 'Normalizes a rule.',
         args: [
             {
                 name: 'rule',
-                desc: 'The rule to normalize',
+                desc: 'The rule to normalize.',
             },
         ],
         aliases: ['normalizerule'],
     },
 
     rule_symmetry: {
-        desc: 'Gets the symmetry of a rule',
+        desc: 'Gets the symmetry of a rule.',
         args: [
             {
                 name: 'rule',
-                desc: 'The rule to use',
+                desc: 'The rule to use.',
             },
         ],
         aliases: ['rulesymmetry'],
+    },
+
+    black_white_reversal: {
+        desc: 'Gets the black/white reversal of a rule.',
+        args: [
+            {
+                name: 'rule',
+                desc: 'The rule to use.',
+            },
+        ],
+        aliases: ['blackwhitereverse', 'bwreverse'],
     },
 
     identify: {

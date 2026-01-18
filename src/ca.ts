@@ -2,7 +2,7 @@
 import {join} from 'node:path';
 import {Worker} from 'node:worker_threads';
 import {EmbedBuilder} from 'discord.js';
-import {Pattern, TRANSITIONS, VALID_TRANSITIONS, HEX_TRANSITIONS, VALID_HEX_TRANSITIONS, unparseTransitions, arrayToTransitions, parseMAP, unparseMAP, PatternType, Identified, findMinmax, getApgcode, getDescription, ALTERNATE_SYMMETRIES, createPattern, toCatagolueRule, getHashsoup, RuleError, MAPPattern} from '../lifeweb/lib/index.js';
+import {RuleError, Pattern, TRANSITIONS, VALID_TRANSITIONS, HEX_TRANSITIONS, VALID_HEX_TRANSITIONS, unparseTransitions, arrayToTransitions, parseMAP, unparseMAP, MAPPattern, PatternType, Identified, findMinmax, getApgcode, getDescription, ALTERNATE_SYMMETRIES, getHashsoup, createPattern, toCatagolueRule, getBlackWhiteReversal} from '../lifeweb/lib/index.js';
 import {BotError, Message, Response, writeFile, names, aliases, simStats, noReplyPings, findRLE} from './util.js';
 
 
@@ -272,6 +272,10 @@ export async function cmdNormalizeRule(msg: Message, argv: string[]): Promise<Re
 
 export async function cmdRuleSymmetry(msg: Message, argv: string[]): Promise<Response> {
     return createPattern(argv.slice(1).join(' '), undefined, aliases).ruleSymmetry;
+}
+
+export async function cmdBlackWhiteReverse(msg: Message, argv: string[]): Promise<Response> {
+    return getBlackWhiteReversal(argv.slice(1).join(' '));
 }
 
 
