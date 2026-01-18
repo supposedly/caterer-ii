@@ -380,7 +380,7 @@ let helpMsgs: {[key: string]: string} = {};
 for (let cmd in HELP) {
     let data = HELP[cmd];
     helpMsg += `* ${cmd} - ${data.desc}\n`;
-    let msg = '`' + cmd;
+    let msg = '`!' + cmd;
     for (let arg of data.args) {
         msg += arg.newline ? '\n' : ' ';
         if (arg.optional) {
