@@ -57,17 +57,20 @@ export async function check5S(channel: TextChannel): Promise<void> {
     let lines: string[] = [];
     for (let key of Object.keys(groups).sort()) {
         let data = groups[key];
+        if (key in TYPE_NAMES) {
+            key = TYPE_NAMES[key];
+        }
         if (data.newShips.length > 0) {
             lines.push(formatNewShips('speed', key, data.newShips, 3));
         }
         if (data.newPeriods.length > 0) {
-            lines.push(formatNewShips('period', key, data.newPeriods, key.includes('b0') || key.includes('B0') ? 1 : 2));
+            lines.push(formatNewShips('period', key, data.newPeriods, key.includes('B0') ? 1 : 2));
         }
         if (data.improvedShips.length > 0) {
             lines.push(formatImprovedShips('speed', key, data.improvedShips, 3));
         }
         if (data.improvedPeriods.length > 0) {
-            lines.push(formatImprovedShips('period', key, data.improvedPeriods, key.includes('b0') || key.includes('B0') ? 1 : 2));
+            lines.push(formatImprovedShips('period', key, data.improvedPeriods, key.includes('B0') ? 1 : 2));
         }
     }
     let current = '';
