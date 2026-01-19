@@ -374,7 +374,7 @@ const HELP: {[key: string]: Help} = {
 };
 
 
-let helpMsg = 'A cellular automata bot for the ConwayLife Lounge Discord server\n\nCommands:';
+let helpMsg = 'A cellular automata bot for the ConwayLife Lounge Discord server\n\nCommands:\n';
 let helpMsgs: {[key: string]: string} = {};
 
 for (let cmd in HELP) {
