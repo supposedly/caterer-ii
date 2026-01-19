@@ -17,13 +17,15 @@ export const TYPE_NAMES: {[key: string]: string} = {
 
 export async function cmdSssss(msg: Message, argv: string[]): Promise<Response> {
     await msg.channel.sendTyping();
-    let type = 'int';
+    let type: string;
     let speed: string;
-    if (argv[1].includes('/') || argv[1].includes(',')) {
-        speed = argv.slice(1).join(' ');
-    } else {
-        type = argv[1].toLowerCase();
+    let lower = argv[1].toLowerCase();
+    if (lower in TYPE_NAMES) {
+        type = lower;
         speed = argv.slice(2).join(' ');
+    } else {
+        type = 'int';
+        speed = argv.slice(1).join(' ');
     }
     let {dx, dy, period} = parseSpeed(speed);
     let resp = await fetch(`https://speedydelete.com/5s/api/get?type=${type}&dx=${dx}&dy=${dy}&period=${period}`);
