@@ -36,37 +36,22 @@ export async function check5S(channel: TextChannel): Promise<void> {
         console.log(`${resp.status} ${resp.statusText} while fetching new ships`);
         return;
     }
-    let data = await resp.json() as {newShips: [string, string, number][], improvedShips: [string, string, number, number][]};
-    if (data.newShips.length === 0 && data.improvedShips.length === 0) {
+    let data = await resp.json() as {newShips: [string, string, number][], improvedShips: [string, string, number, number][], newPeriods: [string, string, number][], improvedPeriods: [string, string, number, number][]};
+    if (data.newShips.length === 0 && data.improvedShips.length === 0 && data.newPeriods.length === 0 && data.improvedPeriods.length === 0) {
         return;
     }
     let groups: {[key: string]: ShipGroup} = {};
-    for (let ship of data.newShips) {
-        let oscillator = ship[1].startsWith('p');
-        let data: ShipGroup;
-        if (ship[0] in groups) {
-            data = groups[ship[0]];
-        } else {
-            data = {newShips: [], newPeriods: [], improvedShips: [], improvedPeriods: []};
-        }
-        if (oscillator) {
-            data.newPeriods.push(ship.slice(1) as [string, number]);
-        } else {
-            data.newShips.push(ship.slice(1) as [string, number]);
-        }
-    }
-    for (let ship of data.newShips) {
-        let oscillator = ship[1].startsWith('p');
-        let data: ShipGroup;
-        if (ship[0] in groups) {
-            data = groups[ship[0]];
-        } else {
-            data = {newShips: [], newPeriods: [], improvedShips: [], improvedPeriods: []};
-        }
-        if (oscillator) {
-            data.improvedPeriods.push(ship.slice(1) as [string, number, number]);
-        } else {
-            data.improvedShips.push(ship.slice(1) as [string, number, number]);
+    for (let key of ['newShips', 'improvedShips', 'newPeriods', 'improvedPeriods'] as const) {
+        for (let ship of data[key]) {
+            let data: ShipGroup;
+            if (ship[0] in groups) {
+                data = groups[ship[0]];
+            } else {
+                data = {newShips: [], newPeriods: [], improvedShips: [], improvedPeriods: []};
+                groups[ship[0]] = data;
+            }
+            // @ts-ignore
+            data[key].push(ship.slice(1));
         }
     }
     let lines: string[] = [];
