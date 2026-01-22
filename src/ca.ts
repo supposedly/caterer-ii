@@ -135,7 +135,7 @@ export async function cmdSim(msg: Message, argv: string[]): Promise<Response> {
         }
         let rule = argv[2];
         argv = argv.slice(2);
-        p = createPattern(rule);
+        p = createPattern(rule, undefined, aliases);
         let size = height * width;
         let data = new Uint8Array(size);
         for (let i = 0; i < size; i++) {
