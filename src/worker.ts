@@ -96,6 +96,7 @@ async function parseSim(argv: string[], rle: string): Promise<{frames: [Pattern,
     let useCAViewer = false;
     let customColors: {[key: number]: [number, number, number]} = {};
     let desc: string | undefined;
+    let partCount = parts.length;
     for (let part of parts) {
         while (part.length > 0) {
             if (typeof part[0] === 'number') {
@@ -109,7 +110,7 @@ async function parseSim(argv: string[], rle: string): Promise<{frames: [Pattern,
                         step = part[1];
                         remove = 2;
                     }
-                    if (parts.length === 1) {
+                    if (partCount === 1) {
                         part[0] = part[0] - 1;
                         if (part[0] === 0) {
                             continue;
@@ -242,7 +243,7 @@ async function parseSim(argv: string[], rle: string): Promise<{frames: [Pattern,
                 if (type.stabilizedAt > 0) {
                     desc = 'Stabilizes into ' + desc;
                 }
-                for (let i = 0; i < type.stabilizedAt + type.period; i++) {
+                for (let i = 0; i < type.stabilizedAt + type.period - 1; i++) {
                     p.runGeneration();
                     frames.push([p.copy(), frameTime]);
                 }
