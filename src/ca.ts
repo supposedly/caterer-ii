@@ -212,7 +212,7 @@ export async function cmdApgdecode(msg: Message, argv: string[]): Promise<Respon
 export async function cmdPopulation(msg: Message, argv: string[]): Promise<Response> {
     let data = await findRLE(msg);
     if (!data) {
-        throw new Error('Cannot find RLE!');
+        throw new BotError('Cannot find RLE!');
     }
     let p = data.p;
     msg = data.msg;
@@ -281,7 +281,7 @@ export async function cmdBlackWhiteReverse(msg: Message, argv: string[]): Promis
 export async function cmdCheckerboardDual(msg: Message, argv: string[]): Promise<Response> {
     let p = createPattern(argv.slice(1).join(' '), undefined, aliases);
     if (!(p instanceof MAPPattern || p instanceof MAPB0Pattern)) {
-        throw new Error('Cannot take checkerboard dual of non-MAP (includes INT) rule!');
+        throw new BotError('Cannot take checkerboard dual of non-MAP (includes INT) rule!');
     }
     let trs = p instanceof MAPPattern ? p.trs : p.evenTrs.map(x => 1 - x);
     let even = new Uint8Array(512);
