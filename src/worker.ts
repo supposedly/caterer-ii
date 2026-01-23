@@ -243,7 +243,7 @@ async function parseSim(argv: string[], rle: string): Promise<{frames: [Pattern,
                 if (type.stabilizedAt > 0) {
                     desc = 'Stabilizes into ' + desc;
                 }
-                for (let i = 0; i < type.stabilizedAt + type.period - 1; i++) {
+                for (let i = 0; i < type.stabilizedAt + type.period - (type.disp && type.disp[0] === 0 && type.disp[1] === 0 ? 1 : 0); i++) {
                     p.runGeneration();
                     frames.push([p.copy(), frameTime]);
                 }
