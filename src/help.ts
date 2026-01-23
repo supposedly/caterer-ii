@@ -389,16 +389,16 @@ const HELP: {[key: string]: Help} = {
 let helpMsg = `A cellular automata bot for the ConwayLife Lounge Discord server
 
 Commands:
-* Simulation: \`sim\`, \`sim rand\`
-* Identification: \`identify\`, \`basic_identify\`, \`full_identify\`, \`minmax\`
-* Pattern manipulation: \`hashsoup\`, \`apgencode\`, \`apgdecode\`, \`population\`
-* Rules: \`map_to_int\`, \`map_to_hex_int\`, \`int_to_map\`, \`normalize_rule\`, \`!rule_symmetry\`, \`!black_white_reverse\`
-* 5S: \`sssss\`, \`sssss_info\`
-* Pattern naming: \`name\`, \`rename\`, \`delete_name\`
-* Statistics: \`sim_stats\`, \`save_sim_stats\`
-* Rule aliases: \`alias\`, \`unalias\`, \`lookup_alias\`
-* Configuration: \`noreplypings\`, \`yesreplypings\`
-* Other: \`wiki\`, \`help\`, \`eval\`, \`ping\`
+* Simulation: \`!sim\`, \`!!sim rand\`
+* Identification: \`!identify\`, \`!!basic_identify\`, \`!full_identify\`, \`!minmax\`
+* Pattern manipulation: \`!hashsoup\`, \`!apgencode\`, \`!apgdecode\`, \`!population\`
+* Rules: \`!map_to_int\`, \`!map_to_hex_int\`, \`!int_to_map\`, \`!normalize_rule\`, \`!!rule_symmetry\`, \`!!black_white_reverse\`
+* 5S: \`!sssss\`, \`!sssss_info\`
+* Pattern naming: \`!name\`, \`!rename\`, \`!delete_name\`
+* Statistics: \`!sim_stats\`, \`!save_sim_stats\`
+* Rule aliases: \`!alias\`, \`!unalias\`, \`!lookup_alias\`
+* Configuration: \`!noreplypings\`, \`!yesreplypings\`
+* Other: \`!wiki\`, \`!help\`, \`!eval\`, \`!ping\`
 
 This bot stores your user ID when you use \`!noreplypings\`, and deletes it when you use \`!yesreplypings\`. So, to delete all your data, use \`!yesreplypings\`.
 
