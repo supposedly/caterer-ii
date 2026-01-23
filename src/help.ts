@@ -402,7 +402,7 @@ Commands:
 
 This bot stores your user ID when you use \`!noreplypings\`, and deletes it when you use \`!yesreplypings\`. So, to delete all your data, use \`!yesreplypings\`.
 
-Type \``;
+Type \`!help <command>\` for help for a specific command!`;
 let helpMsgs: {[key: string]: string} = {};
 
 for (let cmd in HELP) {
