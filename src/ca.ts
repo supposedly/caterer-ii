@@ -2,7 +2,7 @@
 import {join} from 'node:path';
 import {Worker} from 'node:worker_threads';
 import {EmbedBuilder} from 'discord.js';
-import {RuleError, Pattern, TRANSITIONS, VALID_TRANSITIONS, HEX_TRANSITIONS, VALID_HEX_TRANSITIONS, unparseTransitions, arrayToTransitions, parseMAP, unparseMAP, MAPPattern, PatternType, Identified, findMinmax, getApgcode, getDescription, ALTERNATE_SYMMETRIES, getHashsoup, createPattern, toCatagolueRule, getBlackWhiteReversal} from '../lifeweb/lib/index.js';
+import {RuleError, Pattern, TRANSITIONS, VALID_TRANSITIONS, HEX_TRANSITIONS, VALID_HEX_TRANSITIONS, unparseTransitions, arrayToTransitions, parseMAP, unparseMAP, MAPPattern, MAPB0Pattern, PatternType, Identified, findMinmax, getApgcode, getDescription, ALTERNATE_SYMMETRIES, getHashsoup, createPattern, toCatagolueRule, getBlackWhiteReversal} from '../lifeweb/lib/index.js';
 import {BotError, Message, Response, writeFile, names, aliases, simStats, noReplyPings, findRLE} from './util.js';
 
 
@@ -276,6 +276,27 @@ export async function cmdRuleSymmetry(msg: Message, argv: string[]): Promise<Res
 
 export async function cmdBlackWhiteReverse(msg: Message, argv: string[]): Promise<Response> {
     return getBlackWhiteReversal(argv.slice(1).join(' '));
+}
+
+export async function cmdCheckerboardDual(msg: Message, argv: string[]): Promise<Response> {
+    let p = createPattern(argv.slice(1).join(' '), undefined, aliases);
+    if (!(p instanceof MAPPattern || p instanceof MAPB0Pattern)) {
+        throw new Error('Cannot take checkerboard dual of non-MAP (includes INT) rule!');
+    }
+    let trs = p instanceof MAPPattern ? p.trs : p.evenTrs.map(x => 1 - x);
+    let even = new Uint8Array(512);
+    let odd = new Uint8Array(512);
+    for (let i = 0; i < 512; i++) {
+        even[i ^ 0b010101010] = trs[i];
+        odd[i ^ 0b101010101] = trs[i] ^ 1;
+    }
+    if (p.ruleSymmetry === 'D8') {
+        let [evenB, evenS] = arrayToTransitions(even, TRANSITIONS);
+        let [oddB, oddS] = arrayToTransitions(odd, TRANSITIONS);
+        return `Even: B${unparseTransitions(evenB, VALID_TRANSITIONS)}/S${unparseTransitions(evenS, VALID_TRANSITIONS)}\nOdd: B${unparseTransitions(oddB, VALID_TRANSITIONS)}/S${unparseTransitions(oddS, VALID_TRANSITIONS)}`;
+    } else {
+        return `Even: MAP${unparseMAP(even)}\nOdd: MAP${unparseMAP(odd)}`;
+    }
 }
 
 

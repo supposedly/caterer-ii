@@ -25,7 +25,8 @@ const HELP: {[key: string]: Help} = {
                 desc: 'Command to display infomation for. If omitted or invalid, displays generic help/info message.'
             },
         ],
-        extra: 'If an argument looks like <arg>, it is required. If it looks like [arg], it is optional.'
+        extra: 'If an argument looks like <arg>, it is required. If it looks like [arg], it is optional.',
+        aliases: ['about', 'info'],
     },
 
     eval: {
@@ -182,7 +183,7 @@ const HELP: {[key: string]: Help} = {
         aliases: ['rulesymmetry'],
     },
 
-    black_white_reversal: {
+    black_white_reverse: {
         desc: 'Gets the black/white reversal of a rule.',
         args: [
             {
@@ -190,7 +191,18 @@ const HELP: {[key: string]: Help} = {
                 desc: 'The rule to use.',
             },
         ],
-        aliases: ['blackwhitereverse', 'bwreverse'],
+        aliases: ['black_white_reversal', 'blackwhitereverse', 'blackwhitereversal', 'bwreverse', 'bwreversal'],
+    },
+
+    checkerboard_dual: {
+        desc: 'Gets the checkerboard dual of a rule.',
+        args: [
+            {
+                name: 'rule',
+                desc: 'The rule to use.',
+            },
+        ],
+        aliases: ['checkerboard_dual', 'checkerboarddual', 'cb_dual', 'cbdual'],
     },
 
     identify: {
@@ -374,12 +386,27 @@ const HELP: {[key: string]: Help} = {
 };
 
 
-let helpMsg = 'A cellular automata bot for the ConwayLife Lounge Discord server\n\nCommands:\n';
+let helpMsg = `A cellular automata bot for the ConwayLife Lounge Discord server
+
+Commands:
+* Simulation: \`sim\`, \`sim rand\`
+* Identification: \`identify\`, \`basic_identify\`, \`full_identify\`, \`minmax\`
+* Pattern manipulation: \`hashsoup\`, \`apgencode\`, \`apgdecode\`, \`population\`
+* Rules: \`map_to_int\`, \`map_to_hex_int\`, \`int_to_map\`, \`normalize_rule\`, \`!rule_symmetry\`, \`!black_white_reverse\`
+* 5S: \`sssss\`, \`sssss_info\`
+* Pattern naming: \`name\`, \`rename\`, \`delete_name\`
+* Statistics: \`sim_stats\`, \`save_sim_stats\`
+* Rule aliases: \`alias\`, \`unalias\`, \`lookup_alias\`
+* Configuration: \`noreplypings\`, \`yesreplypings\`
+* Other: \`wiki\`, \`help\`, \`eval\`, \`ping\`
+
+This bot stores your user ID when you use \`!noreplypings\`, and deletes it when you use \`!yesreplypings\`. So, to delete all your data, use \`!yesreplypings\`.
+
+Type \``;
 let helpMsgs: {[key: string]: string} = {};
 
 for (let cmd in HELP) {
     let data = HELP[cmd];
-    helpMsg += `* ${cmd} - ${data.desc}\n`;
     let msg = '`!' + cmd;
     for (let arg of data.args) {
         msg += arg.newline ? '\n' : ' ';
@@ -408,9 +435,8 @@ for (let cmd in HELP) {
     helpMsgs[cmd] = msg;
     if (data.aliases) {
         for (let alias in data.aliases) {
-            helpMsgs[alias] = msg;
+            helpMsgs[alias.slice(1)] = msg;
         }
-
     }
 }
 

@@ -4,7 +4,7 @@ import {inspect} from 'node:util';
 import {Client, GatewayIntentBits, DiscordAPIError, Message as _Message, MessageReaction, PartialMessageReaction, MessageReplyOptions, TextChannel, Partials} from 'discord.js';
 import {BotError, Response, Message, readFile, writeFile, config, sentByAdmin, aliases, noReplyPings, findRLEFromText, findRLE} from './util.js';
 import {cmdHelp} from './help.js';
-import {cmdSim, cmdHashsoup, cmdApgencode, cmdApgdecode, cmdPopulation, cmdMAPToINT, cmdMAPToHexINT, cmdINTToMAP, cmdNormalizeRule, cmdRuleSymmetry, cmdBlackWhiteReverse, cmdIdentify, cmdBasicIdentify, cmdFullIdentify, cmdMinmax} from './ca.js';
+import {cmdSim, cmdHashsoup, cmdApgencode, cmdApgdecode, cmdPopulation, cmdMAPToINT, cmdMAPToHexINT, cmdINTToMAP, cmdNormalizeRule, cmdRuleSymmetry, cmdBlackWhiteReverse, cmdCheckerboardDual, cmdIdentify, cmdBasicIdentify, cmdFullIdentify, cmdMinmax} from './ca.js';
 import {cmdSssss, cmdSssssInfo, cmdDyk, cmdName, cmdRename, cmdDeleteName, cmdSimStats, cmdSaveSimStats, cmdAlias, cmdUnalias, cmdLookupAlias} from './db.js';
 import {cmdWiki} from './wiki.js';
 import {check5S} from './notifier.js';
@@ -16,6 +16,8 @@ const EVAL_PREFIX = '\nlet {' + Object.keys(lifeweb).join(', ') + '} = lifeweb;\
 const COMMANDS: {[key: string]: (msg: Message, argv: string[]) => Promise<Response>} = {
 
     help: cmdHelp,
+    about: cmdHelp,
+    info: cmdHelp,
 
     async eval(msg: Message, argv: string[]): Promise<Response> {
         if (sentByAdmin(msg)) {
@@ -94,8 +96,15 @@ const COMMANDS: {[key: string]: (msg: Message, argv: string[]) => Promise<Respon
     'normalize_rule': cmdNormalizeRule,
     'normalizerule': cmdNormalizeRule,
     'black_white_reverse': cmdBlackWhiteReverse,
+    'black_white_reversal': cmdBlackWhiteReverse,
     'blackwhitereverse': cmdBlackWhiteReverse,
+    'blackwhitereversal': cmdBlackWhiteReverse,
     'bwreverse': cmdBlackWhiteReverse,
+    'bwreversal': cmdBlackWhiteReverse,
+    'checkerboard_dual': cmdCheckerboardDual,
+    'checkerboarddual': cmdCheckerboardDual,
+    'cb_dual': cmdCheckerboardDual,
+    'cbdual': cmdCheckerboardDual,
 
     'sssss': cmdSssss,
     '5s': cmdSssss,
