@@ -323,7 +323,7 @@ async function updateStarboard(data: MessageReaction | PartialMessageReaction): 
         return;
     }
     let msg = data.message;
-    if (msg.createdTimestamp < 1768086000000) {
+    if (msg.createdTimestamp < config.initTime) {
         return;
     }
     let users = (await data.users.fetch()).map(x => x.id);

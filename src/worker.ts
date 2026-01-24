@@ -330,9 +330,12 @@ async function runSim(argv: string[], rle: string): Promise<[number, string | un
     let clearCode = 1 << bitWidth;
     let endCode = (1 << bitWidth) + 1;
     let codeSize = bitWidth + 1;
-    let gifData: Uint8Array[] = [new Uint8Array([0x47, 0x49, 0x46, 0x38, 0x39, 0x61, width & 255, (width >> 8) & 255, height & 255, (height >> 8) & 255, 0xf0 | (bitWidth - 1), 0x00, 0x00, 0x36, 0x39, 0x3e])];
-    let gct = new Uint8Array((colors - 1) * 3);
+    let gifData: Uint8Array[] = [new Uint8Array([0x47, 0x49, 0x46, 0x38, 0x39, 0x61, width & 255, (width >> 8) & 255, height & 255, (height >> 8) & 255, 0xf0 | (bitWidth - 1), 0x00, 0x00])];
+    let gct = new Uint8Array(colors * 3);
     let i = 0;
+    gct[i++] = 0x36;
+    gct[i++] = 0x39;
+    gct[i++] = 0x3e;
     for (let value = 1; value < colors; value++) {
         if (value >= p.states) {
             gct[i++] = 0x00;

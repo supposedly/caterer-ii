@@ -20,6 +20,7 @@ export interface Config {
     sssssChannel: string;
     starboardChannel: string;
     starThreshold: number;
+    initTime: number;
 }
 
 
