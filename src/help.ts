@@ -436,9 +436,8 @@ for (let cmd in HELP) {
     }
     helpMsgs[cmd] = msg;
     if (data.aliases) {
-        for (let alias in data.aliases) {
+        for (let alias of data.aliases) {
             helpMsgs[alias] = msg;
-            console.log('Setting', alias);
         }
     }
 }
@@ -449,7 +448,6 @@ export async function cmdHelp(msg: Message, argv: string[]): Promise<Response> {
         if (cmd.startsWith('!')) {
             cmd = cmd.slice(1);
         }
-        console.log(cmd);
         if (cmd in helpMsgs) {
             return helpMsgs[cmd];
         } else {
