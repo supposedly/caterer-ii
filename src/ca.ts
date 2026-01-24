@@ -329,7 +329,7 @@ function embedIdentified(original: Pattern, type: PatternType | Identified, full
         out += `**Max:** ${type.minmax[1]}\n`;
     }
     if ('symmetry' in type) {
-        out += `**Symmetry:** ${type.symmetry} (${ALTERNATE_SYMMETRIES[type.symmetry]})\n`;
+        out += `**Symmetry:** ${type.symmetry} (${ALTERNATE_SYMMETRIES[type.symmetry].replaceAll('\\', '\\\\')})\n`;
     }
     if (type.period > 1 && full) {
         if ('heat' in type && type.heat !== undefined) {
