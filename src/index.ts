@@ -141,7 +141,7 @@ let previousMsgs: [string, Message][] = [];
 let deleters: [string, string][] = [];
 
 async function runCommand(msg: Message): Promise<void> {
-    if (msg.author.bot) {
+    if (msg.author.bot || msg.createdTimestamp < config.initTime) {
         return;
     }
     let data = msg.content;
