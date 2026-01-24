@@ -386,7 +386,7 @@ const HELP: {[key: string]: Help} = {
 };
 
 
-let helpMsg = `A cellular automata bot for the ConwayLife Lounge Discord server
+const HELP_MSG = `A cellular automata bot for the ConwayLife Lounge Discord server
 
 Commands:
 * Simulation: \`!sim\`, \`!!sim rand\`
@@ -403,6 +403,8 @@ Commands:
 This bot stores your user ID when you use \`!noreplypings\`, and deletes it when you use \`!yesreplypings\`. So, to delete all your data, use \`!yesreplypings\`.
 
 Type \`!help <command>\` for help for a specific command!`;
+
+
 let helpMsgs: {[key: string]: string} = {};
 
 for (let cmd in HELP) {
@@ -436,11 +438,10 @@ for (let cmd in HELP) {
     if (data.aliases) {
         for (let alias in data.aliases) {
             helpMsgs[alias] = msg;
+            console.log('Setting', alias);
         }
     }
 }
-
-helpMsg = helpMsg.slice(0, -1);
 
 export async function cmdHelp(msg: Message, argv: string[]): Promise<Response> {
     if (argv.length > 1) {
@@ -448,12 +449,13 @@ export async function cmdHelp(msg: Message, argv: string[]): Promise<Response> {
         if (cmd.startsWith('!')) {
             cmd = cmd.slice(1);
         }
+        console.log(cmd);
         if (cmd in helpMsgs) {
             return helpMsgs[cmd];
         } else {
             throw new BotError(`No command called !${cmd}`);
         }
     } else {
-        return helpMsg;
+        return HELP_MSG;
     }
 }
