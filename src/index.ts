@@ -139,6 +139,7 @@ const COMMANDS: {[key: string]: (msg: Message, argv: string[]) => Promise<Respon
 
 let previousMsgs: [string, Message][] = [];
 let deleters: [string, string][] = [];
+let runningCommands = new Set<string>();
 
 async function runCommand(msg: Message): Promise<void> {
     if (msg.author.bot || msg.createdTimestamp < config.initTime) {
@@ -166,7 +167,9 @@ async function runCommand(msg: Message): Promise<void> {
     let cmd = argv[0].toLowerCase();
     if (cmd in COMMANDS) {
         try {
+            runningCommands.add(msg.id);
             let out = await COMMANDS[cmd](msg, argv);
+            runningCommands.delete(msg.id);
             if (out) {
                 if (typeof out === 'string') {
                     previousMsgs.push([msg.id, await msg.reply({content: out, allowedMentions: {repliedUser: !noReplyPings.includes(msg.author.id), parse: []}})]);
