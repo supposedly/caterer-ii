@@ -413,18 +413,18 @@ for (let cmd in HELP) {
     for (let arg of data.args) {
         msg += arg.newline ? '\n' : ' ';
         if (arg.optional) {
-            msg += '`[' + arg.name + ']`';
+            msg += '[' + arg.name + ']';
         } else {
-            msg += '`<' + arg.name + '>`';
+            msg += '<' + arg.name + '>';
         }
     }
     msg += '`\n\n' + data.desc + '\n\nArguments:';
     for (let arg of data.args) {
         msg += '\n* ';
         if (arg.optional) {
-            msg += '[' + arg.name + ']';
+            msg += '`[' + arg.name + ']`';
         } else {
-            msg += '<' + arg.name + '>';
+            msg += '`<' + arg.name + '>`';
         }
         msg += ' - ' + arg.desc;
     }
