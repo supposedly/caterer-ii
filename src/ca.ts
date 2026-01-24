@@ -259,10 +259,10 @@ export async function cmdMAPToHexINT(msg: Message, argv: string[]): Promise<Resp
 
 export async function cmdINTToMAP(msg: Message, argv: string[]): Promise<Response> {
     let p = createPattern(argv[1], undefined, aliases);
-    if (!(p instanceof MAPPattern)) {
+    if (!(p instanceof MAPPattern || p instanceof MAPB0Pattern)) {
         throw new BotError('Rule must be in B/S notation!');
     }
-    return 'MAP' + unparseMAP(p.trs);
+    return 'MAP' + unparseMAP(p instanceof MAPPattern ? p.trs : p.evenTrs.map(x => 1 - x));
 }
 
 
