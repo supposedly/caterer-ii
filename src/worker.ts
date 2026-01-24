@@ -3,7 +3,7 @@ import {join} from 'node:path';
 import * as fs from 'node:fs/promises';
 import {execSync} from 'node:child_process';
 import {parentPort} from 'node:worker_threads';
-import {RuleError, Pattern, CoordPattern, TreePattern, DataHistoryPattern, CoordHistoryPattern, DataSuperPattern, CoordSuperPattern, InvestigatorPattern, RuleLoaderBgollyPattern, findType, getDescription, identify, createPattern, parse} from '../lifeweb/lib/index.js';
+import {RuleError, Pattern, CoordPattern, TreePattern, DataHistoryPattern, CoordHistoryPattern, DataSuperPattern, CoordSuperPattern, InvestigatorPattern, findType, getDescription, identify, createPattern, parse} from '../lifeweb/lib/index.js';
 import {BotError, parseSpecial, aliases} from './util.js';
 
 
@@ -116,16 +116,10 @@ async function parseSim(argv: string[], rle: string): Promise<{frames: [Pattern,
                             continue;
                         }
                     }
-                    if (useCAViewer || p instanceof RuleLoaderBgollyPattern) {
+                    if (useCAViewer) {
                         await fs.writeFile(join(dir, 'in.rle'), p.toRLE());
                         execSync(`rm -f ${join(dir, 'out.rle')}`);
-                        let caviewer = false;
-                        if (useCAViewer || !p.ruleStr.startsWith('__')) {
-                            caviewer = true;
-                            execSync(`box64 /home/opc/caviewer/lib/runtime/bin/java -p /home/opc/caviewer/app -m CAViewer/application.Main sim -g ${part[0]} -s ${step} -i ${join(dir, 'in.rle')} -o ${join(dir, 'out.rle')}`);
-                        } else {
-                            execSync(`${join(dir, 'lifeweb', 'bgolly')} -a RuleLoader -s ${join(dir, 'lifeweb')}/ -o ${join(dir, 'out.rle')} -m ${part[0]} -i ${step} ${join(dir, 'in.rle')}`);
-                        }
+                        execSync(`box64 /home/opc/caviewer/lib/runtime/bin/java -p /home/opc/caviewer/app -m CAViewer/application.Main sim -g ${part[0]} -s ${step} -i ${join(dir, 'in.rle')} -o ${join(dir, 'out.rle')}`);
                         let data = (await fs.readFile(join(dir, 'out.rle'))).toString();
                         let xOffset: number | null = null;
                         let yOffset: number | null = null;
@@ -144,18 +138,16 @@ async function parseSim(argv: string[], rle: string): Promise<{frames: [Pattern,
                             } else if (line === '@COLOR') {
                                 inColors = true;
                             } else {
-                                let q = parse(`x = 0, y = 0, rule = B3/S23\n${line}`, aliases, true);
+                                let q = parse(`x = 0, y = 0, rule = B3/S23\n${line}`, aliases);
                                 q.xOffset = xOffset ?? 0;
                                 q.yOffset = yOffset ?? 0;
                                 xOffset = null;
                                 yOffset = null;
-                                if (caviewer) {
-                                    q.xOffset--;
-                                    q.yOffset--;
-                                    if (!firstDone) {
-                                        firstDone = true;
-                                        continue;
-                                    }
+                                q.xOffset--;
+                                q.yOffset--;
+                                if (!firstDone) {
+                                    firstDone = true;
+                                    continue;
                                 }
                                 frames.push([q, frameTime]);
                             }
