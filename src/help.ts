@@ -430,12 +430,12 @@ for (let cmd in HELP) {
         msg += '\n\n' + data.extra;
     }
     if (data.aliases) {
-        msg += '\n\nAliases: ' + data.aliases.map(x => '`' + x + '`').join(', ');
+        msg += '\n\nAliases: ' + data.aliases.map(x => '`!' + x + '`').join(', ');
     }
     helpMsgs[cmd] = msg;
     if (data.aliases) {
         for (let alias in data.aliases) {
-            helpMsgs[alias.slice(1)] = msg;
+            helpMsgs[alias] = msg;
         }
     }
 }
