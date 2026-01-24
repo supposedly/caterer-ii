@@ -140,7 +140,7 @@ export async function cmdSim(msg: Message, argv: string[]): Promise<Response> {
         let data = new Uint8Array(size);
         for (let i = 0; i < size; i++) {
             if (Math.random() < fill) {
-                data[i] = Math.ceil(Math.random() * p.states);
+                data[i] = Math.floor(Math.random() * p.states);
             }
         }
         p.setData(height, width, data);
