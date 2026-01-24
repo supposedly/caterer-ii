@@ -326,6 +326,16 @@ async function runSim(argv: string[], rle: string): Promise<[number, string | un
     let startTime = performance.now();
     let {frames, gifSize, minX, minY, width, height, customColors, desc} = await parseSim(argv, rle);
     let parseTime = performance.now() - startTime;
+    let xOffset = 0;
+    let yOffset = 0;
+    if (minX < 0) {
+        xOffset = -minX;
+        minX = 0;
+    }
+    if (minY < 0) {
+        yOffset = -minY;
+        minY = 0;
+    }
     let p = frames[0][0];
     let bitWidth = Math.max(2, Math.ceil(Math.log2(p.states)));
     let colors = 2**bitWidth;
@@ -381,16 +391,18 @@ async function runSim(argv: string[], rle: string): Promise<[number, string | un
     gifData.push(gct);
     gifData.push(new Uint8Array([0x21, 0xff, 0x0b, 0x4E, 0x45, 0x54, 0x53, 0x43, 0x41, 0x50, 0x45, 0x32, 0x2e, 0x30, 0x03, 0x01, 0x00, 0x00, 0x00]));
     for (let [p, frameTime] of frames) {
-        let startY: number;
         let startX: number;
+        let startY: number;
         if (p instanceof CoordPattern) {
             let data = p.getMinMaxCoords();
-            startY = data.minY - minY;
             startX = data.minX - minX;
+            startY = data.minY - minY;
         } else {
-            startY = p.yOffset - minY;
             startX = p.xOffset - minX;
+            startY = p.yOffset - minY;
         }
+        startX += xOffset;
+        startY += yOffset;
         let pHeight = p.height;
         let pWidth = p.width;
         let endX = startX + pWidth;
