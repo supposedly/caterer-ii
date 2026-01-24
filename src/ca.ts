@@ -164,7 +164,7 @@ export async function cmdSim(msg: Message, argv: string[]): Promise<Response> {
         simStats[p.ruleStr] = 1;
     }
     simCounter++;
-    if (simCounter === 16) {
+    if (simCounter === 4) {
         simCounter = 0;
         await writeFile('data/sim_stats.json', JSON.stringify(simStats, undefined, 4));
     }
