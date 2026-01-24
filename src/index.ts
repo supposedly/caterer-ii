@@ -28,10 +28,14 @@ const COMMANDS: {[key: string]: (msg: Message, argv: string[]) => Promise<Respon
             }
             code = `return (async () => {${code}})()`;
             let out = await (new Function('client', 'msg', 'lifeweb', 'aliases', 'findRLE', 'readFile', 'writeFile', '"use strict";' + EVAL_PREFIX + code))(client, msg, lifeweb, aliases, findRLE, readFile, writeFile);
-            return '```ansi\n' + inspect(out, {
-                colors: true,
-                depth: 2,
-            }).replaceAll('\x1b[22m', '\x1b[0m').replaceAll('\x1b[39m', '\x1b[0m') + '```';
+            if (typeof out === 'string') {
+                return '```\n' + out + '\n```';
+            } else {
+                return '```ansi\n' + inspect(out, {
+                    colors: true,
+                    depth: 2,
+                }).replaceAll('\x1b[22m', '\x1b[0m').replaceAll('\x1b[39m', '\x1b[0m') + '\n```';
+            }
         }
     },
 
