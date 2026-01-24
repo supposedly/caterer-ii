@@ -4,7 +4,7 @@ import * as fs from 'node:fs/promises';
 import {execSync} from 'node:child_process';
 import {parentPort} from 'node:worker_threads';
 import {RuleError, Pattern, CoordPattern, TreePattern, DataHistoryPattern, CoordHistoryPattern, DataSuperPattern, CoordSuperPattern, InvestigatorPattern, findType, getDescription, identify, createPattern, parse} from '../lifeweb/lib/index.js';
-import {BotError, parseSpecial, aliases} from './util.js';
+import {BotError, aliases} from './util.js';
 
 
 const HISTORY_COLORS: [number, number, number][] = [
@@ -71,7 +71,7 @@ const INVESTIGATOR_COLORS: [number, number, number][] = [
 let dir = join(import.meta.dirname, '..');
 
 async function parseSim(argv: string[], rle: string): Promise<{frames: [Pattern, number][], gifSize: number, minX: number, minY: number, width: number, height: number, customColors: {[key: number]: [number, number, number]}, desc?: string}> {
-    let p = parseSpecial(rle).shrinkToFit();
+    let p = parse(rle).shrinkToFit();
     let parts: (string | number)[][] = [];
     let currentPart: (string | number)[] = [];
     for (let arg of argv.slice(1)) {
