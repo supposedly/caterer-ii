@@ -317,6 +317,8 @@ async function parseSim(argv: string[], rle: string): Promise<{frames: [Pattern,
         height++;
     }
     let defaultTime = Math.ceil(Math.min(1, Math.max(1/50, 4 / frames.length)) * 100);
+    console.log(minX, minY, height, width);
+    console.log(frames.map(([p]) => p.toRLE()).join('\n'));
     return {frames: frames.map(([p, time]) => [p, Math.max(time ?? defaultTime, 2)]), gifSize, minX, minY, width, height, customColors, desc};
 }
 
