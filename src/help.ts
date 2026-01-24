@@ -392,7 +392,7 @@ Commands:
 * Simulation: \`!sim\`, \`!!sim rand\`
 * Identification: \`!identify\`, \`!!basic_identify\`, \`!full_identify\`, \`!minmax\`
 * Pattern manipulation: \`!hashsoup\`, \`!apgencode\`, \`!apgdecode\`, \`!population\`
-* Rules: \`!map_to_int\`, \`!map_to_hex_int\`, \`!int_to_map\`, \`!normalize_rule\`, \`!!rule_symmetry\`, \`!!black_white_reverse\`
+* Rules: \`!map_to_int\`, \`!map_to_hex_int\`, \`!int_to_map\`, \`!normalize_rule\`, \`!rule_symmetry\`, \`!black_white_reverse\`
 * 5S: \`!sssss\`, \`!sssss_info\`
 * Pattern naming: \`!name\`, \`!rename\`, \`!delete_name\`
 * Statistics: \`!sim_stats\`, \`!save_sim_stats\`
