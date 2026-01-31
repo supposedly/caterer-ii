@@ -3,7 +3,7 @@ import {join} from 'node:path';
 import {Worker} from 'node:worker_threads';
 import {EmbedBuilder} from 'discord.js';
 import {RuleError, Pattern, TRANSITIONS, VALID_TRANSITIONS, HEX_TRANSITIONS, VALID_HEX_TRANSITIONS, unparseTransitions, arrayToTransitions, parseMAP, unparseMAP, MAPPattern, MAPB0Pattern, PatternType, Identified, findMinmax, getApgcode, getDescription, ALTERNATE_SYMMETRIES, getHashsoup, createPattern, toCatagolueRule, getBlackWhiteReversal} from '../lifeweb/lib/index.js';
-import {BotError, Message, Response, writeFile, names, aliases, simStats, noReplyPings, findRLE} from './util.js';
+import {BotError, Message, Response, writeFile, names, aliases, simStats, noReplyPings, findRLE, sentByAdmin} from './util.js';
 
 
 type WorkerResult = {id: number, ok: true} & ({type: 'sim', data: [number, string | undefined]} | {type: 'identify', data: Identified} | {type: 'basic_identify', data: PatternType}) | {id: number, ok: false, error: string, intentional: boolean, type: string};
@@ -90,17 +90,19 @@ function workerOnExit(code: number): void {
     workerHandleFatal(new Error(msg));
 }
 
-function createWorkerJob(type: 'sim', data: {argv: string[], rle: string}): Promise<[number, string | undefined] | null>;
-function createWorkerJob(type: 'identify', data: {rle: string, limit: number}): Promise<Identified | null>;
-function createWorkerJob(type: 'basic_identify', data: {rle: string, limit: number}): Promise<PatternType | null>;
-function createWorkerJob(type: 'sim' | 'identify' | 'basic_identify', data: any): Promise<any> {
+function createWorkerJob(type: 'sim', data: {argv: string[], rle: string}, noTimeout?: boolean): Promise<[number, string | undefined] | null>;
+function createWorkerJob(type: 'identify', data: {rle: string, limit: number}, noTimeout?: boolean): Promise<Identified | null>;
+function createWorkerJob(type: 'basic_identify', data: {rle: string, limit: number}, noTimeout?: boolean): Promise<PatternType | null>;
+function createWorkerJob(type: 'sim' | 'identify' | 'basic_identify', data: any, noTimeout?: boolean): Promise<any> {
     return new Promise((resolve, reject) => {
         let id = nextID++;
         let timeout = setTimeout(() => {
-            jobs.delete(id);
-            resolve(null);
-            restartWorker();
-        }, type === 'sim' && data.argv.includes('longer') ? 60000 : 30000);
+            if (!noTimeout) {
+                jobs.delete(id);
+                resolve(null);
+                restartWorker();
+            }
+        }, 30000);
         jobs.set(id, {resolve, reject, timeout});
         worker.postMessage({id, type, ...data});
     });
@@ -112,6 +114,15 @@ let simCounter = 0;
 export async function cmdSim(msg: Message, argv: string[]): Promise<Response> {
     let startTime = performance.now();
     await msg.channel.sendTyping();
+    let noTimeout = false;
+    if (argv[1] === 'notimeout') {
+        if (sentByAdmin(msg)) {
+            noTimeout = true;
+            argv = argv.slice(1);
+        } else {
+            throw new BotError(`You must be an admin to use notimeout!`);
+        }
+    }
     let outputTime = false;
     if (argv[1] === 'time') {
         outputTime = true;
@@ -153,7 +164,7 @@ export async function cmdSim(msg: Message, argv: string[]): Promise<Response> {
         p = data.p;
         replyTo = data.msg;
     }
-    let data = await createWorkerJob('sim', {argv, rle: p.toRLE()});
+    let data = await createWorkerJob('sim', {argv, rle: p.toRLE()}, noTimeout);
     if (!data) {
         return 'Error: Timed out!';
     }
@@ -391,6 +402,15 @@ function embedIdentified(original: Pattern, type: PatternType | Identified, full
 
 export async function cmdIdentify(msg: Message, argv: string[]): Promise<Response> {
     await msg.channel.sendTyping();
+    let noTimeout = false;
+    if (argv[1] === 'notimeout') {
+        if (sentByAdmin(msg)) {
+            noTimeout = true;
+            argv = argv.slice(1);
+        } else {
+            throw new BotError(`You must be an admin to use notimeout!`);
+        }
+    }
     let limit = 256;
     if (argv[1]) {
         let parsed = parseFloat(argv[1]);
@@ -402,7 +422,7 @@ export async function cmdIdentify(msg: Message, argv: string[]): Promise<Respons
     if (!data) {
         throw new BotError('Cannot find RLE');
     }
-    let out = await createWorkerJob('identify', {rle: data.p.toRLE(), limit});
+    let out = await createWorkerJob('identify', {rle: data.p.toRLE(), limit}, noTimeout);
     if (!out) {
         throw new BotError('Timed out!');
     }
@@ -411,6 +431,15 @@ export async function cmdIdentify(msg: Message, argv: string[]): Promise<Respons
 
 export async function cmdBasicIdentify(msg: Message, argv: string[]): Promise<Response> {
     await msg.channel.sendTyping();
+    let noTimeout = false;
+    if (argv[1] === 'notimeout') {
+        if (sentByAdmin(msg)) {
+            noTimeout = true;
+            argv = argv.slice(1);
+        } else {
+            throw new BotError(`You must be an admin to use notimeout!`);
+        }
+    }
     let limit = 256;
     if (argv[1]) {
         let parsed = parseFloat(argv[1]);
@@ -422,7 +451,7 @@ export async function cmdBasicIdentify(msg: Message, argv: string[]): Promise<Re
     if (!data) {
         throw new BotError('Cannot find RLE');
     }
-    let out = await createWorkerJob('basic_identify', {rle: data.p.toRLE(), limit});
+    let out = await createWorkerJob('basic_identify', {rle: data.p.toRLE(), limit}, noTimeout);
     if (!out) {
         throw new BotError('Timed out!');
     }
@@ -431,6 +460,15 @@ export async function cmdBasicIdentify(msg: Message, argv: string[]): Promise<Re
 
 export async function cmdFullIdentify(msg: Message, argv: string[]): Promise<Response> {
     await msg.channel.sendTyping();
+    let noTimeout = false;
+    if (argv[1] === 'notimeout') {
+        if (sentByAdmin(msg)) {
+            noTimeout = true;
+            argv = argv.slice(1);
+        } else {
+            throw new BotError(`You must be an admin to use notimeout!`);
+        }
+    }
     let limit = 256;
     if (argv[1]) {
         let parsed = parseFloat(argv[1]);
@@ -442,7 +480,7 @@ export async function cmdFullIdentify(msg: Message, argv: string[]): Promise<Res
     if (!data) {
         throw new BotError('Cannot find RLE');
     }
-    let out = await createWorkerJob('identify', {rle: data.p.toRLE(), limit});
+    let out = await createWorkerJob('identify', {rle: data.p.toRLE(), limit}, noTimeout);
     if (!out) {
         throw new BotError('Timed out!');
     }
