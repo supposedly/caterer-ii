@@ -200,6 +200,9 @@ async function runCommand(msg: Message): Promise<void> {
                 let str: string;
                 if (error && typeof error === 'object' && 'stack' in error) {
                     str = String(error.stack);
+                    if (str.length > 1900) {
+                        str = str.slice(0, 1900) + '... (truncated)';
+                    }
                 } else {
                     str = String(error);
                 }
@@ -263,6 +266,9 @@ client.on('messageUpdate', async (old, msg) => {
         let str: string;
         if (error && typeof error === 'object' && 'stack' in error) {
             str = String(error.stack);
+            if (str.length > 1900) {
+                str = str.slice(0, 1900) + '... (truncated)';
+            }
         } else {
             str = String(error);
         }
@@ -417,6 +423,9 @@ setInterval(async () => {
         let str: string;
         if (error && typeof error === 'object' && 'stack' in error) {
             str = String(error.stack);
+            if (str.length > 1900) {
+                str = str.slice(0, 1900) + '... (truncated)';
+            }
         } else {
             str = String(error);
         }
