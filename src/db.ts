@@ -259,5 +259,5 @@ export async function cmdLookupAlias(msg: Message, argv: string[]): Promise<Resp
         out.push(alias);
         break;
     }
-    return out.map(x => '```\n' + x + '```').join('\n');
+    return out.map(x => '```\n' + x + '```').join('');
 }
