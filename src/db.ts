@@ -246,10 +246,11 @@ export async function cmdLookupAlias(msg: Message, argv: string[]): Promise<Resp
         } catch (error) {
             if (error instanceof RuleError) {
                 alias = alias.toLowerCase();
-                out.push(alias);
                 if (out.includes(alias)) {
+                    out.push(alias + ' (recursion)')
                     break;
                 } else {
+                    out.push(alias);
                     continue;
                 }
             } else {
