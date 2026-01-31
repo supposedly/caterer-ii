@@ -71,7 +71,7 @@ const INVESTIGATOR_COLORS: [number, number, number][] = [
 let dir = join(import.meta.dirname, '..');
 
 async function parseSim(argv: string[], rle: string): Promise<{frames: [Pattern, number][], gifSize: number, minX: number, minY: number, width: number, height: number, customColors: {[key: number]: [number, number, number]}, desc?: string}> {
-    let p = parse(rle).shrinkToFit();
+    let p = parse(rle, aliases).shrinkToFit();
     let parts: (string | number)[][] = [];
     let currentPart: (string | number)[] = [];
     for (let arg of argv.slice(1)) {
