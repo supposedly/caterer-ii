@@ -348,7 +348,7 @@ async function runSim(argv: string[], rle: string): Promise<[number, string | un
             gct[i++] = 0xff;
             gct[i++] = 0xff;
         } else if (p instanceof TreePattern && p.rule.colors && p.rule.colors[value]) {
-            throw new Error(`Loading colors for state ${value}`);
+            throw new Error(`Loading colors for state ${value} (${p.states} states)`);
             // let [r, g, b] = p.rule.colors[value];
             // gct[i++] = r;
             // gct[i++] = g;
