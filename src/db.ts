@@ -183,6 +183,9 @@ export async function cmdSaveSimStats(msg: Message): Promise<Response> {
 export async function cmdAlias(msg: Message): Promise<Response> {
     let data = msg.content.slice(msg.content.indexOf(' ') + 1).split('\n');
     let alias = data[0].toLowerCase().trim();
+    if (alias === '') {
+        throw new Error('No alias provided!');
+    }
     let isValidRule = true;
     try {
         createPattern(alias);
