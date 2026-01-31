@@ -70,6 +70,7 @@ export function findRLEFromText(data: string): Pattern | undefined {
     if (index === -1) {
         return;
     }
+    throw new BotError(data.slice(0, index + 1));
     return parse(data.slice(0, index + 1), aliases);
 }
 
