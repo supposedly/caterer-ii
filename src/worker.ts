@@ -348,10 +348,11 @@ async function runSim(argv: string[], rle: string): Promise<[number, string | un
             gct[i++] = 0xff;
             gct[i++] = 0xff;
         } else if (p instanceof TreePattern && p.rule.colors && p.rule.colors[value]) {
-            let [r, g, b] = p.rule.colors[value];
-            gct[i++] = r;
-            gct[i++] = g;
-            gct[i++] = b;
+            throw new Error(`Loading colors for state ${value}`);
+            // let [r, g, b] = p.rule.colors[value];
+            // gct[i++] = r;
+            // gct[i++] = g;
+            // gct[i++] = b;
         } else if (p instanceof DataHistoryPattern || p instanceof CoordHistoryPattern) {
             let [r, g, b] = HISTORY_COLORS[value - 1];
             gct[i++] = r;
