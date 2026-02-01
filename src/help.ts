@@ -79,8 +79,58 @@ const HELP: {[key: string]: Help} = {
                 desc: 'The rule to simulate it in.'
             },
             {
+                name: '\'time\'',
+                optional: true,
+                desc: 'Also show how much time it takes',
+            },
+            {
                 name: 'parts',
                 desc: 'How to run it. See !help sim.',
+            },
+        ],
+    },
+
+    identify: {
+        desc: 'Identify a pattern',
+        args: [
+            {
+                name: 'generations',
+                optional: true,
+                desc: 'Number of generations to run the identifier for (default 256).'
+            },
+        ],
+    },
+
+    basic_identify: {
+        desc: 'Identify a pattern, but provide less information',
+        args: [
+            {
+                name: 'generations',
+                optional: true,
+                desc: 'Number of generations to run the identifier for (default 256).'
+            },
+        ],
+        aliases: ['basicidentify'],
+    },
+
+    full_identify: {
+        desc: 'Identify a pattern, but provide even more information',
+        args: [
+            {
+                name: 'generations',
+                optional: true,
+                desc: 'Number of generations to run the identifier for (default 256).'
+            },
+        ],
+        aliases: ['fullidentify'],
+    },
+
+    minmax: {
+        desc: 'Find the minimum and maximum rule of a pattern',
+        args: [
+            {
+                name: 'generations',
+                desc: 'Number of generations to run the pattern for.',
             },
         ],
     },
@@ -104,12 +154,23 @@ const HELP: {[key: string]: Help} = {
     },
 
     apgencode: {
-        desc: 'Get an unprefixed apgcode for any pattern',
-        args: [],
+        desc: 'Get an unprefixed apgcode for any pattern. For prefixed apgcodes, use `!identify`.',
+        args: [
+            {
+                name: '\'canonical\'',
+                optional: true,
+                desc: 'Whether to canonicalize the apgcode (by rotation/reflection). Can also be `canon` or `c`.',
+            },
+            {
+                name: 'gens',
+                optional: true,
+                desc: 'Only valid with the canonical option. How many generations to run to find the canonicalized apgcode.',
+            },
+        ],
     },
 
     apgdecode: {
-        desc: 'Decode an unprefixed apgcode.',
+        desc: 'Decode an apgcode.',
         args: [
             {
                 name: 'apgcode',
@@ -173,6 +234,17 @@ const HELP: {[key: string]: Help} = {
         aliases: ['normalizerule'],
     },
 
+    to_catagolue_rule: {
+        desc: 'Turns a rule to the Catagolue notation for it',
+        args: [
+            {
+                name: 'rule',
+                desc: 'The rule to use.',
+            },
+        ],
+        aliases: ['tocatagoluerule', 'to_catglue_rule', 'tocatgluerule'],
+    },
+
     rule_symmetry: {
         desc: 'Gets the symmetry of a rule.',
         args: [
@@ -204,51 +276,6 @@ const HELP: {[key: string]: Help} = {
             },
         ],
         aliases: ['checkerboard_dual', 'checkerboarddual', 'cb_dual', 'cbdual'],
-    },
-
-    identify: {
-        desc: 'Identify a pattern',
-        args: [
-            {
-                name: 'generations',
-                optional: true,
-                desc: 'Number of generations to run the identifier for (default 256).'
-            },
-        ],
-    },
-
-    basic_identify: {
-        desc: 'Identify a pattern, but provide less information',
-        args: [
-            {
-                name: 'generations',
-                optional: true,
-                desc: 'Number of generations to run the identifier for (default 256).'
-            },
-        ],
-        aliases: ['basicidentify'],
-    },
-
-    full_identify: {
-        desc: 'Identify a pattern, but provide even more information',
-        args: [
-            {
-                name: 'generations',
-                optional: true,
-                desc: 'Number of generations to run the identifier for (default 256).'
-            },
-        ],
-        aliases: ['fullidentify'],
-    },
-
-    minmax: {
-        desc: 'Find the minimum and maximum rule of a pattern',
-        args: [
-            {
-                name: 'generations',
-                desc: 'Number of generations to run the pattern for.',
-            },
-        ],
     },
 
     sssss: {
@@ -393,7 +420,7 @@ Commands:
 * Simulation: \`!sim\`, \`!!sim rand\`
 * Identification: \`!identify\`, \`!!basic_identify\`, \`!full_identify\`, \`!minmax\`
 * Pattern manipulation: \`!hashsoup\`, \`!apgencode\`, \`!apgdecode\`, \`!population\`
-* Rules: \`!map_to_int\`, \`!map_to_hex_int\`, \`!int_to_map\`, \`!normalize_rule\`, \`!rule_symmetry\`, \`!black_white_reverse\`
+* Rules: \`!map_to_int\`, \`!map_to_hex_int\`, \`!int_to_map\`, \`!normalize_rule\`, \`!to_catagolue_rule\`, \`!rule_symmetry\`, \`!black_white_reverse\`
 * 5S: \`!sssss\`, \`!sssss_info\`
 * Pattern naming: \`!name\`, \`!rename\`, \`!delete_name\`
 * Statistics: \`!sim_stats\`, \`!save_sim_stats\`
