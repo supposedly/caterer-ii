@@ -2,8 +2,8 @@
 import {join} from 'node:path';
 import {Worker} from 'node:worker_threads';
 import {EmbedBuilder} from 'discord.js';
-import {RuleError, Pattern, TRANSITIONS, VALID_TRANSITIONS, HEX_TRANSITIONS, VALID_HEX_TRANSITIONS, unparseTransitions, arrayToTransitions, parseMAP, unparseMAP, MAPPattern, MAPB0Pattern, PatternType, Identified, findMinmax, getApgcode, getDescription, ALTERNATE_SYMMETRIES, getHashsoup, createPattern, toCatagolueRule, getBlackWhiteReversal} from '../lifeweb/lib/index.js';
-import {BotError, Message, Response, writeFile, names, aliases, simStats, noReplyPings, findRLE, sentByAdmin} from './util.js';
+import {RuleError, Pattern, PatternType, Identified, findMinmax, getApgcode, getDescription, ALTERNATE_SYMMETRIES, createPattern, toCatagolueRule} from '../lifeweb/lib/index.js';
+import {BotError, Message, Response, writeFile, names, aliases, simStats, findRLE, sentByAdmin} from './util.js';
 
 
 type WorkerResult = {id: number, ok: true} & ({type: 'sim', data: [number, string | undefined]} | {type: 'identify', data: Identified} | {type: 'basic_identify', data: PatternType}) | {id: number, ok: false, error: string, intentional: boolean, type: string};

@@ -1,6 +1,6 @@
 
 import {TRANSITIONS, VALID_TRANSITIONS, HEX_TRANSITIONS, VALID_HEX_TRANSITIONS, unparseTransitions, arrayToTransitions, parseMAP, unparseMAP, MAPPattern, MAPB0Pattern, getHashsoup, createPattern, toCatagolueRule, getBlackWhiteReversal} from '../lifeweb/lib/index.js';
-import {BotError, Message, Response, aliases, noReplyPings, findRLE} from './util.js';
+import {BotError, Message, Response, aliases, findRLE} from './util.js';
 
 
 export async function cmdHashsoup(msg: Message, argv: string[]): Promise<Response> {
@@ -53,10 +53,7 @@ export async function cmdPopulation(msg: Message, argv: string[]): Promise<Respo
     let p = data.p;
     msg = data.msg;
     if (p.states === 2) {
-        await msg.reply({
-            content: String(p.population),
-            allowedMentions: {repliedUser: !noReplyPings.includes(msg.author.id), parse: []},
-        });
+        return String(p.population);
     } else {
         let counts = [];
         for (let i = 0; i < p.states; i++) {
@@ -69,10 +66,7 @@ export async function cmdPopulation(msg: Message, argv: string[]): Promise<Respo
                 total++;
             }
         }
-        await msg.reply({
-            content: `${total} total live cells\n${counts.map((x, i) => `${x} state ${i} cells`).join('\n')}`,
-            allowedMentions: {repliedUser: !noReplyPings.includes(msg.author.id), parse: []},
-        });
+        return `${total} total live cells\n${counts.map((x, i) => `${x} state ${i} cells`).join('\n')}`;
     }
 }
 
