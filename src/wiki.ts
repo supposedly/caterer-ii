@@ -118,6 +118,8 @@ export async function cmdWiki(msg: Message, argv: string[]): Promise<Response> {
         }
     }
     text = text.replaceAll(/<!--.*?-->/g, '');
+    text = text.replaceAll(/<pre>([\s\S]*?)<\/pre>/g, (_, code) => `\`\`\`\n${code.trim()}\n\`\`\``);
+    text = text.replaceAll(/<code>(.*?)<\/code>/g, '`$1`');
     text = text.replaceAll(/<(noinclude|ref)( ["'a-zA-Z0-9]*?=["'a-zA-Z0-9]*?)*?(?!= ?\/)>.*?<\/\1>/gs, '');
     text = text.replaceAll(/<ref( ["'a-zA-Z0-9]*=["'a-zA-Z0-9]*?)*?( ?\/)?>/gs, '');
     text = text.replaceAll(/\{\{period\|(\d+)\}\}/g, '[period-$1](https://conwaylife.com/wiki/Category:Oscillators_with_period_$1)');
@@ -148,8 +150,6 @@ export async function cmdWiki(msg: Message, argv: string[]): Promise<Response> {
     text = text.replaceAll(/\[(https?:\/\/[^\s]+)\s+([^\]]+)\]((e?s)?)/g, '[$2$3]($1)');
     text = text.replaceAll(/\[\[([^\|\]]+)\|([^\]]+)\]\]((e?s)?)/g, (_, url, name, s) => `[${name}${s}](https://conwaylife.com/wiki/${encodeURIComponent(url)})`);
     text = text.replaceAll(/\[\[([^\]]+)\]\]((e?s)?)/g, (_, page, s) => `[${page}${s}](https://conwaylife.com/wiki/${encodeURIComponent(page)})`);
-    text = text.replaceAll(/<pre>([\s\S]*?)<\/pre>/g, (_, code) => `\`\`\`\n${code.trim()}\n\`\`\``);
-    text = text.replaceAll(/<code>(.*?)<\/code>/g, '`$1`');
     text = text.replaceAll(/ ?\{\{[^}]+\}\}/g, '');
     text = text.replaceAll(/\n{3,}/g, '\n\n');
     text = text.replaceAll(/(?<=\n)\n+(?=#+ )/g, '');
