@@ -32,6 +32,7 @@ const NAMESPACES: {[key: string]: number} = {
     'rule talk': 3795,
     'media': -2,
     'special': -1,
+    'random': NaN,
 };
 
 
@@ -49,7 +50,12 @@ export async function cmdWiki(msg: Message, argv: string[]): Promise<Response> {
         namespace = NAMESPACES[parts[0]];
         query = parts[1];
     }
-    let resp = await fetch(`https://conwaylife.com/w/api.php?action=query&list=search&srnamespace=${namespace}&srsearch=${encodeURIComponent(query)}&srlimit=1&format=json`);
+    let resp: globalThis.Response;
+    if (Number.isNaN(namespace) || (namespace === -1 && query === 'random')) {
+        resp = await fetch(`https://conwaylife.com/w/api.php?action=query&list=random&rnamespace=${namespace}&rnlimit=1&format=json`);
+    } else {
+        resp = await fetch(`https://conwaylife.com/w/api.php?action=query&list=search&srnamespace=${namespace}&srsearch=${encodeURIComponent(query)}&srlimit=1&format=json`);
+    }
     if (!resp.ok) {
         throw new BotError(`Server returned ${resp.status} ${resp.statusText}`);
     }
