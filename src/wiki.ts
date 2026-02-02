@@ -34,37 +34,6 @@ const NAMESPACES: {[key: string]: number} = {
     'special': -1,
 };
 
-const REVERSE_NAMESPACES: {[key: number]: string} = {
-    0: '',
-    1: 'Talk',
-    2: 'User',
-    3: 'User talk',
-    4: 'LifeWiki',
-    5: 'LifeWiki talk',
-    6: 'File',
-    7: 'File talk',
-    8: 'MediaWiki',
-    9: 'MediaWiki talk',
-    10: 'Template',
-    11: 'Template talk',
-    12: 'Help',
-    13: 'Help talk',
-    14: 'Category',
-    15: 'Category talk',
-    16: 'ConwayLife.com',
-    17: 'ConwayLife.com talk',
-    102: 'OCA',
-    103: 'OCA talk',
-    3782: 'LV',
-    3783: 'LV talk',
-    3792: 'RLE',
-    3793: 'RLE talk',
-    3794: 'Rule',
-    3795: 'Rule talk',
-    '-2': 'Media',
-    '-1': 'Special',
-};
-
 
 export async function cmdWiki(msg: Message, argv: string[]): Promise<Response> {
     let query = argv.slice(1).join(' ').toLowerCase();
