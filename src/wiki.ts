@@ -120,8 +120,8 @@ export async function cmdWiki(msg: Message, argv: string[]): Promise<Response> {
     text = text.replaceAll(/<!--.*?-->/g, '');
     text = text.replaceAll(/<pre>([\s\S]*?)<\/pre>/g, (_, code) => `\`\`\`\n${code.trim()}\n\`\`\``);
     text = text.replaceAll(/<code>(.*?)<\/code>/g, '`$1`');
-    text = text.replaceAll(/<(noinclude|ref)( ["'a-zA-Z0-9-]*?=["'a-zA-Z0-9-]*?)*?(?!= ?\/)>.*?<\/\1>/gs, '');
-    text = text.replaceAll(/<ref( ["'a-zA-Z0-9-]*=["'a-zA-Z0-9-]*?)*?( ?\/)?>/gs, '');
+    text = text.replaceAll(/<(noinclude|ref)( ["'a-zA-Z0-9_-]*?=["'a-zA-Z0-9_-]*?)*?(?!= ?\/)>.*?<\/\1>/gs, '');
+    text = text.replaceAll(/<ref( ["'a-zA-Z0-9_-]*=["'a-zA-Z0-9_-]*?)*?( ?\/)?>/gs, '');
     text = text.replaceAll(/\{\{period\|(\d+)\}\}/g, '[period-$1](https://conwaylife.com/wiki/Category:Oscillators_with_period_$1)');
     text = text.replaceAll(/\{\{year\|(\d+)\}\}/g, '[$1](https://conwaylife.com/wiki/Category:Patterns_found_in_$1)');
     text = text.replaceAll(/\{\{slcells\|(\d+)[^}]+\}\}/g, '[$1-cell](https://conwaylife.com/wiki/Category:Strict_still_lifes_with_$1_cells)');
