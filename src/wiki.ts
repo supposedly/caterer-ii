@@ -71,12 +71,13 @@ export async function cmdWiki(msg: Message, argv: string[]): Promise<Response> {
             throw new BotError('No such page exists!');
         }
         title = data[0].title;
-        id = data[0];
+        id = data[0].id;
     }
     let resp = await fetch(`https://conwaylife.com/w/api.php?action=query&prop=revisions&rvprop=content&rvslots=main&pageids=${id}&format=json`);
     if (!resp.ok) {
         throw new BotError(`Server returned ${resp.status} ${resp.statusText}`);
     }
+    console.log(resp);
     let text: string = JSON.parse(await resp.text()).query.pages[id].revisions[0].slots.main['*'].trim();
     let i = 0;
     let prefix = '';
