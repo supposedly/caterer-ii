@@ -77,8 +77,9 @@ export async function cmdWiki(msg: Message, argv: string[]): Promise<Response> {
     if (!resp.ok) {
         throw new BotError(`Server returned ${resp.status} ${resp.statusText}`);
     }
-    console.log(resp);
-    let text: string = JSON.parse(await resp.text()).query.pages[id].revisions[0].slots.main['*'].trim();
+    let data = JSON.parse(await resp.text());
+    console.log(data);
+    let text: string = data.query.pages[id].revisions[0].slots.main['*'].trim();
     let i = 0;
     let prefix = '';
     while (text.toLowerCase().startsWith('#redirect ')) {
