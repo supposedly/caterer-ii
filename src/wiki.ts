@@ -50,23 +50,31 @@ export async function cmdWiki(msg: Message, argv: string[]): Promise<Response> {
         namespace = NAMESPACES[parts[0]];
         query = parts[1];
     }
-    let resp: globalThis.Response;
+    let title: string;
+    let id: number;
     if (Number.isNaN(namespace) || (namespace === -1 && query === 'random')) {
-        resp = await fetch(`https://conwaylife.com/w/api.php?action=query&list=random&rnamespace=${namespace}&rnlimit=1&format=json`);
+        let resp = await fetch(`https://conwaylife.com/w/api.php?action=query&list=random&rnamespace=${namespace}&rnlimit=1&format=json`);
+        if (!resp.ok) {
+            throw new BotError(`Server returned ${resp.status} ${resp.statusText}`);
+        }
+        let data = JSON.parse(await resp.text()).query.random[0];
+        title = data.title;
+        id = data.id;
+        namespace = data.ns;
     } else {
-        resp = await fetch(`https://conwaylife.com/w/api.php?action=query&list=search&srnamespace=${namespace}&srsearch=${encodeURIComponent(query)}&srlimit=1&format=json`);
+        let resp = await fetch(`https://conwaylife.com/w/api.php?action=query&list=search&srnamespace=${namespace}&srsearch=${encodeURIComponent(query)}&srlimit=1&format=json`);
+        if (!resp.ok) {
+            throw new BotError(`Server returned ${resp.status} ${resp.statusText}`);
+        }
+        let data = JSON.parse(await resp.text()).query.search;
+        if (data.length === 0) {
+            throw new BotError('No such page exists!');
+        }
+        title = data[0].title;
+        id = data[0];
     }
-    if (!resp.ok) {
-        throw new BotError(`Server returned ${resp.status} ${resp.statusText}`);
-    }
-    let data = JSON.parse(await resp.text()).query.search;
-    if (data.length === 0) {
-        throw new BotError('No such page exists!');
-    }
-    let title = data[0].title;
-    let url = `https://conwaylife.com/wiki/${encodeURIComponent(data[0].title).replaceAll('%20', '_')}`;
-    let id = data[0].pageid;
-    resp = await fetch(`https://conwaylife.com/w/api.php?action=query&prop=revisions&rvprop=content&rvslots=main&pageids=${id}&format=json`);
+    let url = `https://conwaylife.com/wiki/${encodeURIComponent(title).replaceAll('%20', '_')}`;
+    let resp = await fetch(`https://conwaylife.com/w/api.php?action=query&prop=revisions&rvprop=content&rvslots=main&pageids=${id}&format=json`);
     if (!resp.ok) {
         throw new BotError(`Server returned ${resp.status} ${resp.statusText}`);
     }
