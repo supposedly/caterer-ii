@@ -92,7 +92,38 @@ export async function cmdWiki(msg: Message, argv: string[]): Promise<Response> {
     if (!resp.ok) {
         throw new BotError(`Server returned ${resp.status} ${resp.statusText}`);
     }
-    let text: string = JSON.parse(await resp.text()).query.pages[id].revisions[0].slots.main['*'];
+    let text: string = JSON.parse(await resp.text()).query.pages[id].revisions[0].slots.main['*'].trim();
+    let i = 0;
+    while (text.toLowerCase().startsWith('#redirect ')) {
+        let line = text.slice('#redirect '.length);
+        let index = line.indexOf('\n');
+        if (index !== -1) {
+            line = line.slice(0, index);
+        }
+        let match = line.match(/\[\[\s*([^\]|#]+).*?\]\]/);
+        if (!match) {
+            break;
+        }
+        let title = match[1].trim();
+        resp = await fetch(`https://conwaylife.com/w/api.php?action=query&titles=${encodeURIComponent(title)}&format=json`);
+        if (!resp.ok) {
+            throw new BotError(`Server returned ${resp.status} ${resp.statusText}`);
+        }
+        let data = JSON.parse(await resp.text());
+        let newId = Object.keys(data.query.pages)[0];
+        if (newId === '-1') {
+            break;
+        }
+        i++;
+        if (i === 10) {
+            break;
+        }
+        resp = await fetch(`https://conwaylife.com/w/api.php?action=query&prop=revisions&rvprop=content&rvslots=main&pageids=${id}&format=json`);
+        if (!resp.ok) {
+            throw new BotError(`Server returned ${resp.status} ${resp.statusText}`);
+        }
+        text = JSON.parse(await resp.text()).query.pages[id].revisions[0].slots.main['*'].trim();
+    }
     let useImage = false;
     if (!text.match(/\{\{[^{]*hideimg[^{]*\}\}/)) {
         let resp = await fetch(`https://conwaylife.com/w/api.php?action=query&titles=File:${title.replaceAll(' ', '')}.gif&prop=imageinfo&iiprop=url&format=json`);
