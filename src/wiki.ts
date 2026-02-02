@@ -70,10 +70,10 @@ export async function cmdWiki(msg: Message, argv: string[]): Promise<Response> {
         if (data.length === 0) {
             throw new BotError('No such page exists!');
         }
+        console.log(data);
         title = data[0].title;
         id = data[0].id;
     }
-    console.log(id);
     let resp = await fetch(`https://conwaylife.com/w/api.php?action=query&prop=revisions&rvprop=content&rvslots=main&pageids=${id}&format=json`);
     if (!resp.ok) {
         throw new BotError(`Server returned ${resp.status} ${resp.statusText}`);
