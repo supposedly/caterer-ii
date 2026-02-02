@@ -123,7 +123,7 @@ export async function cmdWiki(msg: Message, argv: string[]): Promise<Response> {
     text = text.replaceAll(/\{\{period\|(\d+)\}\}/g, '[period-$1](https://conwaylife.com/wiki/Category:Oscillators_with_period_$1)');
     text = text.replaceAll(/\{\{year\|(\d+)\}\}/g, '[$1](https://conwaylife.com/wiki/Category:Patterns_found_in_$1)');
     text = text.replaceAll(/<\/?references( \/)?>/g, '');
-    text = text.replaceAll(/__[NO]?TOC__/g, '');
+    text = text.replaceAll(/__(NO)?TOC__/g, '');
     text = text.replaceAll(/^\*\*\*/gm, '    - ');
     text = text.replaceAll(/^\*\*/gm, '  - ');
     text = text.replaceAll(/^\*/gm, '- ');
