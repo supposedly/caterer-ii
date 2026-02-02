@@ -100,6 +100,7 @@ export async function cmdWiki(msg: Message, argv: string[]): Promise<Response> {
         if (index !== -1) {
             line = line.slice(0, index);
         }
+        console.log(line);
         let match = line.match(/\[\[\s*([^\]|#]+).*?\]\]/);
         if (!match) {
             break;
@@ -114,15 +115,15 @@ export async function cmdWiki(msg: Message, argv: string[]): Promise<Response> {
         if (newId === '-1') {
             break;
         }
-        i++;
-        if (i === 10) {
-            break;
-        }
         resp = await fetch(`https://conwaylife.com/w/api.php?action=query&prop=revisions&rvprop=content&rvslots=main&pageids=${id}&format=json`);
         if (!resp.ok) {
             throw new BotError(`Server returned ${resp.status} ${resp.statusText}`);
         }
         text = JSON.parse(await resp.text()).query.pages[id].revisions[0].slots.main['*'].trim();
+        i++;
+        if (i === 10) {
+            break;
+        }
     }
     let useImage = false;
     if (!text.match(/\{\{[^{]*hideimg[^{]*\}\}/)) {
