@@ -82,11 +82,11 @@ export async function cmdWiki(msg: Message, argv: string[]): Promise<Response> {
             throw new BotError(`Server returned ${resp.status} ${resp.statusText}`);
         }
         let data = JSON.parse(await resp.text());
-        let newId = Object.keys(data.query.pages)[0];
-        if (newId === '-1') {
+        let id = Object.keys(data.query.pages)[0];
+        if (id === '-1') {
             break;
         }
-        resp = await fetch(`https://conwaylife.com/w/api.php?action=query&prop=revisions&rvprop=content&rvslots=main&pageids=${newId}&format=json`);
+        resp = await fetch(`https://conwaylife.com/w/api.php?action=query&prop=revisions&rvprop=content&rvslots=main&pageids=${id}&format=json`);
         if (!resp.ok) {
             throw new BotError(`Server returned ${resp.status} ${resp.statusText}`);
         }
