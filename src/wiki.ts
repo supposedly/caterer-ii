@@ -73,7 +73,6 @@ export async function cmdWiki(msg: Message, argv: string[]): Promise<Response> {
         title = data[0].title;
         id = data[0];
     }
-    let url = `https://conwaylife.com/wiki/${encodeURIComponent(title).replaceAll('%20', '_')}`;
     let resp = await fetch(`https://conwaylife.com/w/api.php?action=query&prop=revisions&rvprop=content&rvslots=main&pageids=${id}&format=json`);
     if (!resp.ok) {
         throw new BotError(`Server returned ${resp.status} ${resp.statusText}`);
@@ -114,6 +113,7 @@ export async function cmdWiki(msg: Message, argv: string[]): Promise<Response> {
             break;
         }
     }
+    let url = `https://conwaylife.com/wiki/${encodeURIComponent(title).replaceAll('%20', '_')}`;
     let useImage = false;
     if (!text.match(/\{\{[^{]*hideimg[^{]*\}\}/)) {
         let resp = await fetch(`https://conwaylife.com/w/api.php?action=query&titles=File:${title.replaceAll(' ', '')}.gif&prop=imageinfo&iiprop=url&format=json`);
