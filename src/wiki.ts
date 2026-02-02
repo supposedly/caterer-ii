@@ -155,7 +155,7 @@ export async function cmdWiki(msg: Message, argv: string[]): Promise<Response> {
     text = text.replaceAll(/\n{3,}/g, '\n\n');
     text = text.replaceAll(/(?<=\n)\n+(?=#+ )/g, '');
     text = text.trim();
-    console.log(text);
+    console.log('the text', text);
     text = prefix + text;
     if (text.length > 1000) {
         text = text.slice(0, 1000);
