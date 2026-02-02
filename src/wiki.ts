@@ -75,6 +75,7 @@ export async function cmdWiki(msg: Message, argv: string[]): Promise<Response> {
             break;
         }
         let title = match[1].trim();
+        console.log('title:', title);
         resp = await fetch(`https://conwaylife.com/w/api.php?action=query&titles=${encodeURIComponent(title)}&format=json`);
         if (!resp.ok) {
             throw new BotError(`Server returned ${resp.status} ${resp.statusText}`);
@@ -89,6 +90,7 @@ export async function cmdWiki(msg: Message, argv: string[]): Promise<Response> {
             throw new BotError(`Server returned ${resp.status} ${resp.statusText}`);
         }
         text = JSON.parse(await resp.text()).query.pages[id].revisions[0].slots.main['*'].trim();
+        console.log('new text:', text);
         i++;
         if (i === 10) {
             break;
