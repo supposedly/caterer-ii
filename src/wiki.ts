@@ -53,7 +53,7 @@ export async function cmdWiki(msg: Message, argv: string[]): Promise<Response> {
     let title: string;
     let id: number;
     if (Number.isNaN(namespace) || (namespace === -1 && query === 'random')) {
-        let resp = await fetch(`https://conwaylife.com/w/api.php?action=query&list=random&rnamespace=${namespace}&rnlimit=1&format=json`);
+        let resp = await fetch(`https://conwaylife.com/w/api.php?action=query&list=random${namespace === -1 ? '' : `&rnnamespace=${namespace}`}&rnlimit=1&format=json`);
         if (!resp.ok) {
             throw new BotError(`Server returned ${resp.status} ${resp.statusText}`);
         }
