@@ -46,6 +46,7 @@ export async function cmdWiki(msg: Message, argv: string[]): Promise<Response> {
         namespace = NAMESPACES[parts[0]];
         query = parts[1];
     }
+    console.log(namespace, query);
     let resp = await fetch(`https://conwaylife.com/w/api.php?action=query&list=search&srnamespace=${namespace}&srsearch=${encodeURIComponent(query)}&srlimit=1&format=json`);
     if (!resp.ok) {
         throw new BotError(`Server returned ${resp.status} ${resp.statusText}`);
