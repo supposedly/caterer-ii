@@ -66,7 +66,7 @@ export async function cmdWiki(msg: Message, argv: string[]): Promise<Response> {
     let prefix = '';
     while (text.toLowerCase().startsWith('#redirect ')) {
         if (i === 0) {
-            prefix = `Redirected from (${title})[https://conwaylife.com/w/index.php?title=${encodeURIComponent(title)}&redirect=no]\n\n`;
+            prefix = `Redirected from [${title}](https://conwaylife.com/w/index.php?title=${encodeURIComponent(title)}&redirect=no)\n\n`;
         }
         let line = text.slice('#redirect '.length);
         let index = line.indexOf('\n');
@@ -127,6 +127,7 @@ export async function cmdWiki(msg: Message, argv: string[]): Promise<Response> {
     text = text.replaceAll('`', '\\`');
     text = text.replaceAll('|', '\\|');
     text = text.replaceAll('#', '\\#');
+    text = text.replaceAll(/(?<=\n): /g, '     ');
     text = text.replaceAll(/'''''(.*?)'''''/g, '***$1***');
     text = text.replaceAll(/'''(.*?)'''/g, '**$1**');
     text = text.replaceAll(/''(.*?)''/g, '*$1*');
