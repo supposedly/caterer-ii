@@ -24,6 +24,9 @@ export async function cmdCanonicalApgenode(msg: Message, argv: string[]): Promis
         let gens = 0;
         if (argv[2] !== undefined) {
             gens = parseInt(argv[2]);
+            if (Number.isNaN(gens)) {
+                throw new BotError('Invalid number');
+            }
         }
     } else {
         return data.p.toApgcode();
