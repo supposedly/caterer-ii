@@ -151,7 +151,6 @@ export async function cmdWiki(msg: Message, argv: string[]): Promise<Response> {
     text = text.replaceAll(/<pre>([\s\S]*?)<\/pre>/g, (_, code) => `\`\`\`\n${code.trim()}\n\`\`\``);
     text = text.replaceAll(/<code>(.*?)<\/code>/g, '`$1`');
     text = text.replaceAll(/ ?\{\{[^}]+\}\}/g, '');
-    text = text.replaceAll(/<ref[^>]*>.*?<\/ref>/gs, '');
     text = text.replaceAll(/\n{3,}/g, '\n\n');
     text = text.replaceAll(/(?<=\n)\n+(?=#+ )/g, '');
     text = text.trim();
