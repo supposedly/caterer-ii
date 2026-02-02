@@ -175,7 +175,7 @@ export async function cmdWiki(msg: Message, argv: string[]): Promise<Response> {
         text = text.slice(0, 1000);
         text = text.slice(0, text.lastIndexOf(' ')) + '...';
     } else if (text.length === 0) {
-        throw new BotError('Page has no content!');
+        text = '(no content in page)';
     }
     let embed = (new EmbedBuilder()).setTitle(title).setDescription(text).setURL(url);
     if (useImage) {
