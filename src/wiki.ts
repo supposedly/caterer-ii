@@ -37,6 +37,9 @@ const NAMESPACES: {[key: string]: number} = {
 
 export async function cmdWiki(msg: Message, argv: string[]): Promise<Response> {
     let query = argv.slice(1).join(' ').toLowerCase();
+    if (query.length === 0) {
+        throw new BotError('No page provided!');
+    }
     let namespace = 0;
     if (query.includes(':')) {
         let parts = query.split(':');
