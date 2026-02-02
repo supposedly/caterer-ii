@@ -239,13 +239,14 @@ export async function cmdLookupAlias(msg: Message, argv: string[]): Promise<Resp
         return 'Alias does not exist';
     }
     let out: string[] = [alias];
-    while (alias in aliases) {
-        alias = aliases[alias];
+    let key = alias.toLowerCase();
+    while (key in aliases) {
+        alias = aliases[key];
+        key = alias.toLowerCase();
         try {
             createPattern(alias);
         } catch (error) {
             if (error instanceof RuleError) {
-                alias = alias.toLowerCase();
                 if (out.includes(alias)) {
                     out.push(alias + ' (recursion)')
                     break;
