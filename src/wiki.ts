@@ -125,7 +125,7 @@ export async function cmdWiki(msg: Message, argv: string[]): Promise<Response> {
     text = text.replaceAll(/\{\{period\|(\d+)[^}]+\}\}/g, '[period-$1](https://conwaylife.com/wiki/Category:Oscillators_with_period_$1)');
     text = text.replaceAll(/\{\{year\|(\d+)[^}]*\}\}/g, '[$1](https://conwaylife.com/wiki/Category:Patterns_found_in_$1)');
     text = text.replaceAll(/\{\{slcells\|(\d+)[^}]*\}\}/g, '[$1-cell](https://conwaylife.com/wiki/Category:Strict_still_lifes_with_$1_cells)');
-    text = text.replaceAll(/\{\{gliders\|(\d+)\|text=([^|}]+)[^}]*\}\}/g, '[$2](https://conwaylife.com/wiki/Category:Strict_still_lifes_with_$1_cells)');
+    text = text.replaceAll(/\{\{gliders\|(\d+)\|text=([^|}]+)[^}]*\}\}/g, '[$2](https://conwaylife.com/wiki/Category:Pattrns_constructible_with_$1_gliders)');
     text = text.replaceAll(/<\/?references( \/)?>/g, '');
     text = text.replaceAll(/__(NO)?TOC__/g, '');
     text = text.replaceAll(/^\*\*\*/gm, '    - ');
