@@ -2,6 +2,7 @@
 import * as fs from 'node:fs/promises';
 import {EmbedBuilder} from 'discord.js';
 import {BotError, Message, Response} from './util.js';
+import test from 'node:test';
 
 
 const NAMESPACES: {[key: string]: number} = {
@@ -63,7 +64,11 @@ export async function cmdWiki(msg: Message, argv: string[]): Promise<Response> {
     }
     let text: string = JSON.parse(await resp.text()).query.pages[id].revisions[0].slots.main['*'].trim();
     let i = 0;
+    let prefix = '';
     while (text.toLowerCase().startsWith('#redirect ')) {
+        if (i === 0) {
+            prefix = `Redirected from \n\n`;
+        }
         let line = text.slice('#redirect '.length);
         let index = line.indexOf('\n');
         if (index !== -1) {
@@ -74,9 +79,7 @@ export async function cmdWiki(msg: Message, argv: string[]): Promise<Response> {
         if (!match) {
             break;
         }
-        let title = match[1].trim();
-        console.log('title:', title);
-        resp = await fetch(`https://conwaylife.com/w/api.php?action=query&titles=${encodeURIComponent(title)}&format=json`);
+        resp = await fetch(`https://conwaylife.com/w/api.php?action=query&titles=${encodeURIComponent(match[1].trim())}&format=json`);
         if (!resp.ok) {
             throw new BotError(`Server returned ${resp.status} ${resp.statusText}`);
         }
@@ -91,10 +94,10 @@ export async function cmdWiki(msg: Message, argv: string[]): Promise<Response> {
         }
         text = JSON.parse(await resp.text()).query.pages[id].revisions[0].slots.main['*'].trim();
         console.log('new text:', text);
-        i++;
-        if (i === 10) {
-            break;
-        }
+        // i++;
+        // if (i === 10) {
+        //     break;
+        // }
     }
     let useImage = false;
     if (!text.match(/\{\{[^{]*hideimg[^{]*\}\}/)) {
@@ -116,7 +119,7 @@ export async function cmdWiki(msg: Message, argv: string[]): Promise<Response> {
     text = text.replaceAll(/\{\{period\|(\d+)\}\}/g, '[period-$1](https://conwaylife.com/wiki/Category:Oscillators_with_period_$1');
     text = text.replaceAll(/\{\{year\|(\d+)\}\}/g, '[$1](https://conwaylife.com/wiki/Category:Patterns_found_in_$1)');
     text = text.replaceAll(/<\/?references( \/)?>/g, '');
-    text = text.replaceAll('__NOTOC__', '');
+    text = text.replaceAll(/__[NO]?TOC__/, '');
     text = text.replaceAll(/^\*\*\*/gm, '    - ');
     text = text.replaceAll(/^\*\*/gm, '  - ');
     text = text.replaceAll(/^\*/gm, '- ');
@@ -147,6 +150,7 @@ export async function cmdWiki(msg: Message, argv: string[]): Promise<Response> {
     text = text.replaceAll(/\n{3,}/g, '\n\n');
     text = text.replaceAll(/(?<=\n)\n+(?=#+ )/g, '');
     text = text.trim();
+    text = prefix + text;
     if (text.length > 1000) {
         text = text.slice(0, 1000);
         text = text.slice(0, text.lastIndexOf(' ')) + '...';
