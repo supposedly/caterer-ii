@@ -119,7 +119,7 @@ export async function cmdWiki(msg: Message, argv: string[]): Promise<Response> {
         }
     }
     text = text.replaceAll(/<!--.*?-->/g, '');
-    text = text.replaceAll(/<(noinclude|ref)>.*?<\/\1>/gs, '');
+    text = text.replaceAll(/<(noinclude|ref)( ["'a-zA-Z0-9]*=["'a-zA-Z0-9]*)*>.*?<\/\1>/gs, '');
     text = text.replaceAll(/\{\{period\|(\d+)\}\}/g, '[period-$1](https://conwaylife.com/wiki/Category:Oscillators_with_period_$1)');
     text = text.replaceAll(/\{\{year\|(\d+)\}\}/g, '[$1](https://conwaylife.com/wiki/Category:Patterns_found_in_$1)');
     text = text.replaceAll(/<\/?references( \/)?>/g, '');
