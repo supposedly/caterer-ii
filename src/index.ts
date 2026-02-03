@@ -151,7 +151,7 @@ let deleters: [string, string][] = [];
 let runningCommands = new Set<string>();
 
 async function runCommand(msg: Message): Promise<void> {
-    if (msg.author.bot || msg.createdTimestamp < config.initTime) {
+    if (msg.author.bot || msg.createdTimestamp < config.initTime || runningCommands.has(msg.id)) {
         return;
     }
     let data = msg.content;
