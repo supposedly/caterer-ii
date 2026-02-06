@@ -142,6 +142,7 @@ const COMMANDS: {[key: string]: (msg: Message, argv: string[]) => Promise<Respon
     'lookupalias': cmdLookupAlias,
     'list_aliases': cmdListAliases,
     'listaliases': cmdListAliases,
+    'aliases': cmdListAliases,
 
     'wiki': cmdWiki,
 

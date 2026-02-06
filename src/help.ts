@@ -394,7 +394,7 @@ const HELP: {[key: string]: Help} = {
     list_aliases: {
         desc: 'Lists all the aliases',
         args: [],
-        aliases: ['listaliases'],
+        aliases: ['listaliases', 'aliases'],
     },
 
     wiki: {
