@@ -6,7 +6,7 @@ import {BotError, Response, Message, readFile, writeFile, config, sentByAdmin, a
 import {cmdHelp} from './help.js';
 import {cmdSim, cmdIdentify, cmdBasicIdentify, cmdFullIdentify, cmdMinmax} from './core.js';
 import {cmdHashsoup, cmdApgencode, cmdApgdecode, cmdPopulation, cmdMAPToINT, cmdMAPToHexINT, cmdINTToMAP, cmdNormalizeRule, cmdToCatagolueRule, cmdRuleSymmetry, cmdBlackWhiteReverse, cmdCheckerboardDual} from './ca.js';
-import {cmdSssss, cmdSssssInfo, cmdDyk, cmdName, cmdRename, cmdDeleteName, cmdSimStats, cmdSaveSimStats, cmdAlias, cmdUnalias, cmdLookupAlias} from './db.js';
+import {cmdSssss, cmdSssssInfo, cmdDyk, cmdName, cmdRename, cmdDeleteName, cmdSimStats, cmdSaveSimStats, cmdAlias, cmdUnalias, cmdLookupAlias, cmdListAliases} from './db.js';
 import {cmdWiki} from './wiki.js';
 import {check5S} from './notifier.js';
 
@@ -140,6 +140,8 @@ const COMMANDS: {[key: string]: (msg: Message, argv: string[]) => Promise<Respon
     'deletealias': cmdUnalias,
     'lookup_alias': cmdLookupAlias,
     'lookupalias': cmdLookupAlias,
+    'list_aliases': cmdListAliases,
+    'listaliases': cmdListAliases,
 
     'wiki': cmdWiki,
 

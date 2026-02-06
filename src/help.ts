@@ -391,6 +391,12 @@ const HELP: {[key: string]: Help} = {
         aliases: ['lookupalias'],
     },
 
+    list_aliases: {
+        desc: 'Lists all the aliases',
+        args: [],
+        aliases: ['listaliases'],
+    },
+
     wiki: {
         desc: 'Look up something on the ConwayLife.com wiki',
         args: [
@@ -424,7 +430,7 @@ Commands:
 * 5S: \`!sssss\`, \`!sssss_info\`
 * Pattern naming: \`!name\`, \`!rename\`, \`!delete_name\`
 * Statistics: \`!sim_stats\`, \`!save_sim_stats\`
-* Rule aliases: \`!alias\`, \`!unalias\`, \`!lookup_alias\`
+* Rule aliases: \`!alias\`, \`!unalias\`, \`!lookup_alias\`, \`!list_aliases\`
 * Configuration: \`!noreplypings\`, \`!yesreplypings\`
 * Other: \`!wiki\`, \`!help\`, \`!eval\`, \`!ping\`
 

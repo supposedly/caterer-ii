@@ -266,3 +266,7 @@ export async function cmdLookupAlias(msg: Message, argv: string[]): Promise<Resp
     }
     return out.map(x => '```\n' + x + '```').join('');
 }
+
+export async function cmdListAliases(msg: Message, argv: string[]): Promise<Response> {
+    return Object.keys(aliases).join('\n');
+}
