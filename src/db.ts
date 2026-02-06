@@ -235,6 +235,9 @@ export async function cmdUnalias(msg: Message, argv: string[]): Promise<Response
 
 export async function cmdLookupAlias(msg: Message, argv: string[]): Promise<Response> {
     let alias = argv.slice(1).join(' ').toLowerCase().trim();
+    if (alias.length === 0) {
+        throw new Error('No alias provided!');
+    }
     if (!(alias in aliases)) {
         return 'Alias does not exist';
     }
