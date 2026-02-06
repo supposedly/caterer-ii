@@ -4,7 +4,8 @@ import {BotError, Message, Response, aliases, findRLE} from './util.js';
 
 
 export async function cmdHashsoup(msg: Message, argv: string[]): Promise<Response> {
-    return createPattern(argv[3] ?? 'B3/S23', await getHashsoup(argv[2], argv[1]), aliases).toRLE();
+    let {height, width, data} = await getHashsoup(argv[2], argv[1]);
+    return createPattern(argv[3] ?? 'B3/S23', aliases, height, width, data).toRLE();
 }
 
 export async function cmdApgencode(msg: Message, argv: string[]): Promise<Response> {
@@ -44,7 +45,7 @@ export async function cmdApgdecode(msg: Message, argv: string[]): Promise<Respon
     if (!argv[2]) {
         return lifePattern.loadApgcode(code).toRLE();
     } else {
-        return createPattern(argv.slice(2).join(' '), undefined, aliases).loadApgcode(code).toRLE();
+        return createPattern(argv.slice(2).join(' '), aliases).loadApgcode(code).toRLE();
     }
 }
 
@@ -91,7 +92,7 @@ export async function cmdMAPToHexINT(msg: Message, argv: string[]): Promise<Resp
 }
 
 export async function cmdINTToMAP(msg: Message, argv: string[]): Promise<Response> {
-    let p = createPattern(argv[1], undefined, aliases);
+    let p = createPattern(argv[1], aliases);
     if (!(p instanceof MAPPattern || p instanceof MAPB0Pattern)) {
         throw new BotError('Rule must be in B/S notation!');
     }
@@ -100,7 +101,7 @@ export async function cmdINTToMAP(msg: Message, argv: string[]): Promise<Respons
 
 
 export async function cmdNormalizeRule(msg: Message, argv: string[]): Promise<Response> {
-    return createPattern(argv.slice(1).join(' '), undefined, aliases).ruleStr;
+    return createPattern(argv.slice(1).join(' '), aliases).ruleStr;
 }
 
 export async function cmdToCatagolueRule(msg: Message, argv: string[]): Promise<Response> {
@@ -108,7 +109,7 @@ export async function cmdToCatagolueRule(msg: Message, argv: string[]): Promise<
 }
 
 export async function cmdRuleSymmetry(msg: Message, argv: string[]): Promise<Response> {
-    return createPattern(argv.slice(1).join(' '), undefined, aliases).ruleSymmetry;
+    return createPattern(argv.slice(1).join(' '), aliases).ruleSymmetry;
 }
 
 export async function cmdBlackWhiteReverse(msg: Message, argv: string[]): Promise<Response> {
@@ -116,7 +117,7 @@ export async function cmdBlackWhiteReverse(msg: Message, argv: string[]): Promis
 }
 
 export async function cmdCheckerboardDual(msg: Message, argv: string[]): Promise<Response> {
-    let p = createPattern(argv.slice(1).join(' '), undefined, aliases);
+    let p = createPattern(argv.slice(1).join(' '), aliases);
     if (!(p instanceof MAPPattern || p instanceof MAPB0Pattern)) {
         throw new BotError('Cannot take checkerboard dual of non-MAP rule!');
     }

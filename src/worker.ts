@@ -253,7 +253,7 @@ async function parseSim(argv: string[], rle: string): Promise<{frames: [Pattern,
                 if (typeof part[1] === 'number') {
                     throw new BotError(`Invalid part: ${part.join(' ')}`);
                 }
-                let q = createPattern(part[1], {height: p.height, width: p.width, data: p.getData()});
+                let q = createPattern(part[1], aliases, p.height, p.width, p.getData());
                 q.xOffset = p.xOffset;
                 q.yOffset = p.yOffset;
                 q.generation = p.generation;
