@@ -479,9 +479,9 @@ parentPort.on('message', async (data: {id: number, type: 'sim', argv: string[], 
         if (data.type === 'sim') {
             parentPort.postMessage({id, ok: true, data: await runSim(data.argv, data.rle)});
         } else if (data.type === 'identify') {
-            parentPort.postMessage({id, ok: true, data: identify(parse(data.rle), data.limit)});
+            parentPort.postMessage({id, ok: true, data: identify(parse(data.rle, aliases), data.limit)});
         } else if (data.type === 'basic_identify') {
-            parentPort.postMessage({id, ok: true, data: findType(parse(data.rle), data.limit)});
+            parentPort.postMessage({id, ok: true, data: findType(parse(data.rle, aliases), data.limit)});
         } else {
             throw new Error('Invalid type!');
         }
