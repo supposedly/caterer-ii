@@ -5,7 +5,7 @@ import {Client, GatewayIntentBits, DiscordAPIError, Message as _Message, Message
 import {BotError, Response, Message, readFile, writeFile, config, sentByAdmin, aliases, noReplyPings, findRLEFromText, findRLE} from './util.js';
 import {cmdHelp} from './help.js';
 import {cmdSim, cmdIdentify, cmdBasicIdentify, cmdFullIdentify, cmdMinmax} from './core.js';
-import {cmdHashsoup, cmdApgencode, cmdApgdecode, cmdPopulation, cmdMAPToINT, cmdMAPToHexINT, cmdINTToMAP, cmdNormalizeRule, cmdToCatagolueRule, cmdRuleSymmetry, cmdBlackWhiteReverse, cmdCheckerboardDual} from './ca.js';
+import {cmdHashsoup, cmdApgencode, cmdApgdecode, cmdPopulation, cmdMAPToINT, cmdMAPToHexINT, cmdINTToMAP, cmdRuleInfo, cmdBlackWhiteReverse, cmdCheckerboardDual} from './ca.js';
 import {cmdSssss, cmdSssssInfo, cmdDyk, cmdName, cmdRename, cmdDeleteName, cmdSimStats, cmdSaveSimStats, cmdAlias, cmdUnalias, cmdLookupAlias, cmdListAliases} from './db.js';
 import {cmdWiki} from './wiki.js';
 import {check5S} from './notifier.js';
@@ -96,14 +96,8 @@ const COMMANDS: {[key: string]: (msg: Message, argv: string[]) => Promise<Respon
     'int_to_map': cmdINTToMAP,
     'inttomap': cmdINTToMAP,
 
-    'normalize_rule': cmdNormalizeRule,
-    'normalizerule': cmdNormalizeRule,
-    'to_catagolue_rule': cmdToCatagolueRule,
-    'tocatagoluerule': cmdToCatagolueRule,
-    'to_catglue_rule': cmdToCatagolueRule,
-    'tocatgluerule': cmdToCatagolueRule,
-    'rule_symmetry': cmdRuleSymmetry,
-    'rulesymmetry': cmdRuleSymmetry,
+    'rule_info': cmdRuleInfo,
+    'ruleinfo': cmdRuleInfo,
     'black_white_reverse': cmdBlackWhiteReverse,
     'black_white_reversal': cmdBlackWhiteReverse,
     'blackwhitereverse': cmdBlackWhiteReverse,

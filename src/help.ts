@@ -223,37 +223,15 @@ const HELP: {[key: string]: Help} = {
         aliases: ['inttomap'],
     },
 
-    normalize_rule: {
-        desc: 'Normalizes a rule.',
-        args: [
-            {
-                name: 'rule',
-                desc: 'The rule to normalize.',
-            },
-        ],
-        aliases: ['normalizerule'],
-    },
-
-    to_catagolue_rule: {
-        desc: 'Turns a rule to the Catagolue notation for it',
+    rule_info: {
+        desc: 'Gets information about a rule.',
         args: [
             {
                 name: 'rule',
                 desc: 'The rule to use.',
             },
         ],
-        aliases: ['tocatagoluerule', 'to_catglue_rule', 'tocatgluerule'],
-    },
-
-    rule_symmetry: {
-        desc: 'Gets the symmetry of a rule.',
-        args: [
-            {
-                name: 'rule',
-                desc: 'The rule to use.',
-            },
-        ],
-        aliases: ['rulesymmetry'],
+        aliases: ['ruleinfo'],
     },
 
     black_white_reverse: {
@@ -426,7 +404,7 @@ Commands:
 * Simulation: \`!sim\`, \`!sim rand\`
 * Identification: \`!identify\`, \`!basic_identify\`, \`!full_identify\`, \`!minmax\`
 * Pattern manipulation: \`!hashsoup\`, \`!apgencode\`, \`!apgdecode\`, \`!population\`
-* Rules: \`!map_to_int\`, \`!map_to_hex_int\`, \`!int_to_map\`, \`!normalize_rule\`, \`!to_catagolue_rule\`, \`!rule_symmetry\`, \`!black_white_reverse\`
+* Rules: \`!map_to_int\`, \`!map_to_hex_int\`, \`!int_to_map\`, \`!rule_info\`, \`!black_white_reverse\`, \`!checkerboard_dual\`
 * 5S: \`!sssss\`, \`!sssss_info\`
 * Pattern naming: \`!name\`, \`!rename\`, \`!delete_name\`
 * Statistics: \`!sim_stats\`, \`!save_sim_stats\`
