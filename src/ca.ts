@@ -105,9 +105,9 @@ export async function cmdRuleInfo(msg: Message, argv: string[]): Promise<Respons
     let rule = argv.slice(1).join(' ');
     let p = createPattern(rule, aliases);
     let catagolue = toCatagolueRule(rule, aliases);
-    let out = `Class: ${p.constructor.name}\nStates: ${p.states}\nSymmetry: ${p.ruleSymmetry}\nPeriod: ${p.rulePeriod}`;
+    let out = `Class: ${p.constructor.name}\nStates: ${p.states}\nSymmetry: ${p.ruleSymmetry}\nPeriod: ${p.rulePeriod}\n`;
     try {
-        out += `Black/white reversal: ${getBlackWhiteReversal(rule)}`;
+        out += `Black/white reversal: ${getBlackWhiteReversal(rule)}\n`;
     } catch (error) {
         if (!(error instanceof RuleError)) {
             throw error;
