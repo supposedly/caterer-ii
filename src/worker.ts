@@ -75,9 +75,12 @@ async function parseSim(argv: string[], rle: string): Promise<{frames: [Pattern,
     let parts: (string | number)[][] = [];
     let currentPart: (string | number)[] = [];
     for (let arg of argv.slice(1)) {
+        arg = arg.replaceAll('`', '');
         if (arg === '>') {
             parts.push(currentPart);
             currentPart = [];
+        } else if (arg === '') {
+            continue;
         } else {
             if (arg.match(/^[0-9.-]+$/)) {
                 currentPart.push(parseFloat(arg));
