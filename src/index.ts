@@ -397,6 +397,7 @@ async function updateStarboard(data: MessageReaction | PartialMessageReaction): 
         } else {
             text += `<@${msg.author?.id}>`;
         }
+        text += ` https://discord.com/channels/${msg.guildId}/${msg.channelId}/${msg.id}`;
         if (entry) {
             (await starboardChannel.messages.fetch(entry[0])).edit({content: text, allowedMentions: {parse: []}});
         } else {
