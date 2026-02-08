@@ -344,7 +344,7 @@ async function updateStarboard(data: MessageReaction | PartialMessageReaction): 
         return;
     }
     let msg = data.message;
-    if (msg.createdTimestamp < config.initTime) {
+    if (msg.createdTimestamp < config.initTime || msg.guildId === '846677253290983444') {
         return;
     }
     let users = (await data.users.fetch()).map(x => x.id);
