@@ -1,6 +1,6 @@
 
 import {EmbedBuilder} from 'discord.js';
-import {TRANSITIONS, VALID_TRANSITIONS, HEX_TRANSITIONS, VALID_HEX_TRANSITIONS, unparseTransitions, arrayToTransitions, parseMAP, unparseMAP, MAPPattern, MAPB0Pattern, getHashsoup, createPattern, toCatagolueRule, getBlackWhiteReversal} from '../lifeweb/lib/index.js';
+import {RuleError, TRANSITIONS, VALID_TRANSITIONS, HEX_TRANSITIONS, VALID_HEX_TRANSITIONS, unparseTransitions, arrayToTransitions, parseMAP, unparseMAP, MAPPattern, MAPB0Pattern, getHashsoup, createPattern, toCatagolueRule, getBlackWhiteReversal} from '../lifeweb/lib/index.js';
 import {BotError, Message, Response, aliases, findRLE} from './util.js';
 
 
@@ -105,7 +105,15 @@ export async function cmdRuleInfo(msg: Message, argv: string[]): Promise<Respons
     let rule = argv.slice(1).join(' ');
     let p = createPattern(rule, aliases);
     let catagolue = toCatagolueRule(rule, aliases);
-    let out = `Class: ${p.constructor.name}\nSymmetry: ${p.ruleSymmetry}\nPeriod: ${p.rulePeriod}\nCatagolue: [${catagolue}](https://catagolue.hatsya.com/census/${catagolue})`;
+    let out = `Class: ${p.constructor.name}\nStates: ${p.states}\nSymmetry: ${p.ruleSymmetry}\nPeriod: ${p.rulePeriod}`;
+    try {
+        out += `Black/white reversal: ${getBlackWhiteReversal(rule)}`;
+    } catch (error) {
+        if (!(error instanceof RuleError)) {
+            throw error;
+        }
+    }
+    out += `Catagolue: [${catagolue}](https://catagolue.hatsya.com/census/${catagolue})`;
     return {embeds: [(new EmbedBuilder()).setTitle(p.ruleStr).setDescription(out)]};
 }
 
