@@ -105,15 +105,15 @@ export async function cmdRuleInfo(msg: Message, argv: string[]): Promise<Respons
     let rule = argv.slice(1).join(' ');
     let p = createPattern(rule, aliases);
     let catagolue = toCatagolueRule(rule, aliases);
-    let out = `**Class**: ${p.constructor.name}\n**States**: ${p.states}\n**Symmetry**: ${p.ruleSymmetry}\n**Period**: ${p.rulePeriod}\n`;
+    let out = `**Class:** ${p.constructor.name}\n**States:** ${p.states}\n**Symmetry:** ${p.ruleSymmetry}\n**Period:** ${p.rulePeriod}\n`;
     try {
-        out += `**Black/white reversal**: ${getBlackWhiteReversal(rule)}\n`;
+        out += `**Black/white reversal:** ${getBlackWhiteReversal(rule)}\n`;
     } catch (error) {
         if (!(error instanceof RuleError)) {
             throw error;
         }
     }
-    out += `**Catagolue**: [${catagolue}](https://catagolue.hatsya.com/census/${catagolue})`;
+    out += `**Catagolue:** [${catagolue}](https://catagolue.hatsya.com/census/${catagolue})`;
     return {embeds: [(new EmbedBuilder()).setTitle(p.ruleStr).setDescription(out)]};
 }
 
