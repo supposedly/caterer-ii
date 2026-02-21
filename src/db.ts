@@ -27,8 +27,28 @@ export async function cmdSssss(msg: Message, argv: string[]): Promise<Response> 
         type = 'int';
         speed = argv.slice(1).join(' ');
     }
-    let {dx, dy, period} = parseSpeed(speed);
-    let resp = await fetch(`https://speedydelete.com/5s/api/get?type=${type}&dx=${dx}&dy=${dy}&period=${period}`);
+    let adjustables = 'yes';
+    if (speed.endsWith('yes')) {
+        adjustables = 'yes';
+        speed = speed.slice(0, -3);
+    } else if (speed.endsWith('no')) {
+        adjustables = 'no';
+        speed = speed.slice(0, -2);
+    } else if (speed.endsWith('only')) {
+        adjustables = 'only';
+        speed = speed.slice(0, -4);
+    }
+    let parsed: ReturnType<typeof parseSpeed>;
+    try {
+        parsed = parseSpeed(speed);
+    } catch (error) {
+        if (error instanceof Error && error.message === 'Invalid speed!') {
+            throw new BotError('Invalid speed!');
+        } else {
+            throw error;
+        }
+    }
+    let resp = await fetch(`https://speedydelete.com/5s/api/get?type=${type}&dx=${parsed.dx}&dy=${parsed.dy}&period=${parsed.period}&adjustables=${adjustables}`);
     if (resp.ok) {
         return await resp.text();
     } else {
