@@ -1,8 +1,8 @@
 
 import * as fs from 'node:fs/promises';
 import {join} from 'node:path';
+import {DiscordAPIError, Message as _Message, OmitPartialGroupDMChannel} from 'discord.js';
 import {RuleError, Pattern, MAPPattern, parse} from '../lifeweb/lib/index.js';
-import {Message as _Message, OmitPartialGroupDMChannel} from 'discord.js';
 
 
 export class BotError extends Error {}
@@ -105,10 +105,19 @@ export async function findRLE(msg: Message): Promise<{msg: Message, p: Pattern} 
         return out;
     }
     if (msg.reference) {
-        let reply = await msg.fetchReference();
-        out = await findRLEFromMessage(reply);
-        if (out) {
-            return out;
+        let reply: Message | undefined = undefined;
+        try {
+            reply = await msg.fetchReference();
+        } catch (error) {
+            if (!(error instanceof DiscordAPIError && error.message.includes('Could not resolve channel'))) {
+                throw error;
+            }
+        }
+        if (reply) {
+            out = await findRLEFromMessage(reply);
+            if (out) {
+                return out;
+            }
         }
     }
     let msgs = await msg.channel.messages.fetch({limit: 50});
