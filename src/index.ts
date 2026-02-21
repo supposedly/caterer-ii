@@ -194,8 +194,10 @@ async function runCommand(msg: Message): Promise<void> {
                 }
             }
         } catch (error) {
-            if (error instanceof BotError || error instanceof lifeweb.RuleError || (error instanceof Error && error.message === 'Worker exited with code 1')) {
+            if (error instanceof BotError || error instanceof lifeweb.RuleError) {
                 previousMsgs.push([msg.id, await msg.reply({content: 'Error: ' + error.message, allowedMentions: {repliedUser: !noReplyPings.includes(msg.author.id), parse: []}})]);
+            } else if (error instanceof Error && error.message === 'Worker exited with code 1') {
+                previousMsgs.push([msg.id, await msg.reply({content: `Error: ${error.message} (try running the command again!)`, allowedMentions: {repliedUser: !noReplyPings.includes(msg.author.id), parse: []}})]);
             } else if (error instanceof DiscordAPIError && error.message.match(/Must be (2|4)000 or fewer in length/)) {
                 previousMsgs.push([msg.id, await msg.reply({content: 'Error: Message too long!', allowedMentions: {repliedUser: !noReplyPings.includes(msg.author.id), parse: []}})]);
             } else {

@@ -85,7 +85,7 @@ function workerOnError(error: Error): void {
 
 function workerOnExit(code: number): void {
     workerAlive = false;
-    let msg = 'Worker exited with code ' + code;
+    let msg = `Worker exited with code ` + code;
     console.log(msg + ', restarting worker');
     workerHandleFatal(new Error(msg));
 }
@@ -128,6 +128,9 @@ export async function cmdSim(msg: Message, argv: string[]): Promise<Response> {
     if (argv[1] === 'rand') {
         let height = 16;
         let width = 16;
+        if (!argv[2]) {
+            throw new BotError('Expected arguments!');
+        }
         if (argv[2].match(/^\d+x\d+$/)) {
             let data = argv[2].split('x');
             width = parseInt(data[0]);
@@ -135,6 +138,9 @@ export async function cmdSim(msg: Message, argv: string[]): Promise<Response> {
             argv = argv.slice(1);
         }
         let fill = 0.5;
+        if (!argv[2]) {
+            throw new BotError('Expected arguments!');
+        }
         if (argv[2].endsWith('%')) {
             fill = parseFloat(argv[2]) / 100;
             argv = argv.slice(1);
