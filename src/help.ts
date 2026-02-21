@@ -265,7 +265,12 @@ const HELP: {[key: string]: Help} = {
             },
             {
                 name: 'speed',
-                desc: 'A speed, such as c/2, c/2o, c/2d, (2, 1)c/5, etc',
+                desc: 'A speed, such as c/2, c/2o, c/2d, (2, 1)c/5, etc.',
+            },
+            {
+                name: 'adjustables',
+                optional: true,
+                desc: `Whether to search for adjustable spaceships, can be 'yes', 'no', or 'only'.'`,
             },
         ],
         aliases: ['5s'],
