@@ -270,7 +270,7 @@ const HELP: {[key: string]: Help} = {
             {
                 name: 'adjustables',
                 optional: true,
-                desc: `Whether to search for adjustable spaceships, can be 'yes', 'no', or 'only'.'`,
+                desc: `Whether to search for adjustable spaceships, can be 'yes', 'no', or 'only'.`,
             },
         ],
         aliases: ['5s'],
