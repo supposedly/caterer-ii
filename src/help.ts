@@ -112,18 +112,6 @@ const HELP: {[key: string]: Help} = {
         aliases: ['basicidentify'],
     },
 
-    full_identify: {
-        desc: 'Identify a pattern, but provide even more information',
-        args: [
-            {
-                name: 'generations',
-                optional: true,
-                desc: 'Number of generations to run the identifier for (default 256).'
-            },
-        ],
-        aliases: ['fullidentify'],
-    },
-
     minmax: {
         desc: 'Find the minimum and maximum rule of a pattern',
         args: [
@@ -406,7 +394,7 @@ const HELP_MSG = `A cellular automata bot for the ConwayLife Lounge Discord serv
 
 Commands:
 * Simulation: \`!sim\`, \`!sim rand\`
-* Identification: \`!identify\`, \`!basic_identify\`, \`!full_identify\`, \`!minmax\`
+* Identification: \`!identify\`, \`!basic_identify\`, \`!minmax\`
 * Pattern manipulation: \`!hashsoup\`, \`!apgencode\`, \`!apgdecode\`, \`!population\`
 * Rules: \`!map_to_int\`, \`!map_to_hex_int\`, \`!int_to_map\`, \`!rule_info\`, \`!black_white_reverse\`, \`!checkerboard_dual\`
 * 5S: \`!sssss\`, \`!sssss_info\`

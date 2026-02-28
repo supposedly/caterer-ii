@@ -4,7 +4,7 @@ import {inspect} from 'node:util';
 import {Client, GatewayIntentBits, DiscordAPIError, Message as _Message, MessageReaction, PartialMessageReaction, MessageReplyOptions, TextChannel, Partials} from 'discord.js';
 import {BotError, Response, Message, readFile, writeFile, config, sentByAdmin, aliases, noReplyPings, findRLEFromText, findRLE} from './util.js';
 import {cmdHelp} from './help.js';
-import {cmdSim, cmdIdentify, cmdBasicIdentify, cmdFullIdentify, cmdMinmax} from './core.js';
+import {cmdSim, cmdIdentify, cmdBasicIdentify, cmdMinmax} from './core.js';
 import {cmdHashsoup, cmdApgencode, cmdApgdecode, cmdPopulation, cmdMAPToINT, cmdMAPToHexINT, cmdINTToMAP, cmdRuleInfo, cmdBlackWhiteReverse, cmdCheckerboardDual} from './ca.js';
 import {cmdSssss, cmdSssssInfo, cmdDyk, cmdName, cmdRename, cmdDeleteName, cmdSimStats, cmdSaveSimStats, cmdAlias, cmdUnalias, cmdLookupAlias, cmdListAliases} from './db.js';
 import {cmdWiki} from './wiki.js';
@@ -53,7 +53,7 @@ const COMMANDS: {[key: string]: (msg: Message, argv: string[]) => Promise<Respon
         }
     },
 
-    async noreplypings(msg: Message): Promise<Response> {
+    async noreplypings(msg: Message, argv: string[]): Promise<Response> {
         if (noReplyPings.includes(msg.author.id)) {
             throw new BotError(`You already have reply pings disabled!`);
         } else {
@@ -63,7 +63,7 @@ const COMMANDS: {[key: string]: (msg: Message, argv: string[]) => Promise<Respon
         }
     },
 
-    async yesreplypings(msg: Message): Promise<Response> {
+    async yesreplypings(msg: Message, argv: string[]): Promise<Response> {
         let index = noReplyPings.indexOf(msg.author.id);
         if (index === -1) {
             throw new BotError(`You already have reply pings enabled!`);
@@ -79,8 +79,6 @@ const COMMANDS: {[key: string]: (msg: Message, argv: string[]) => Promise<Respon
     'identify': cmdIdentify,
     'basic_identify': cmdBasicIdentify,
     'basicidentify': cmdBasicIdentify,
-    'full_identify': cmdFullIdentify,
-    'fullidentify': cmdFullIdentify,
     'minmax': cmdMinmax,
 
     'hashsoup': cmdHashsoup,

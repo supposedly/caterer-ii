@@ -298,7 +298,7 @@ function embedIdentified(original: Pattern, type: PatternType | Identified, full
 }
 
 export async function cmdIdentify(msg: Message, argv: string[]): Promise<Response> {
-    await msg.channel.sendTyping();
+   await msg.channel.sendTyping();
     let noTimeout = false;
     if (argv[1] === 'notimeout') {
         if (sentByAdmin(msg)) {
@@ -323,7 +323,7 @@ export async function cmdIdentify(msg: Message, argv: string[]): Promise<Respons
     if (!out) {
         throw new BotError('Timed out!');
     }
-    return {embeds: embedIdentified(data.p, out)};
+    return {embeds: embedIdentified(data.p, out, true)};
 }
 
 export async function cmdBasicIdentify(msg: Message, argv: string[]): Promise<Response> {
@@ -353,35 +353,6 @@ export async function cmdBasicIdentify(msg: Message, argv: string[]): Promise<Re
         throw new BotError('Timed out!');
     }
     return {embeds: embedIdentified(data.p, out)};
-}
-
-export async function cmdFullIdentify(msg: Message, argv: string[]): Promise<Response> {
-    await msg.channel.sendTyping();
-    let noTimeout = false;
-    if (argv[1] === 'notimeout') {
-        if (sentByAdmin(msg)) {
-            noTimeout = true;
-            argv = argv.slice(1);
-        } else {
-            throw new BotError(`You must be an admin to use notimeout!`);
-        }
-    }
-    let limit = 256;
-    if (argv[1]) {
-        let parsed = parseFloat(argv[1]);
-        if (!Number.isNaN(parsed)) {
-            limit = parsed;
-        }
-    }
-    let data = await findRLE(msg);
-    if (!data) {
-        throw new BotError('Cannot find RLE');
-    }
-    let out = await createWorkerJob('identify', {rle: data.p.toRLE(), limit}, noTimeout);
-    if (!out) {
-        throw new BotError('Timed out!');
-    }
-    return {embeds: embedIdentified(data.p, out, true)};
 }
 
 export async function cmdMinmax(msg: Message, argv: string[]): Promise<Response> {
