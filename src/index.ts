@@ -40,12 +40,12 @@ const COMMANDS: {[key: string]: (msg: Message, argv: string[]) => Promise<Respon
         }
     },
 
-    async ping(msg: Message): Promise<Response> {
+    async ping(msg: Message, argv: string[]): Promise<Response> {
         let msg2 = await msg.reply({content: 'Pong!', allowedMentions: {repliedUser: !noReplyPings.includes(msg.author.id), parse: []}});
         msg2.edit({content: `Pong! Latency: ${Math.round(msg2.createdTimestamp - msg.createdTimestamp)} ms (Discord WebSocket: ${Math.round(client.ws.ping)} ms)`, allowedMentions: {repliedUser: !noReplyPings.includes(msg.author.id), parse: []}})
     },
 
-    async pig(msg: Message): Promise<Response> {
+    async pig(msg: Message, argv: string[]): Promise<Response> {
         if (msg.reference) {
             await (await msg.fetchReference()).react('🐷');
         } else {
