@@ -269,9 +269,6 @@ function embedIdentified(original: Pattern, type: PatternType | Identified, full
         out += '](https://catagolue.hatsya.com/object/' + apgcode + '/' + toCatagolueRule(type.phases[0].ruleStr) + ')';
     }
     let title = 'desc' in type ? type.desc : getDescription(type);
-    if ('strictVolatility' in type && type.strictVolatility === 0) {
-        title += ' (trivial)';
-    }
     let name: string | undefined = undefined;
     if (apgcode.startsWith('x') || apgcode.startsWith('y')) {
         name = names.get(apgcode);
@@ -279,13 +276,7 @@ function embedIdentified(original: Pattern, type: PatternType | Identified, full
         name = names.get(type.phases[0].toCanonicalApgcode(1, 'x'));
     }
     if (name !== undefined) {
-        if (type.stabilizedAt > 0) {
-            title = 'Stabilizes into ' + name + ' (' + title + ')';
-        } else {
-            title = name[0].toUpperCase() + name.slice(1) + ' (' + title + ')';
-        }
-    } else if (type.stabilizedAt > 0) {
-        title = 'Stabilizes into ' + title;
+        title = name[0].toUpperCase() + name.slice(1) + ' (' + title + ')';
     }
     if (isOutput) {
         title = 'Output: ' + title;
