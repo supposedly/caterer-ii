@@ -231,13 +231,7 @@ async function parseSim(argv: string[], rle: string): Promise<{frames: [Pattern,
             } else if (part[0] === 'identify') {
                 part = part.slice(1);
                 let type = findType(p, 120000, true);
-                desc = getDescription(type);
-                if ('strictVolatility' in type && type.strictVolatility === 0) {
-                    desc += ' (trivial)';
-                }
-                if (type.stabilizedAt > 0) {
-                    desc = 'Stabilizes into ' + desc;
-                }
+                desc = getDescription(type);5
                 for (let i = 0; i < type.stabilizedAt + type.period - (type.disp && type.disp[0] === 0 && type.disp[1] === 0 ? 1 : 0); i++) {
                     p.runGeneration();
                     frames.push([p.copy(), frameTime]);
