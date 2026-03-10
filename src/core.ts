@@ -276,7 +276,7 @@ function embedIdentified(original: Pattern, type: PatternType | Identified, full
         name = names.get(type.phases[0].toCanonicalApgcode(1, 'x'));
     }
     if (name !== undefined) {
-        title = name[0].toUpperCase() + name.slice(1) + ' (' + title + ')';
+        title = name + ' (' + title + ')';
     }
     if (isOutput) {
         title = 'Output: ' + title;
