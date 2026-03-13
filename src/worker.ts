@@ -371,7 +371,7 @@ async function runSim(argv: string[], rle: string): Promise<[number, string | un
             gct[i++] = b;
         } else {
             gct[i++] = 0xff;
-            gct[i++] = Math.max(0, Math.ceil((value - 1) / (p.states - 2) * 256) - 1);
+            gct[i++] = 0xff - Math.max(0, Math.ceil((value - 1) / (p.states - 2) * 256) - 1);
             gct[i++] = 0;
         }
     }
