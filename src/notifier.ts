@@ -12,7 +12,7 @@ function formatNewShips(category: 'speed' | 'period', type: string, data: [strin
             out.push(`${speed} (${cells} cell${cells === 1 ? '' : 's'})`);
         }
     }
-    return `${data.length} new ${category}${data.length === 1 ? '' : 's'} in ${type}: ${out.join(', ')}`;
+    return `${data.length === 1 ? 'New' : data.length + ' new'} ${category}${data.length === 1 ? '' : 's'} in ${type}: ${out.join(', ')}`;
 }
 
 function formatImprovedShips(category: 'speed' | 'period', type: string, data: [string, number, number][], bold: number): string {
@@ -24,7 +24,7 @@ function formatImprovedShips(category: 'speed' | 'period', type: string, data: [
             out.push(`${speed} (${oldCells} to ${newCells} cell${newCells === 1 ? '' : 's'})`);
         }
     }
-    return `${data.length} improved ${category}${data.length === 1 ? '' : 's'} in ${type}: ${out.join(', ')}`;
+    return `${data.length === 1 ? 'Improved' : data.length + ' improved'} ${category}${data.length === 1 ? '' : 's'} in ${type}: ${out.join(', ')}`;
 }
 
 
