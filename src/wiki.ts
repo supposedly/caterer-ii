@@ -20,8 +20,8 @@ const NAMESPACES: {[key: string]: number} = {
     'help talk': 13,
     'category': 14,
     'category talk': 15,
-    'en.wikipedia.org': 16,
-    'en.wikipedia.org talk': 17,
+    'conwaylife.com': 16,
+    'conwaylife.com talk': 17,
     'oca': 102,
     'oca talk': 103,
     'lv': 3782,
@@ -53,7 +53,7 @@ export async function cmdWiki(msg: Message, argv: string[]): Promise<Response> {
     let title: string;
     let id: number;
     if (Number.isNaN(namespace) || (namespace === -1 && query === 'random')) {
-        let resp = await fetch(`https://en.wikipedia.org/w/api.php?action=query&list=random${namespace === -1 ? '' : `&rnnamespace=${namespace}`}&rnlimit=1&format=json`);
+        let resp = await fetch(`https://conwaylife.com/w/api.php?action=query&list=random${namespace === -1 ? '' : `&rnnamespace=${namespace}`}&rnlimit=1&format=json`);
         if (!resp.ok) {
             throw new BotError(`Server returned ${resp.status} ${resp.statusText}`);
         }
@@ -62,7 +62,7 @@ export async function cmdWiki(msg: Message, argv: string[]): Promise<Response> {
         id = data.id;
         namespace = data.ns;
     } else {
-        let resp = await fetch(`https://en.wikipedia.org/w/api.php?action=query&list=search&srnamespace=${namespace}&srsearch=${encodeURIComponent(query)}&srlimit=1&format=json`);
+        let resp = await fetch(`https://conwaylife.com/w/api.php?action=query&list=search&srnamespace=${namespace}&srsearch=${encodeURIComponent(query)}&srlimit=1&format=json`);
         if (!resp.ok) {
             throw new BotError(`Server returned ${resp.status} ${resp.statusText}`);
         }
@@ -74,7 +74,7 @@ export async function cmdWiki(msg: Message, argv: string[]): Promise<Response> {
         title = data[0].title;
         id = data[0].pageid;
     }
-    let resp = await fetch(`https://en.wikipedia.org/w/api.php?action=query&prop=revisions&rvprop=content&rvslots=main&pageids=${id}&format=json`);
+    let resp = await fetch(`https://conwaylife.com/w/api.php?action=query&prop=revisions&rvprop=content&rvslots=main&pageids=${id}&format=json`);
     if (!resp.ok) {
         throw new BotError(`Server returned ${resp.status} ${resp.statusText}`);
     }
@@ -83,7 +83,7 @@ export async function cmdWiki(msg: Message, argv: string[]): Promise<Response> {
     let prefix = '';
     while (text.toLowerCase().startsWith('#redirect ')) {
         if (i === 0) {
-            prefix = `-# Redirected from [${title}](https://en.wikipedia.org/w/index.php?title=${encodeURIComponent(title)}&redirect=no)\n\n`;
+            prefix = `-# Redirected from [${title}](https://conwaylife.com/w/index.php?title=${encodeURIComponent(title)}&redirect=no)\n\n`;
         }
         let line = text.slice('#redirect '.length);
         let index = line.indexOf('\n');
@@ -95,7 +95,7 @@ export async function cmdWiki(msg: Message, argv: string[]): Promise<Response> {
             break;
         }
         title = match[1].trim();
-        resp = await fetch(`https://en.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(title)}&format=json`);
+        resp = await fetch(`https://conwaylife.com/w/api.php?action=query&titles=${encodeURIComponent(title)}&format=json`);
         if (!resp.ok) {
             throw new BotError(`Server returned ${resp.status} ${resp.statusText}`);
         }
@@ -104,7 +104,7 @@ export async function cmdWiki(msg: Message, argv: string[]): Promise<Response> {
         if (id === '-1') {
             break;
         }
-        resp = await fetch(`https://en.wikipedia.org/w/api.php?action=query&prop=revisions&rvprop=content&rvslots=main&pageids=${id}&format=json`);
+        resp = await fetch(`https://conwaylife.com/w/api.php?action=query&prop=revisions&rvprop=content&rvslots=main&pageids=${id}&format=json`);
         if (!resp.ok) {
             throw new BotError(`Server returned ${resp.status} ${resp.statusText}`);
         }
@@ -114,10 +114,10 @@ export async function cmdWiki(msg: Message, argv: string[]): Promise<Response> {
             break;
         }
     }
-    let url = `https://en.wikipedia.org/wiki/${encodeURIComponent(title).replaceAll('%20', '_')}`;
+    let url = `https://conwaylife.com/wiki/${encodeURIComponent(title).replaceAll('%20', '_')}`;
     let useImage = false;
     if (!text.match(/\{\{[^{]*hideimg[^{]*\}\}/)) {
-        let resp = await fetch(`https://en.wikipedia.org/w/api.php?action=query&titles=File:${title.replaceAll(' ', '')}.gif&prop=imageinfo&iiprop=url&format=json`);
+        let resp = await fetch(`https://conwaylife.com/w/api.php?action=query&titles=File:${title.replaceAll(' ', '')}.gif&prop=imageinfo&iiprop=url&format=json`);
         if (resp.ok) {
             let data = JSON.parse(await resp.text())?.query?.pages;
             if (typeof data === 'object') {
@@ -137,10 +137,10 @@ export async function cmdWiki(msg: Message, argv: string[]): Promise<Response> {
     text = text.replaceAll(/<code>(.*?)<\/code>/g, '`$1`');
     text = text.replaceAll(/<(noinclude|ref)( ["'a-zA-Z0-9_-]*?=["'a-zA-Z0-9_-]*?)*?(?!= ?\/)>.*?<\/\1>/gs, '');
     text = text.replaceAll(/<ref( ["'a-zA-Z0-9_-]*=["'a-zA-Z0-9_-]*?)*?( ?\/)?>/gs, '');
-    text = text.replaceAll(/\{\{period\|(\d+)[^}]+\}\}/g, '[period-$1](https://en.wikipedia.org/wiki/Category:Oscillators_with_period_$1)');
-    text = text.replaceAll(/\{\{year\|(\d+)[^}]*\}\}/g, '[$1](https://en.wikipedia.org/wiki/Category:Patterns_found_in_$1)');
-    text = text.replaceAll(/\{\{slcells\|(\d+)[^}]*\}\}/g, '[$1-cell](https://en.wikipedia.org/wiki/Category:Strict_still_lifes_with_$1_cells)');
-    text = text.replaceAll(/\{\{gliders\|(\d+)\|text=([^|}]+)[^}]*\}\}/g, '[$2](https://en.wikipedia.org/wiki/Category:Patterns_that_can_be_constructed_with_$1_gliders)');
+    text = text.replaceAll(/\{\{period\|(\d+)[^}]+\}\}/g, '[period-$1](https://conwaylife.com/wiki/Category:Oscillators_with_period_$1)');
+    text = text.replaceAll(/\{\{year\|(\d+)[^}]*\}\}/g, '[$1](https://conwaylife.com/wiki/Category:Patterns_found_in_$1)');
+    text = text.replaceAll(/\{\{slcells\|(\d+)[^}]*\}\}/g, '[$1-cell](https://conwaylife.com/wiki/Category:Strict_still_lifes_with_$1_cells)');
+    text = text.replaceAll(/\{\{gliders\|(\d+)\|text=([^|}]+)[^}]*\}\}/g, '[$2](https://conwaylife.com/wiki/Category:Patterns_that_can_be_constructed_with_$1_gliders)');
     text = text.replaceAll(/<\/?references( \/)?>/g, '');
     text = text.replaceAll(/__(NO)?TOC__/g, '');
     text = text.replaceAll(/^\*\*\*/gm, '    - ');
@@ -165,8 +165,8 @@ export async function cmdWiki(msg: Message, argv: string[]): Promise<Response> {
     text = text.replaceAll(/^=\s*(.*?)\s*=$/gm, '# $1');
     text = text.replaceAll(/\[\[(File|Image):[^\]]+\]\]/gi, '');
     text = text.replaceAll(/\[(https?:\/\/[^\s]+)\s+([^\]]+)\]((e?s)?)/g, '[$2$3]($1)');
-    text = text.replaceAll(/\[\[([^\|\]]+)\|([^\]]+)\]\]((e?s)?)/g, (_, url, name, s) => `[${name}${s}](https://en.wikipedia.org/wiki/${encodeURIComponent(url)})`);
-    text = text.replaceAll(/\[\[([^\]]+)\]\]((e?s)?)/g, (_, page, s) => `[${page}${s}](https://en.wikipedia.org/wiki/${encodeURIComponent(page)})`);
+    text = text.replaceAll(/\[\[([^\|\]]+)\|([^\]]+)\]\]((e?s)?)/g, (_, url, name, s) => `[${name}${s}](https://conwaylife.com/wiki/${encodeURIComponent(url)})`);
+    text = text.replaceAll(/\[\[([^\]]+)\]\]((e?s)?)/g, (_, page, s) => `[${page}${s}](https://conwaylife.com/wiki/${encodeURIComponent(page)})`);
     text = text.replaceAll(/ ?\{\{[^}]+\}\}/g, '');
     text = text.replaceAll(/\n{3,}/g, '\n\n');
     text = text.replaceAll(/(?<=\n)\n+(?=#+ )/g, '');
