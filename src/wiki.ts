@@ -63,7 +63,7 @@ export async function cmdWiki(msg: Message, argv: string[]): Promise<Response> {
         id = data.id;
         namespace = data.ns;
     } else {
-        let resp = await fetch(`https://conwaylife.com/w/api.php?action=query&titles=${encodeURIComponent(originalQuery)}&redirects=1&format=json`);
+        let resp = await fetch(`https://conwaylife.com/w/api.php?action=query&titles=${encodeURIComponent(originalQuery)}&format=json`);
         if (!resp.ok) {
             throw new BotError(`Server returned ${resp.status} ${resp.statusText}`);
         }
@@ -85,7 +85,7 @@ export async function cmdWiki(msg: Message, argv: string[]): Promise<Response> {
             id = data[0].pageid;
         }
     }
-    let resp = await fetch(`https://conwaylife.com/w/api.php?action=query&prop=revisions&rvprop=content&rvslots=main&pageids=${id}&redirects=1&format=json`);
+    let resp = await fetch(`https://conwaylife.com/w/api.php?action=query&prop=revisions&rvprop=content&rvslots=main&pageids=${id}&format=json`);
     if (!resp.ok) {
         throw new BotError(`Server returned ${resp.status} ${resp.statusText}`);
     }
@@ -106,7 +106,7 @@ export async function cmdWiki(msg: Message, argv: string[]): Promise<Response> {
             break;
         }
         title = match[1].trim();
-        resp = await fetch(`https://conwaylife.com/w/api.php?action=query&titles=${encodeURIComponent(title)}&redirects=1&format=json`);
+        resp = await fetch(`https://conwaylife.com/w/api.php?action=query&titles=${encodeURIComponent(title)}&format=json`);
         if (!resp.ok) {
             throw new BotError(`Server returned ${resp.status} ${resp.statusText}`);
         }
@@ -115,7 +115,7 @@ export async function cmdWiki(msg: Message, argv: string[]): Promise<Response> {
         if (id === '-1') {
             break;
         }
-        resp = await fetch(`https://conwaylife.com/w/api.php?action=query&prop=revisions&rvprop=content&rvslots=main&pageids=${id}&redirects=1&format=json`);
+        resp = await fetch(`https://conwaylife.com/w/api.php?action=query&prop=revisions&rvprop=content&rvslots=main&pageids=${id}&format=json`);
         if (!resp.ok) {
             throw new BotError(`Server returned ${resp.status} ${resp.statusText}`);
         }
