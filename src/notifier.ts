@@ -3,7 +3,41 @@ import {TextChannel} from 'discord.js';
 import {TYPE_NAMES} from './db.js';
 
 
-function formatNewShips(category: 'speed' | 'period', type: string, data: [string, number][], bold: number): string {
+const LIMIT = 1997;
+
+function splitMessages(...data: (string | string[])[]): string[] {
+    let out: string[] = [];
+    let current = '';
+    for (let value of data) {
+        let prev = current;
+        if (typeof value === 'string') {
+            current += value;
+            if (current.length > LIMIT) {
+                out.push(prev);
+                current = value;
+            }
+        } else {
+            for (let i = 0; i < value.length; i++) {
+                let prev = current;
+                let part = value[i];
+                if (i !== value.length - 1) {
+                    part += ', ';
+                }
+                current += part;
+                if (current.length > LIMIT) {
+                    out.push(prev);
+                    current = part;
+                }
+            }
+        }
+    }
+    if (current.length > 0) {
+        out.push(current);
+    }
+    return out;
+}
+
+function formatNewShips(category: 'speed' | 'period', type: string, data: [string, number][], bold: number): string[] {
     let out: string[] = [];
     for (let [speed, cells] of data) {
         if (cells === bold) {
@@ -12,10 +46,10 @@ function formatNewShips(category: 'speed' | 'period', type: string, data: [strin
             out.push(`${speed} (${cells} cell${cells === 1 ? '' : 's'})`);
         }
     }
-    return `${data.length === 1 ? 'New' : data.length + ' new'} ${category}${data.length === 1 ? '' : 's'} in ${type}: ${out.join(', ')}`;
+    return splitMessages(`${data.length === 1 ? 'New' : data.length + ' new'} ${category}${data.length === 1 ? '' : 's'} in ${type}: `, out);
 }
 
-function formatImprovedShips(category: 'speed' | 'period', type: string, data: [string, number, number][], bold: number): string {
+function formatImprovedShips(category: 'speed' | 'period', type: string, data: [string, number, number][], bold: number): string[] {
     let out: string[] = [];
     for (let [speed, newCells, oldCells] of data) {
         if (newCells === bold) {
@@ -24,7 +58,7 @@ function formatImprovedShips(category: 'speed' | 'period', type: string, data: [
             out.push(`${speed} (${oldCells} to ${newCells} cell${newCells === 1 ? '' : 's'})`);
         }
     }
-    return `${data.length === 1 ? 'Improved' : data.length + ' improved'} ${category}${data.length === 1 ? '' : 's'} in ${type}: ${out.join(', ')}`;
+    return splitMessages(`${data.length === 1 ? 'Improved' : data.length + ' improved'} ${category}${data.length === 1 ? '' : 's'} in ${type}: `, out);
 }
 
 
@@ -54,48 +88,26 @@ export async function check5S(channel: TextChannel): Promise<void> {
             data[key].push(ship.slice(1));
         }
     }
-    let lines: string[] = [];
+    let msgs: string[] = [];
     for (let key of Object.keys(groups).sort()) {
         let data = groups[key];
         if (key in TYPE_NAMES) {
             key = TYPE_NAMES[key];
         }
         if (data.newShips.length > 0) {
-            lines.push(formatNewShips('speed', key, data.newShips, 3));
+            msgs.push(...formatNewShips('speed', key, data.newShips, 3));
         }
         if (data.newPeriods.length > 0) {
-            lines.push(formatNewShips('period', key, data.newPeriods, key.includes('B0') ? 1 : 2));
+            msgs.push(...formatNewShips('period', key, data.newPeriods, key.includes('B0') ? 1 : 2));
         }
         if (data.improvedShips.length > 0) {
-            lines.push(formatImprovedShips('speed', key, data.improvedShips, 3));
+            msgs.push(...formatImprovedShips('speed', key, data.improvedShips, 3));
         }
         if (data.improvedPeriods.length > 0) {
-            lines.push(formatImprovedShips('period', key, data.improvedPeriods, key.includes('B0') ? 1 : 2));
+            msgs.push(...formatImprovedShips('period', key, data.improvedPeriods, key.includes('B0') ? 1 : 2));
         }
     }
-    let current = '';
-    for (let line of lines) {
-        let prev = current;
-        current += line + '\n';
-        if (current.length > 2000) {
-            if (prev !== '') {
-                await channel.send(prev);
-            }
-            current = '';
-            while (line.length > 2000) {
-                let index = line.slice(0, 1999).lastIndexOf(',');
-                await channel.send(line.slice(0, index));
-                line = line.slice(index);
-            }
-            await channel.send(line);
-        }
-    }
-    if (current !== '') {
-        while (current.length > 2000) {
-            let index = current.slice(0, 1999).lastIndexOf(',');
-            await channel.send(current.slice(0, index));
-            current = current.slice(index);
-        }
-        await channel.send(current);
+    for (let msg of msgs) {
+        await channel.send(msg);
     }
 }
