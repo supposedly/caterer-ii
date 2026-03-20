@@ -70,7 +70,13 @@ export function findRLEFromText(data: string): Pattern | undefined {
     if (index === -1) {
         return;
     }
-    return parse(data.slice(0, index + 1), aliases);
+    try {
+        return parse(data.slice(0, index + 1), aliases);
+    } catch (error) {
+        if (error instanceof Error && error.message === 'Pattern too big for torus!') {
+            throw new BotError('Pattern too big for torus!');
+        }
+    }
 }
 
 export async function findRLEFromMessage(msg: Message): Promise<{msg: Message, p: Pattern} | undefined> {
