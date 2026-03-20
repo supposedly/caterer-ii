@@ -67,25 +67,13 @@ export async function cmdWiki(msg: Message, argv: string[]): Promise<Response> {
         if (!resp.ok) {
             throw new BotError(`Server returned ${resp.status} ${resp.statusText}`);
         }
-        let data = JSON.parse(await resp.text()).query;
-        if (data) {
-            data = data.pages;
+        let data = JSON.parse(await resp.text())?.query?.pages;
+        if (data && typeof data === 'object') {
             data = data[Object.keys(data)[0]];
-            if (data) {
-                title = data.title;
-                id = data.pageid;
-            } else {
-                let resp = await fetch(`https://conwaylife.com/w/api.php?action=query&list=search&srnamespace=${namespace}&srsearch=${encodeURIComponent(query)}&srlimit=1&format=json`);
-                if (!resp.ok) {
-                    throw new BotError(`Server returned ${resp.status} ${resp.statusText}`);
-                }
-                let data = JSON.parse(await resp.text()).query.search;
-                if (data.length === 0) {
-                    throw new BotError('No such page exists!');
-                }
-                title = data[0].title;
-                id = data[0].pageid;
-            }
+        }
+        if (data && typeof data === 'object') {
+            title = data.title;
+            id = data.pageid;
         } else {
             let resp = await fetch(`https://conwaylife.com/w/api.php?action=query&list=search&srnamespace=${namespace}&srsearch=${encodeURIComponent(query)}&srlimit=1&format=json`);
             if (!resp.ok) {
@@ -96,14 +84,14 @@ export async function cmdWiki(msg: Message, argv: string[]): Promise<Response> {
                 throw new BotError('No such page exists!');
             }
             title = data[0].title;
-            id = data[0].pageid;   
+            id = data[0].pageid;
         }
     }
     let resp = await fetch(`https://conwaylife.com/w/api.php?action=query&prop=revisions&rvprop=content&rvslots=main&pageids=${id}&format=json`);
     if (!resp.ok) {
         throw new BotError(`Server returned ${resp.status} ${resp.statusText}`);
     }
-    let text: string = JSON.parse(await resp.text()).query.pages[id].revisions[0].slots.main['*'].trim();
+    let text: string = JSON.parse(await resp.text())?.query?.pages?.[id]?.revisions?.[0]?.slots?.main?.['*']?.trim();
     let i = 0;
     let prefix = '';
     while (text.toLowerCase().startsWith('#redirect ')) {
@@ -145,7 +133,7 @@ export async function cmdWiki(msg: Message, argv: string[]): Promise<Response> {
         let resp = await fetch(`https://conwaylife.com/w/api.php?action=query&titles=File:${title.replaceAll(' ', '')}.gif&prop=imageinfo&iiprop=url&format=json`);
         if (resp.ok) {
             let data = JSON.parse(await resp.text())?.query?.pages;
-            if (typeof data === 'object') {
+            if (data && typeof data === 'object') {
                 data = data[Object.keys(data)[0]]?.imageinfo?.url;
                 if (typeof data === 'string') {
                     let resp = await fetch(data);
