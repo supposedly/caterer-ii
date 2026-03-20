@@ -91,7 +91,7 @@ export async function cmdWiki(msg: Message, argv: string[]): Promise<Response> {
     if (!resp.ok) {
         throw new BotError(`Server returned ${resp.status} ${resp.statusText}`);
     }
-    throw new Error(JSON.parse(await resp.text()));
+    throw new Error(await resp.text());
     let text: string = JSON.parse(await resp.text()).query.pages[id].revisions[0].slots.main['*'].trim();
     let i = 0;
     let prefix = '';
