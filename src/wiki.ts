@@ -170,6 +170,8 @@ export async function cmdWiki(msg: Message, argv: string[]): Promise<Response> {
     text = text.replaceAll(/ ?\{\{[^}]+\}\}/g, '');
     text = text.replaceAll(/\n{3,}/g, '\n\n');
     text = text.replaceAll(/(?<=\n)\n+(?=#+ )/g, '');
+    text = text.replaceAll('&lt;', '<');
+    text = text.replaceAll('&gt;', '>');
     text = text.trim();
     text = prefix + text;
     if (text.length > 1000) {
