@@ -68,6 +68,7 @@ export async function cmdWiki(msg: Message, argv: string[]): Promise<Response> {
             throw new BotError(`Server returned ${resp.status} ${resp.statusText}`);
         }
         let data = JSON.parse(await resp.text())?.query?.pages;
+        throw new Error(JSON.stringify(data));
         if (data && typeof data === 'object') {
             data = data[Object.keys(data)[0]];
         }
@@ -91,7 +92,6 @@ export async function cmdWiki(msg: Message, argv: string[]): Promise<Response> {
     if (!resp.ok) {
         throw new BotError(`Server returned ${resp.status} ${resp.statusText}`);
     }
-    throw new Error(await resp.text());
     let text: string = JSON.parse(await resp.text()).query.pages[id].revisions[0].slots.main['*'].trim();
     let i = 0;
     let prefix = '';
@@ -108,7 +108,7 @@ export async function cmdWiki(msg: Message, argv: string[]): Promise<Response> {
         if (!match) {
             break;
         }
-        // title = match[1].trim();
+        title = match[1].trim();
         resp = await fetch(`https://conwaylife.com/w/api.php?action=query&titles=${encodeURIComponent(title)}&format=json`);
         if (!resp.ok) {
             throw new BotError(`Server returned ${resp.status} ${resp.statusText}`);
