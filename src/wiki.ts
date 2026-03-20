@@ -37,8 +37,9 @@ const NAMESPACES: {[key: string]: number} = {
 
 
 export async function cmdWiki(msg: Message, argv: string[]): Promise<Response> {
-    let query = argv.slice(1).join(' ').toLowerCase();
+    let query = argv.slice(1).join(' ');
     let originalQuery = query;
+    query = query.toLowerCase();
     if (query.length === 0) {
         throw new BotError('No page provided!');
     }
@@ -68,7 +69,6 @@ export async function cmdWiki(msg: Message, argv: string[]): Promise<Response> {
             throw new BotError(`Server returned ${resp.status} ${resp.statusText}`);
         }
         let data = JSON.parse(await resp.text())?.query?.pages;
-        throw new Error(JSON.stringify(data));
         if (data && typeof data === 'object') {
             data = data[Object.keys(data)[0]];
         }
