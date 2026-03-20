@@ -367,7 +367,12 @@ async function updateStarboard(data: MessageReaction | PartialMessageReaction): 
         users.push(...(await getStarReactions(await starboardChannel.messages.fetch(entry[0]))));
         users.push(...(await getStarReactions(await starboardChannel.messages.fetch(entry[1]))));
     }
-    let count = Array.from(new Set(users)).filter(x => x !== senderId).length;
+    let users2 = Array.from(new Set(users)).filter(x => x !== senderId);
+    if (msg.author?.id === data.client.user.id && msg.attachments.size === 1) {
+        let msg2 = await msg.fetchReference();
+        users2 = users2.filter(x => x !== msg2.author.id);
+    }
+    let count = users2.length;
     if (count >= config.starThreshold) {
         let text: string;
         if (count < Math.floor(config.starThreshold * 2)) {
