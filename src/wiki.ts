@@ -38,6 +38,7 @@ const NAMESPACES: {[key: string]: number} = {
 
 export async function cmdWiki(msg: Message, argv: string[]): Promise<Response> {
     let query = argv.slice(1).join(' ').toLowerCase();
+    let originalQuery = query;
     if (query.length === 0) {
         throw new BotError('No page provided!');
     }
@@ -62,19 +63,29 @@ export async function cmdWiki(msg: Message, argv: string[]): Promise<Response> {
         id = data.id;
         namespace = data.ns;
     } else {
-        let resp = await fetch(`https://conwaylife.com/w/api.php?action=query&list=search&srnamespace=${namespace}&srsearch=${encodeURIComponent(query)}&srlimit=1&format=json`);
+        let resp = await fetch(`https://conwaylife.com/w/api.php?action=query&titles=${encodeURIComponent(originalQuery)}&redirects=1&format=json`);
         if (!resp.ok) {
             throw new BotError(`Server returned ${resp.status} ${resp.statusText}`);
         }
-        let data = JSON.parse(await resp.text()).query.search;
-        if (data.length === 0) {
-            throw new BotError('No such page exists!');
+        let data = JSON.parse(await resp.text()).query.pages;
+        data = data[Object.keys(data)[0]];
+        if (data) {
+            title = data.title;
+            id = data.pageid;
+        } else {
+            let resp = await fetch(`https://conwaylife.com/w/api.php?action=query&list=search&srnamespace=${namespace}&srsearch=${encodeURIComponent(query)}&srlimit=1&format=json`);
+            if (!resp.ok) {
+                throw new BotError(`Server returned ${resp.status} ${resp.statusText}`);
+            }
+            let data = JSON.parse(await resp.text()).query.search;
+            if (data.length === 0) {
+                throw new BotError('No such page exists!');
+            }
+            title = data[0].title;
+            id = data[0].pageid;
         }
-        console.log(data);
-        title = data[0].title;
-        id = data[0].pageid;
     }
-    let resp = await fetch(`https://conwaylife.com/w/api.php?action=query&prop=revisions&rvprop=content&rvslots=main&pageids=${id}&format=json`);
+    let resp = await fetch(`https://conwaylife.com/w/api.php?action=query&prop=revisions&rvprop=content&rvslots=main&pageids=${id}&redirects=1&format=json`);
     if (!resp.ok) {
         throw new BotError(`Server returned ${resp.status} ${resp.statusText}`);
     }
@@ -95,7 +106,7 @@ export async function cmdWiki(msg: Message, argv: string[]): Promise<Response> {
             break;
         }
         title = match[1].trim();
-        resp = await fetch(`https://conwaylife.com/w/api.php?action=query&titles=${encodeURIComponent(title)}&format=json`);
+        resp = await fetch(`https://conwaylife.com/w/api.php?action=query&titles=${encodeURIComponent(title)}&redirects=1&format=json`);
         if (!resp.ok) {
             throw new BotError(`Server returned ${resp.status} ${resp.statusText}`);
         }
@@ -104,7 +115,7 @@ export async function cmdWiki(msg: Message, argv: string[]): Promise<Response> {
         if (id === '-1') {
             break;
         }
-        resp = await fetch(`https://conwaylife.com/w/api.php?action=query&prop=revisions&rvprop=content&rvslots=main&pageids=${id}&format=json`);
+        resp = await fetch(`https://conwaylife.com/w/api.php?action=query&prop=revisions&rvprop=content&rvslots=main&pageids=${id}&redirects=1&format=json`);
         if (!resp.ok) {
             throw new BotError(`Server returned ${resp.status} ${resp.statusText}`);
         }
