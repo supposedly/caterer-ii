@@ -256,6 +256,8 @@ async function parseSim(argv: string[], rle: string): Promise<{frames: [Pattern,
                 q.generation = p.generation;
                 p = q;
                 part = part.slice(2);
+            } else if (part[0] === 'removefirst') {
+                frames.shift();
             } else {
                 throw new BotError(`Invalid part: ${part.join(' ')}`);
             }
