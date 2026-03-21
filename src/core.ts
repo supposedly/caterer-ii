@@ -208,7 +208,7 @@ export async function cmdSim(msg: Message, argv: string[]): Promise<Response> {
 }
 
 
-function embedIdentified(original: Pattern, type: PatternType | Identified, full: boolean = false, isOutput?: boolean): EmbedBuilder[] {
+function embedIdentified(original: Pattern, type: PatternType | Identified, isOutput?: boolean): EmbedBuilder[] {
     let out = '';
     if (type.period > 0) {
         out += `**Period:** ${type.period}\n`;
@@ -239,7 +239,7 @@ function embedIdentified(original: Pattern, type: PatternType | Identified, full
     if ('symmetry' in type) {
         out += `**Symmetry:** ${type.symmetry} (${ALTERNATE_SYMMETRIES[type.symmetry].replaceAll('\\', '\\\\')})\n`;
     }
-    if (type.period > 1 && full) {
+    if (type.period > 1) {
         if ('heat' in type && type.heat !== undefined) {
             out += `**Heat:** ${Math.round(type.heat * 1000) / 1000}\n`;
         }
@@ -283,7 +283,7 @@ function embedIdentified(original: Pattern, type: PatternType | Identified, full
     }
     let embeds = [(new EmbedBuilder()).setTitle(title).setDescription(out)];
     if ('output' in type && type.output) {
-        embeds.push(...embedIdentified(Object.assign(original.clearedCopy(), type.output.phases[0]), type.output, full, true));
+        embeds.push(...embedIdentified(Object.assign(original.clearedCopy(), type.output.phases[0]), type.output, true));
     }
     return embeds;
 }
